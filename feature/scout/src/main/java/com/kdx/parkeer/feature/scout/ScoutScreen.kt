@@ -142,7 +142,7 @@ fun ScoutScreen(
                             Text(
                                 stringResource(R.string.scout_reading_hint),
                                 style = DX.Font.caption,
-                                color = DX.Color.text.secondary
+                                color = DX.Color.text.secondary,
                             )
                         }
                     }

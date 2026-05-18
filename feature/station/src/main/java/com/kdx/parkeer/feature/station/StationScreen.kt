@@ -286,7 +286,7 @@ private fun ProcessingState() {
         Text(
             stringResource(R.string.station_processing_hint),
             style = DX.Font.caption,
-            color = DX.Color.text.secondary
+            color = DX.Color.text.secondary,
         )
     }
 }

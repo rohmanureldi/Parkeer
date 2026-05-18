@@ -134,7 +134,8 @@ fun GateScreen(
                         onSimHoursChange = {
                             simHoursAgo =
                                 it
-                        })
+                        },
+                    )
                     is GateUiState.Processing -> GateProcessingState()
                     is GateUiState.Success -> GateSuccessState(state.memberName, state.checkInTime, simEnabled, onDone = { viewModel.reset() })
                     is GateUiState.Error -> GateErrorState(state.error, onDismiss = { viewModel.reset() })
@@ -206,7 +207,7 @@ private fun GateReadyState(
                             stringResource(
                                 R.string.gate_sim_will_record,
                                 timeFmt.format(
-                                    Instant.ofEpochMilli(simTime).atZone(ZoneId.systemDefault())
+                                    Instant.ofEpochMilli(simTime).atZone(ZoneId.systemDefault()),
                                 ),
                             ),
                             style = DX.Font.caption,
@@ -229,7 +230,7 @@ private fun GateProcessingState() {
         Text(
             stringResource(R.string.gate_processing_hint),
             style = DX.Font.caption,
-            color = DX.Color.text.secondary
+            color = DX.Color.text.secondary,
         )
     }
 }

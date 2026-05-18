@@ -127,7 +127,7 @@ fun TerminalScreen(
                             Text(
                                 stringResource(R.string.terminal_calculating_hint),
                                 style = DX.Font.caption,
-                                color = DX.Color.text.secondary
+                                color = DX.Color.text.secondary,
                             )
                         }
                     }
@@ -243,7 +243,7 @@ fun TerminalScreen(
                                     R.string.terminal_dismiss,
                                 ),
                                 variant = ButtonVariant.Secondary.Large,
-                                modifier = Modifier.fillMaxWidth()
+                                modifier = Modifier.fillMaxWidth(),
                             )
                         }
                     }
