@@ -5,7 +5,9 @@ import com.kdx.parkeer.core.model.Activity
 import com.kdx.parkeer.core.model.CardData
 import com.kdx.parkeer.core.model.TransactionLog
 import com.kdx.parkeer.core.model.VisitState
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 
@@ -24,8 +26,8 @@ class CardProtocolTest {
             visitState = VisitState.CheckedIn(1700000000000L),
             logs = listOf(
                 TransactionLog(10000, 1700000000000L, Activity.PARKING),
-                TransactionLog(50000, 1699999000000L, Activity.TOP_UP),
-            ),
+                TransactionLog(50000, 1699999000000L, Activity.TOP_UP)
+            )
         )
 
         val raw = CardProtocol.serialize(data, cipher, cardUid, previousWriteCounter = 0)
@@ -41,10 +43,10 @@ class CardProtocolTest {
     }
 
     @Test
-    fun `serialize produces correct total size`() {
+    fun `serialize produces correct slot size`() {
         val data = CardData(memberId = 1, memberName = "Bob", balance = 0)
         val raw = CardProtocol.serialize(data, cipher, cardUid)
-        assertEquals(CardProtocol.TOTAL_SIZE, raw.size)
+        assertEquals(CardProtocol.SLOT_SIZE, raw.size)
     }
 
     @Test
@@ -53,7 +55,7 @@ class CardProtocolTest {
         val raw = CardProtocol.serialize(data, cipher, cardUid)
 
         // Tamper with a byte in the state area (covered by HMAC)
-        raw[44] = 0x01 // flip visit state
+        raw[44] = 0x01
 
         assertThrows<IllegalArgumentException> {
             CardProtocol.deserialize(raw, cipher, cardUid)

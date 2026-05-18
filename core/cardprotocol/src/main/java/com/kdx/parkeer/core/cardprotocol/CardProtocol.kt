@@ -9,9 +9,9 @@ import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
 /**
- * Binary wire format for NFC card memory.
+ * Binary wire format for NFC card memory (per-slot).
  *
- * Layout (145 bytes total):
+ * Layout (144 bytes per slot):
  * [0..1]   Magic 0x4D42
  * [2]      Version 0x01
  * [3]      Flags (bit0=registered, bit1=active)
@@ -22,13 +22,17 @@ import java.nio.ByteOrder
  * [48..55] Check-in timestamp (Long)
  * [56..135] Transaction logs (5 × 16B)
  * [136..143] HMAC (8 bytes)
- * [144]    Commit byte
+ *
+ * NTAG215 card layout (504 bytes user memory, pages 4–129):
+ * Page 4 (bytes 0–3):     Slot pointer [0x00=A, 0x01=B, xx, xx]
+ * Pages 5–40 (144 bytes): Slot A
+ * Pages 41–76 (144 bytes): Slot B
  */
 object CardProtocol {
 
     const val MAGIC = 0x4D42.toShort()
     const val VERSION: Byte = 0x01
-    const val TOTAL_SIZE = 145
+    const val SLOT_SIZE = 144
     private const val COUNTER_OFFSET = 4
     private const val ENCRYPTED_OFFSET = 8
     private const val ENCRYPTED_SIZE = 36
@@ -42,7 +46,7 @@ object CardProtocol {
 
     fun serialize(data: CardData, cipher: CardCipher, cardUid: ByteArray, previousWriteCounter: Int = 0): ByteArray {
         val writeCounter = previousWriteCounter + 1
-        val buf = ByteBuffer.allocate(TOTAL_SIZE).order(ByteOrder.BIG_ENDIAN)
+        val buf = ByteBuffer.allocate(SLOT_SIZE).order(ByteOrder.BIG_ENDIAN)
 
         // Header
         buf.putShort(MAGIC)
@@ -63,7 +67,7 @@ object CardProtocol {
             putInt(data.balance)
         }.array()
         val encrypted = cipher.encrypt(cardUid, writeCounter, plaintext)
-        buf.put(encrypted.copyOf(ENCRYPTED_SIZE)) // 36 bytes (20 ciphertext + 16 tag)
+        buf.put(encrypted.copyOf(ENCRYPTED_SIZE))
 
         // Visit state
         val stateFlag: Byte = if (data.visitState is VisitState.CheckedIn) 0x01 else 0x00
@@ -90,23 +94,20 @@ object CardProtocol {
             }
         }
 
-        // Compute HMAC over non-encrypted fields (header + state + timestamp + logs)
+        // Compute HMAC over non-encrypted fields (header + counter + state + timestamp + logs)
         val hmacInput = ByteArray(4 + 4 + 1 + 3 + 8 + (LOG_COUNT * LOG_ENTRY_SIZE))
         val arr = buf.array()
         System.arraycopy(arr, 0, hmacInput, 0, 4) // header
-        System.arraycopy(arr, 4, hmacInput, 4, 4) // reserved
+        System.arraycopy(arr, 4, hmacInput, 4, 4) // write counter
         System.arraycopy(arr, STATE_OFFSET, hmacInput, 8, 1 + 3 + 8 + (LOG_COUNT * LOG_ENTRY_SIZE))
         val hmac = cipher.computeHmac(cardUid, hmacInput)
         buf.put(hmac.copyOf(HMAC_SIZE))
-
-        // Commit byte
-        buf.put(0x00)
 
         return buf.array()
     }
 
     fun deserialize(raw: ByteArray, cipher: CardCipher, cardUid: ByteArray): CardData {
-        require(raw.size >= TOTAL_SIZE) { "Invalid card data size: ${raw.size}" }
+        require(raw.size >= SLOT_SIZE) { "Invalid card data size: ${raw.size}" }
         val buf = ByteBuffer.wrap(raw).order(ByteOrder.BIG_ENDIAN)
 
         // Verify magic
@@ -126,18 +127,18 @@ object CardProtocol {
 
         // Decrypt identity + balance
         val encryptedBlock = ByteArray(ENCRYPTED_SIZE)
-        buf[encryptedBlock]
+        buf.get(encryptedBlock)
         val plaintext = cipher.decrypt(cardUid, writeCounter, encryptedBlock)
         val ptBuf = ByteBuffer.wrap(plaintext).order(ByteOrder.BIG_ENDIAN)
         val memberId = ptBuf.int
         val nameBytes = ByteArray(12)
-        ptBuf[nameBytes]
+        ptBuf.get(nameBytes)
         val memberName = String(nameBytes, Charsets.UTF_8).trimEnd('\u0000')
         val balance = ptBuf.int
 
         // Visit state
         val stateFlag = buf.get()
-        buf[ByteArray(3)] // padding
+        buf.get(ByteArray(3)) // padding
         val timestamp = buf.long
         val visitState = if (stateFlag == 0x01.toByte()) {
             VisitState.CheckedIn(timestamp)
@@ -151,7 +152,7 @@ object CardProtocol {
             val amount = buf.int
             val logTimestamp = buf.long
             val activityCode = buf.get()
-            buf[ByteArray(3)] // padding
+            buf.get(ByteArray(3)) // padding
             if (amount != 0 || logTimestamp != 0L) {
                 val activity = Activity.entries.find { it.code == activityCode } ?: Activity.PARKING
                 logs.add(TransactionLog(amount, logTimestamp, activity))
@@ -160,7 +161,7 @@ object CardProtocol {
 
         // Verify HMAC
         val storedHmac = ByteArray(HMAC_SIZE)
-        buf[storedHmac]
+        buf.get(storedHmac)
         val hmacInput = ByteArray(4 + 4 + 1 + 3 + 8 + (LOG_COUNT * LOG_ENTRY_SIZE))
         System.arraycopy(raw, 0, hmacInput, 0, 4)
         System.arraycopy(raw, 4, hmacInput, 4, 4)

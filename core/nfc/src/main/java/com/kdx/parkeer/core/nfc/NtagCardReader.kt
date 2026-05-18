@@ -11,7 +11,31 @@ import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import javax.inject.Inject
 
-class NtagCardReader @Inject constructor(private val cipher: CardCipher) : CardReader {
+/**
+ * Double-buffer NFC reader/writer for NTAG215 (504 bytes user memory).
+ *
+ * Card layout:
+ *   Page 4 (4 bytes):       Slot pointer [activeSlot, 0, 0, 0]
+ *   Pages 5–40 (144 bytes): Slot A
+ *   Pages 41–76 (144 bytes): Slot B
+ *
+ * Write strategy:
+ *   1. Read active slot pointer
+ *   2. Write new data to INACTIVE slot
+ *   3. Flip pointer to the newly written slot (single atomic page write)
+ *
+ * If interrupted before step 3, the active slot is untouched.
+ */
+class NtagCardReader @Inject constructor(
+    private val cipher: CardCipher
+) : CardReader {
+
+    companion object {
+        private const val POINTER_PAGE = 4       // page 4 = first user memory page
+        private const val SLOT_A_START_PAGE = 5  // pages 5–40
+        private const val SLOT_B_START_PAGE = 41 // pages 41–76
+        private const val SLOT_PAGES = 36        // 144 bytes / 4 bytes per page
+    }
 
     override suspend fun read(tag: Tag): Result<CardData> = withContext(Dispatchers.IO) {
         runCatching {
@@ -19,11 +43,9 @@ class NtagCardReader @Inject constructor(private val cipher: CardCipher) : CardR
                 ?: error("Not a MifareUltralight tag")
             ultralight.connect()
             try {
-                val raw = readAllPages(ultralight)
-                // Verify commit byte before trusting data
-                require(raw[CardProtocol.TOTAL_SIZE - 1] == 0x01.toByte()) {
-                    "Card has uncommitted write — data may be corrupt"
-                }
+                val activeSlot = readActiveSlot(ultralight)
+                val startPage = if (activeSlot == 0) SLOT_A_START_PAGE else SLOT_B_START_PAGE
+                val raw = readSlot(ultralight, startPage)
                 CardProtocol.deserialize(raw, cipher, tag.id)
             } finally {
                 ultralight.close()
@@ -37,42 +59,46 @@ class NtagCardReader @Inject constructor(private val cipher: CardCipher) : CardR
                 ?: error("Not a MifareUltralight tag")
             ultralight.connect()
             try {
-                // Read current write counter from card (bytes 4..7)
-                val header = ultralight.readPages(4) // pages 4-7 = bytes 0-15 of user memory
-                val previousCounter = ByteBuffer.wrap(header, 4, 4).order(ByteOrder.BIG_ENDIAN).int
+                val activeSlot = readActiveSlot(ultralight)
+                val inactiveSlot = 1 - activeSlot
+                val writeStartPage = if (inactiveSlot == 0) SLOT_A_START_PAGE else SLOT_B_START_PAGE
 
+                // Read write counter from active slot
+                val activeStartPage = if (activeSlot == 0) SLOT_A_START_PAGE else SLOT_B_START_PAGE
+                val activeHeader = ultralight.readPages(activeStartPage) // 16 bytes (4 pages)
+                val previousCounter =
+                    ByteBuffer.wrap(activeHeader, 4, 4).order(ByteOrder.BIG_ENDIAN).int
+
+                // Serialize new data
                 val raw = CardProtocol.serialize(data, cipher, tag.id, previousCounter)
 
-                // Step 1: Write data with commit byte = 0x00 (already 0x00 from serialize)
-                writeAllPages(ultralight, raw)
+                // Step 1: Write to INACTIVE slot
+                writeSlot(ultralight, writeStartPage, raw)
 
-                // Step 2: Read back and verify integrity (excluding commit byte)
-                val readBack = readAllPages(ultralight)
-                val dataMatch = raw.copyOfRange(0, CardProtocol.TOTAL_SIZE - 1)
-                    .contentEquals(readBack.copyOfRange(0, CardProtocol.TOTAL_SIZE - 1))
-                require(dataMatch) { "Read-back verification failed — card data mismatch" }
+                // Step 2: Verify the write
+                val readBack = readSlot(ultralight, writeStartPage)
+                require(raw.contentEquals(readBack)) { "Write verification failed" }
 
-                // Step 3: Write commit byte = 0x01 to finalize
-                val commitPage = (CardProtocol.TOTAL_SIZE - 1) / 4 + 4 // page offset in user memory
-                val commitPageOffset = (CardProtocol.TOTAL_SIZE - 1) % 4
-                val commitPageData = readBack.copyOfRange(
-                    (commitPage - 4) * 4,
-                    (commitPage - 4) * 4 + 4,
-                ).also { it[commitPageOffset] = 0x01 }
-                ultralight.writePage(commitPage, commitPageData)
+                // Step 3: Flip pointer (atomic — single 4-byte page write)
+                ultralight.writePage(POINTER_PAGE, byteArrayOf(inactiveSlot.toByte(), 0, 0, 0))
             } finally {
                 ultralight.close()
             }
         }
     }
 
-    private fun readAllPages(ultralight: MifareUltralight): ByteArray {
-        val result = ByteArray(CardProtocol.TOTAL_SIZE)
+    private fun readActiveSlot(ultralight: MifareUltralight): Int {
+        val pointerData = ultralight.readPages(POINTER_PAGE) // returns 16 bytes
+        return pointerData[0].toInt() and 0x01 // 0 = slot A, 1 = slot B
+    }
+
+    private fun readSlot(ultralight: MifareUltralight, startPage: Int): ByteArray {
+        val result = ByteArray(CardProtocol.SLOT_SIZE)
         var offset = 0
-        var page = 4
-        while (offset < CardProtocol.TOTAL_SIZE) {
-            val data = ultralight.readPages(page)
-            val toCopy = minOf(16, CardProtocol.TOTAL_SIZE - offset)
+        var page = startPage
+        while (offset < CardProtocol.SLOT_SIZE) {
+            val data = ultralight.readPages(page) // reads 16 bytes (4 pages)
+            val toCopy = minOf(16, CardProtocol.SLOT_SIZE - offset)
             System.arraycopy(data, 0, result, offset, toCopy)
             offset += 16
             page += 4
@@ -80,9 +106,9 @@ class NtagCardReader @Inject constructor(private val cipher: CardCipher) : CardR
         return result
     }
 
-    private fun writeAllPages(ultralight: MifareUltralight, data: ByteArray) {
+    private fun writeSlot(ultralight: MifareUltralight, startPage: Int, data: ByteArray) {
         var offset = 0
-        var page = 4
+        var page = startPage
         while (offset < data.size) {
             val pageData = data.copyOfRange(offset, minOf(offset + 4, data.size))
                 .let { if (it.size < 4) it + ByteArray(4 - it.size) else it }
