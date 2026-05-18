@@ -39,6 +39,7 @@ dependencies {
     implementation(libs.telkomsel.dexterity)
     implementation(libs.dotlottie.android)
     ksp(libs.hilt.compiler)
+    lintChecks(libs.compose.lint.checks)
 
     testImplementation(libs.junit.jupiter)
 }

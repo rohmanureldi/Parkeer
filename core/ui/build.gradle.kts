@@ -27,4 +27,5 @@ dependencies {
     implementation(libs.compose.material.icons.extended)
     implementation(libs.telkomsel.dexterity)
     implementation(libs.dotlottie.android)
+    lintChecks(libs.compose.lint.checks)
 }

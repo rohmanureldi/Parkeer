@@ -66,6 +66,7 @@ dependencies {
     implementation(libs.hilt.navigation.compose)
     implementation(libs.telkomsel.dexterity)
     ksp(libs.hilt.compiler)
+    lintChecks(libs.compose.lint.checks)
 
     debugImplementation(libs.compose.ui.tooling)
 
