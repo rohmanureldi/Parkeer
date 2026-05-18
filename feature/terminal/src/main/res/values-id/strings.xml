@@ -5,13 +5,14 @@
     <string name="terminal_ready">Siap</string>
     <string name="terminal_tap_to_check_out">Tempelkan kartu anggota untuk check-out</string>
     <string name="terminal_rate_info">Tarif: %1$s/jam (dibulatkan ke atas)</string>
-    <string name="terminal_calculating">Menghitung…</string>
+    <string name="terminal_calculating">Menulis ke kartu…</string>
+    <string name="terminal_calculating_hint">Jangan lepas kartu</string>
     <string name="terminal_checkout_complete">Checkout Selesai!</string>
     <string name="terminal_done">Selesai</string>
     <string name="terminal_insufficient_balance">Saldo Tidak Cukup</string>
     <string name="terminal_topup_hint">Silakan isi saldo di Station terdekat, lalu kembali ke sini.</string>
     <string name="terminal_dismiss">Tutup</string>
-    <string name="terminal_error">Error</string>
+    <string name="terminal_error">Terjadi kesalahan</string>
     <string name="terminal_receipt_member">Anggota</string>
     <string name="terminal_receipt_checkin">Check-in</string>
     <string name="terminal_receipt_checkout">Check-out</string>
@@ -30,8 +31,8 @@
     <string name="terminal_cd_insufficient">Saldo Tidak Cukup</string>
     <string name="terminal_cd_tip">Tips</string>
     <string name="terminal_cd_error">Error</string>
-    <string name="terminal_error_card_not_recognized">Kartu tidak dikenali: %1$s</string>
-    <string name="terminal_error_not_checked_in">Belum check-in. Silakan check-in di Gate terlebih dahulu.</string>
-    <string name="terminal_error_invalid_time">Waktu tidak valid. Jam perangkat mungkin salah.</string>
-    <string name="terminal_error_write_failed">Gagal menulis: %1$s</string>
+    <string name="terminal_error_card_not_recognized">Kartu tidak dapat dibaca. Pastikan ini kartu anggota yang terdaftar.</string>
+    <string name="terminal_error_not_checked_in">Kartu ini belum check-in. Silakan check-in di Gate terlebih dahulu.</string>
+    <string name="terminal_error_invalid_time">Ada masalah dengan waktu. Periksa jam perangkat Anda.</string>
+    <string name="terminal_error_write_failed">Gagal menyimpan ke kartu. Tahan kartu dengan stabil dan coba lagi.</string>
 </resources>

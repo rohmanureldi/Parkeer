@@ -9,12 +9,13 @@
     <string name="gate_sim_hours_placeholder">Hours ago</string>
     <string name="gate_sim_hours_label">Set check-in time (hours ago)</string>
     <string name="gate_sim_will_record">Will record: %1$s</string>
-    <string name="gate_processing">Processing…</string>
+    <string name="gate_processing">Writing to card…</string>
+    <string name="gate_processing_hint">Don\'t remove the card</string>
     <string name="gate_welcome">Welcome, %1$s!</string>
     <string name="gate_checked_in_at">Checked in at %1$s</string>
     <string name="gate_simulated">(Simulated)</string>
     <string name="gate_done">Done</string>
-    <string name="gate_error">Error</string>
+    <string name="gate_error">Something went wrong</string>
     <string name="gate_dismiss">Dismiss</string>
     <string name="gate_busy">Please wait — still processing</string>
     <string name="gate_cd_back">Back</string>
@@ -22,7 +23,7 @@
     <string name="gate_cd_sim_warning">Simulation warning</string>
     <string name="gate_cd_success">Success</string>
     <string name="gate_cd_error">Error</string>
-    <string name="gate_error_card_not_recognized">Card not recognized: %1$s</string>
-    <string name="gate_error_already_checked_in">Already checked in. Please proceed to Terminal.</string>
-    <string name="gate_error_write_failed">Write failed: %1$s</string>
+    <string name="gate_error_card_not_recognized">Unable to read this card. Make sure it\'s a registered member card.</string>
+    <string name="gate_error_already_checked_in">This card is already checked in. Please proceed to Terminal for check-out.</string>
+    <string name="gate_error_write_failed">Couldn\'t save to card. Please hold the card steady and try again.</string>
 </resources>

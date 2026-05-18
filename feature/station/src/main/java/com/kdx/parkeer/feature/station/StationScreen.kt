@@ -40,6 +40,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.kdx.parkeer.core.ui.ErrorLogger
 import com.kdx.parkeer.core.ui.NfcPulseAnimation
 import com.kdx.parkeer.core.ui.rememberHapticFeedback
 import com.kdx.parkeer.core.ui.toRupiah
@@ -282,6 +283,11 @@ private fun ProcessingState() {
         CircularProgressIndicator()
         Spacer(Modifier.height(DX.Spacing.L))
         Text(stringResource(R.string.station_processing), style = DX.Font.bodySemiBold, color = DX.Color.text.primary)
+        Text(
+            stringResource(R.string.station_processing_hint),
+            style = DX.Font.caption,
+            color = DX.Color.text.secondary
+        )
     }
 }
 
@@ -314,9 +320,17 @@ private fun ErrorState(error: StationError, onDismiss: () -> Unit) {
     val message = when (error) {
         is StationError.AlreadyRegistered -> stringResource(R.string.station_error_already_registered)
         is StationError.InvalidMemberId -> stringResource(R.string.station_error_invalid_member_id)
-        is StationError.CardNotRecognized -> stringResource(R.string.station_error_card_not_recognized, error.reason.orEmpty())
+        is StationError.CardNotRecognized -> stringResource(R.string.station_error_card_not_recognized)
         is StationError.MaxBalanceExceeded -> stringResource(R.string.station_error_max_balance, error.currentBalance)
-        is StationError.WriteFailed -> stringResource(R.string.station_error_write_failed, error.reason.orEmpty())
+        is StationError.WriteFailed -> stringResource(R.string.station_error_write_failed)
+    }
+    LaunchedEffect(error) {
+        val reason = when (error) {
+            is StationError.CardNotRecognized -> error.reason
+            is StationError.WriteFailed -> error.reason
+            else -> null
+        }
+        ErrorLogger.log("Station", message, reason)
     }
     Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
         Spacer(Modifier.height(DX.Spacing.XL2))

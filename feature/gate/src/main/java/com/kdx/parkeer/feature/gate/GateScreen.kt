@@ -44,6 +44,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.kdx.parkeer.core.ui.ErrorLogger
 import com.kdx.parkeer.core.ui.NfcPulseAnimation
 import com.kdx.parkeer.core.ui.ParkeerCard
 import com.kdx.parkeer.core.ui.rememberHapticFeedback
@@ -225,6 +226,11 @@ private fun GateProcessingState() {
         CircularProgressIndicator()
         Spacer(Modifier.height(DX.Spacing.L))
         Text(stringResource(R.string.gate_processing), style = DX.Font.bodySemiBold, color = DX.Color.text.primary)
+        Text(
+            stringResource(R.string.gate_processing_hint),
+            style = DX.Font.caption,
+            color = DX.Color.text.secondary
+        )
     }
 }
 
@@ -261,9 +267,17 @@ private fun GateSuccessState(memberName: String, checkInTime: Long, simEnabled: 
 @Composable
 private fun GateErrorState(error: GateError, onDismiss: () -> Unit) {
     val message = when (error) {
-        is GateError.CardNotRecognized -> stringResource(R.string.gate_error_card_not_recognized, error.reason.orEmpty())
+        is GateError.CardNotRecognized -> stringResource(R.string.gate_error_card_not_recognized)
         is GateError.AlreadyCheckedIn -> stringResource(R.string.gate_error_already_checked_in)
-        is GateError.WriteFailed -> stringResource(R.string.gate_error_write_failed, error.reason.orEmpty())
+        is GateError.WriteFailed -> stringResource(R.string.gate_error_write_failed)
+    }
+    LaunchedEffect(error) {
+        val reason = when (error) {
+            is GateError.CardNotRecognized -> error.reason
+            is GateError.WriteFailed -> error.reason
+            else -> null
+        }
+        ErrorLogger.log("Gate", message, reason)
     }
     Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
         Spacer(Modifier.height(DX.Spacing.XL2))

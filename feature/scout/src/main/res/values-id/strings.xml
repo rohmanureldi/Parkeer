@@ -3,7 +3,8 @@
     <string name="scout_title">Scout</string>
     <string name="scout_read_only">Hanya Baca – TIDAK akan mengubah kartu Anda</string>
     <string name="scout_tap_to_view">Tempelkan kartu untuk melihat info</string>
-    <string name="scout_reading">Membaca…</string>
+    <string name="scout_reading">Membaca kartu…</string>
+    <string name="scout_reading_hint">Jangan lepas kartu</string>
     <string name="scout_tap_again">Tempelkan Lagi untuk Refresh</string>
     <string name="scout_try_again">Coba Lagi</string>
     <string name="scout_card_brand">PARKEER</string>
@@ -22,5 +23,5 @@
     <string name="scout_cd_read_only">Mode hanya baca</string>
     <string name="scout_cd_nfc">NFC</string>
     <string name="scout_cd_error">Error</string>
-    <string name="scout_error_read_failed">Gagal membaca: %1$s</string>
+    <string name="scout_error_read_failed">Kartu tidak dapat dibaca. Pastikan ini kartu Parkeer terdaftar dan tahan dengan stabil.</string>
 </resources>

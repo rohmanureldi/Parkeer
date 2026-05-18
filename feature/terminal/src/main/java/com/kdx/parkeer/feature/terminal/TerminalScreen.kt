@@ -40,6 +40,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.kdx.parkeer.core.ui.ErrorLogger
 import com.kdx.parkeer.core.ui.NfcPulseAnimation
 import com.kdx.parkeer.core.ui.ParkeerCard
 import com.kdx.parkeer.core.ui.rememberHapticFeedback
@@ -123,6 +124,11 @@ fun TerminalScreen(
                             CircularProgressIndicator()
                             Spacer(Modifier.height(DX.Spacing.L))
                             Text(stringResource(R.string.terminal_calculating), style = DX.Font.bodySemiBold, color = DX.Color.text.primary)
+                            Text(
+                                stringResource(R.string.terminal_calculating_hint),
+                                style = DX.Font.caption,
+                                color = DX.Color.text.secondary
+                            )
                         }
                     }
                     is TerminalUiState.Success -> {
@@ -237,7 +243,7 @@ fun TerminalScreen(
                                     R.string.terminal_dismiss,
                                 ),
                                 variant = ButtonVariant.Secondary.Large,
-                                modifier = Modifier.fillMaxWidth(),
+                                modifier = Modifier.fillMaxWidth()
                             )
                         }
                     }
@@ -253,13 +259,18 @@ fun TerminalScreen(
                             Spacer(Modifier.height(DX.Spacing.M))
                             Text(stringResource(R.string.terminal_error), style = DX.Font.subHeadingSemiBold, color = DX.Color.text.red)
                             val message = when (state.error) {
-                                is TerminalError.CardNotRecognized -> stringResource(
-                                    R.string.terminal_error_card_not_recognized,
-                                    state.error.reason.orEmpty(),
-                                )
+                                is TerminalError.CardNotRecognized -> stringResource(R.string.terminal_error_card_not_recognized)
                                 is TerminalError.NotCheckedIn -> stringResource(R.string.terminal_error_not_checked_in)
                                 is TerminalError.InvalidTime -> stringResource(R.string.terminal_error_invalid_time)
-                                is TerminalError.WriteFailed -> stringResource(R.string.terminal_error_write_failed, state.error.reason.orEmpty())
+                                is TerminalError.WriteFailed -> stringResource(R.string.terminal_error_write_failed)
+                            }
+                            LaunchedEffect(state.error) {
+                                val reason = when (state.error) {
+                                    is TerminalError.CardNotRecognized -> state.error.reason
+                                    is TerminalError.WriteFailed -> state.error.reason
+                                    else -> null
+                                }
+                                ErrorLogger.log("Terminal", message, reason)
                             }
                             Text(message, style = DX.Font.body, color = DX.Color.text.secondary)
                             Spacer(Modifier.height(DX.Spacing.XL))

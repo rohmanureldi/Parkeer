@@ -3,7 +3,8 @@
     <string name="scout_title">Scout</string>
     <string name="scout_read_only">Read Only – Will NOT modify your card</string>
     <string name="scout_tap_to_view">Tap your card to view info</string>
-    <string name="scout_reading">Reading…</string>
+    <string name="scout_reading">Reading card…</string>
+    <string name="scout_reading_hint">Don\'t remove the card</string>
     <string name="scout_tap_again">Tap Again to Refresh</string>
     <string name="scout_try_again">Try Again</string>
     <string name="scout_card_brand">PARKEER</string>
@@ -22,5 +23,5 @@
     <string name="scout_cd_read_only">Read only mode</string>
     <string name="scout_cd_nfc">NFC</string>
     <string name="scout_cd_error">Error</string>
-    <string name="scout_error_read_failed">Read failed: %1$s</string>
+    <string name="scout_error_read_failed">Unable to read this card. Make sure it\'s a registered Parkeer card and hold it steady.</string>
 </resources>

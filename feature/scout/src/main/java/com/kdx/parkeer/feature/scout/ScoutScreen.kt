@@ -55,6 +55,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.kdx.parkeer.core.model.Activity
 import com.kdx.parkeer.core.model.CardData
 import com.kdx.parkeer.core.model.VisitState
+import com.kdx.parkeer.core.ui.ErrorLogger
 import com.kdx.parkeer.core.ui.NfcPulseAnimation
 import com.kdx.parkeer.core.ui.ParkeerCard
 import com.kdx.parkeer.core.ui.rememberHapticFeedback
@@ -138,6 +139,11 @@ fun ScoutScreen(
                             CircularProgressIndicator()
                             Spacer(Modifier.height(DX.Spacing.L))
                             Text(stringResource(R.string.scout_reading), style = DX.Font.bodySemiBold, color = DX.Color.text.primary)
+                            Text(
+                                stringResource(R.string.scout_reading_hint),
+                                style = DX.Font.caption,
+                                color = DX.Color.text.secondary
+                            )
                         }
                     }
                     is ScoutUiState.Loaded -> {
@@ -166,11 +172,11 @@ fun ScoutScreen(
                                 tint = DX.Color.text.red,
                             )
                             Spacer(Modifier.height(DX.Spacing.M))
+                            LaunchedEffect(state.reason) {
+                                ErrorLogger.log("Scout", "Read failed", state.reason)
+                            }
                             Text(
-                                stringResource(
-                                    R.string.scout_error_read_failed,
-                                    state.reason.orEmpty()
-                                ),
+                                stringResource(R.string.scout_error_read_failed),
                                 style = DX.Font.body,
                                 color = DX.Color.text.red,
                             )
