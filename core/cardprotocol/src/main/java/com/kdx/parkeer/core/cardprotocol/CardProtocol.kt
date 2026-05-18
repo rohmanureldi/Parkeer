@@ -165,7 +165,13 @@ object CardProtocol {
         System.arraycopy(raw, 0, hmacInput, 0, 4)
         System.arraycopy(raw, 4, hmacInput, 4, 4)
         System.arraycopy(raw, STATE_OFFSET, hmacInput, 8, 1 + 3 + 8 + (LOG_COUNT * LOG_ENTRY_SIZE))
-        require(cipher.verifyHmac(cardUid, hmacInput, storedHmac)) { "HMAC verification failed - card may be tampered" }
+        require(
+            cipher.verifyHmac(
+                cardUid,
+                hmacInput,
+                storedHmac
+            )
+        ) { "Card data corrupted — please re-register at Station" }
 
         return CardData(
             memberId = memberId,

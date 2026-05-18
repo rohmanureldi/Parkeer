@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.hilt)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.stability.analyzer)
 }
 
 android {
@@ -33,6 +34,7 @@ android {
     kotlin {
         compilerOptions {
             languageVersion = org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_2_0
+            jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21
         }
     }
 
