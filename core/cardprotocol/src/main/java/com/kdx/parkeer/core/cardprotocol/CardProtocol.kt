@@ -12,7 +12,7 @@ import java.nio.ByteOrder
  * Binary wire format for NFC card memory (per-slot).
  *
  * Layout (144 bytes per slot):
- * [0..1]   Magic 0x4D42
+ * [0..1]   Magic 0x4C44
  * [2]      Version 0x01
  * [3]      Flags (bit0=registered, bit1=active)
  * [4..7]   Write counter (monotonic nonce for AES-GCM IV derivation)
@@ -30,15 +30,11 @@ import java.nio.ByteOrder
  */
 object CardProtocol {
 
-    const val MAGIC = 0x4D42.toShort()
+    const val MAGIC = 0x4C44.toShort()
     const val VERSION: Byte = 0x01
     const val SLOT_SIZE = 144
-    private const val COUNTER_OFFSET = 4
-    private const val ENCRYPTED_OFFSET = 8
     private const val ENCRYPTED_SIZE = 36
     private const val STATE_OFFSET = 44
-    private const val TIMESTAMP_OFFSET = 48
-    private const val LOGS_OFFSET = 56
     private const val LOG_ENTRY_SIZE = 16
     private const val LOG_COUNT = 5
     private const val HMAC_OFFSET = 136
@@ -170,8 +166,8 @@ object CardProtocol {
             cipher.verifyHmac(
                 cardUid,
                 hmacInput,
-                storedHmac
-            )
+                storedHmac,
+            ),
         ) { "Card data corrupted — please re-register at Station" }
 
         return CardData(
@@ -187,14 +183,5 @@ object CardProtocol {
         if (raw.size < 4) return false
         val buf = ByteBuffer.wrap(raw).order(ByteOrder.BIG_ENDIAN)
         return buf.short == MAGIC && buf.get() == VERSION
-    }
-
-    fun isRegistered(raw: ByteArray): Boolean {
-        if (raw.size < 4) return false
-        val buf = ByteBuffer.wrap(raw).order(ByteOrder.BIG_ENDIAN)
-        buf.short // magic
-        buf.get() // version
-        val flags = buf.get()
-        return flags.toInt() and 0x01 == 1
     }
 }
