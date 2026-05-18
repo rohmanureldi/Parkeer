@@ -26,15 +26,13 @@ import javax.inject.Inject
  *
  * If interrupted before step 3, the active slot is untouched.
  */
-class NtagCardReader @Inject constructor(
-    private val cipher: CardCipher
-) : CardReader {
+class NtagCardReader @Inject constructor(private val cipher: CardCipher) : CardReader {
 
     companion object {
-        private const val POINTER_PAGE = 4       // page 4 = first user memory page
-        private const val SLOT_A_START_PAGE = 5  // pages 5–40
+        private const val POINTER_PAGE = 4 // page 4 = first user memory page
+        private const val SLOT_A_START_PAGE = 5 // pages 5–40
         private const val SLOT_B_START_PAGE = 41 // pages 41–76
-        private const val SLOT_PAGES = 36        // 144 bytes / 4 bytes per page
+        private const val SLOT_PAGES = 36 // 144 bytes / 4 bytes per page
     }
 
     override suspend fun read(tag: Tag): Result<CardData> = withContext(Dispatchers.IO) {
@@ -107,12 +105,18 @@ class NtagCardReader @Inject constructor(
     }
 
     private fun writeSlot(ultralight: MifareUltralight, startPage: Int, data: ByteArray) {
+        // Read existing inactive slot to skip unchanged pages (delta write)
+        val existing = readSlot(ultralight, startPage)
         var offset = 0
         var page = startPage
         while (offset < data.size) {
             val pageData = data.copyOfRange(offset, minOf(offset + 4, data.size))
                 .let { if (it.size < 4) it + ByteArray(4 - it.size) else it }
-            ultralight.writePage(page, pageData)
+            val existingPage = existing.copyOfRange(offset, minOf(offset + 4, existing.size))
+                .let { if (it.size < 4) it + ByteArray(4 - it.size) else it }
+            if (!pageData.contentEquals(existingPage)) {
+                ultralight.writePage(page, pageData)
+            }
             offset += 4
             page++
         }
