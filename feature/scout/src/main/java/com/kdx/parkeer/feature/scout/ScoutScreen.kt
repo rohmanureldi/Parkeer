@@ -46,10 +46,7 @@ import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ScoutScreen(
-    onBack: () -> Unit,
-    viewModel: ScoutViewModel = hiltViewModel()
-) {
+fun ScoutScreen(onBack: () -> Unit, viewModel: ScoutViewModel = hiltViewModel()) {
     val uiState by viewModel.uiState.collectAsState()
     val haptic = rememberHapticFeedback()
     val fullFmt = remember { DateTimeFormatter.ofPattern("dd MMM yyyy, HH:mm:ss") }
@@ -71,9 +68,9 @@ fun ScoutScreen(
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.scout_cd_back))
                     }
-                }
+                },
             )
-        }
+        },
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -82,17 +79,22 @@ fun ScoutScreen(
                 .consumeWindowInsets(innerPadding)
                 .padding(horizontal = DX.Spacing.L)
                 .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(DX.Spacing.M)
+            verticalArrangement = Arrangement.spacedBy(DX.Spacing.M),
         ) {
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(DX.Spacing.XS)) {
-                Icon(Icons.Filled.Lock, contentDescription = stringResource(R.string.scout_cd_read_only), modifier = Modifier.size(16.dp), tint = DX.Color.text.blue)
+                Icon(
+                    Icons.Filled.Lock,
+                    contentDescription = stringResource(R.string.scout_cd_read_only),
+                    modifier = Modifier.size(16.dp),
+                    tint = DX.Color.text.blue,
+                )
                 Text(stringResource(R.string.scout_read_only), style = DX.Font.caption, color = DX.Color.text.blue)
             }
 
             AnimatedContent(
                 targetState = uiState,
                 transitionSpec = { fadeIn() togetherWith fadeOut() },
-                label = "scout_state"
+                label = "scout_state",
             ) { state ->
                 when (state) {
                     is ScoutUiState.Ready -> {
@@ -115,17 +117,40 @@ fun ScoutScreen(
                         Column(verticalArrangement = Arrangement.spacedBy(DX.Spacing.M)) {
                             PhysicalCardUi(state.card)
                             CardDetailsSection(state.card, fullFmt, shortFmt)
-                            DXButton(onClick = { viewModel.reset() }, text = stringResource(R.string.scout_tap_again), variant = ButtonVariant.Secondary.Large, modifier = Modifier.fillMaxWidth())
+                            DXButton(
+                                onClick = {
+                                    viewModel.reset()
+                                },
+                                text = stringResource(
+                                    R.string.scout_tap_again,
+                                ),
+                                variant = ButtonVariant.Secondary.Large,
+                                modifier = Modifier.fillMaxWidth(),
+                            )
                         }
                     }
                     is ScoutUiState.Error -> {
                         Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
                             Spacer(Modifier.height(DX.Spacing.XL2))
-                            Icon(Icons.Filled.Error, contentDescription = stringResource(R.string.scout_cd_error), modifier = Modifier.size(48.dp), tint = DX.Color.text.red)
+                            Icon(
+                                Icons.Filled.Error,
+                                contentDescription = stringResource(R.string.scout_cd_error),
+                                modifier = Modifier.size(48.dp),
+                                tint = DX.Color.text.red,
+                            )
                             Spacer(Modifier.height(DX.Spacing.M))
                             Text(state.message, style = DX.Font.body, color = DX.Color.text.red)
                             Spacer(Modifier.height(DX.Spacing.XL))
-                            DXButton(onClick = { viewModel.reset() }, text = stringResource(R.string.scout_try_again), variant = ButtonVariant.Secondary.Large, modifier = Modifier.fillMaxWidth())
+                            DXButton(
+                                onClick = {
+                                    viewModel.reset()
+                                },
+                                text = stringResource(
+                                    R.string.scout_try_again,
+                                ),
+                                variant = ButtonVariant.Secondary.Large,
+                                modifier = Modifier.fillMaxWidth(),
+                            )
                         }
                     }
                 }
@@ -144,15 +169,20 @@ private fun PhysicalCardUi(card: CardData) {
             .aspectRatio(1.586f)
             .clip(RoundedCornerShape(16.dp))
             .background(gradient)
-            .padding(24.dp)
+            .padding(24.dp),
     ) {
         Row(
             Modifier.fillMaxWidth().align(Alignment.TopStart),
             horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(stringResource(R.string.scout_card_brand), color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Bold, letterSpacing = 2.sp)
-            Icon(Icons.Filled.Contactless, contentDescription = stringResource(R.string.scout_cd_nfc), tint = Color.White.copy(alpha = 0.7f), modifier = Modifier.size(28.dp))
+            Icon(
+                Icons.Filled.Contactless,
+                contentDescription = stringResource(R.string.scout_cd_nfc),
+                tint = Color.White.copy(alpha = 0.7f),
+                modifier = Modifier.size(28.dp),
+            )
         }
 
         Column(Modifier.align(Alignment.CenterStart)) {
@@ -163,7 +193,7 @@ private fun PhysicalCardUi(card: CardData) {
         Row(
             Modifier.fillMaxWidth().align(Alignment.BottomStart),
             horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.Bottom
+            verticalAlignment = Alignment.Bottom,
         ) {
             Column {
                 Text(card.memberName.uppercase(), color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, letterSpacing = 1.sp)
@@ -193,7 +223,8 @@ private fun CardDetailsSection(card: CardData, fullFmt: DateTimeFormatter, short
                 Text(stringResource(R.string.scout_checked_in), style = DX.Font.bodySemiBold, color = DX.Color.text.darkGreen)
                 Text(
                     stringResource(R.string.scout_checked_in_since, fullFmt.format(Instant.ofEpochMilli(visitState.timestamp).atZone(zone))),
-                    style = DX.Font.caption, color = DX.Color.text.secondary
+                    style = DX.Font.caption,
+                    color = DX.Color.text.secondary,
                 )
             }
         }
@@ -229,7 +260,7 @@ private fun TransactionRow(activity: Activity, amount: Int, timestamp: Long, fmt
     Row(
         Modifier.fillMaxWidth().padding(vertical = DX.Spacing.S),
         horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Row(horizontalArrangement = Arrangement.spacedBy(DX.Spacing.S), verticalAlignment = Alignment.CenterVertically) {
             Icon(icon, contentDescription = label, modifier = Modifier.size(16.dp), tint = color)

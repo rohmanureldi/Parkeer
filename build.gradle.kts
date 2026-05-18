@@ -5,4 +5,25 @@ plugins {
     alias(libs.plugins.kotlin.compose) apply false
     alias(libs.plugins.hilt) apply false
     alias(libs.plugins.ksp) apply false
+    alias(libs.plugins.spotless)
+}
+
+spotless {
+    kotlin {
+        target("**/*.kt")
+        targetExclude("**/build/**")
+        ktlint("1.5.0")
+            .editorConfigOverride(
+                mapOf(
+                    "max_line_length" to "150",
+                    "ktlint_function_naming_ignore_when_annotated_with" to "Composable",
+                    "ktlint_standard_no-wildcard-imports" to "disabled",
+                ),
+            )
+    }
+    kotlinGradle {
+        target("**/*.gradle.kts")
+        targetExclude("**/build/**")
+        ktlint("1.5.0")
+    }
 }

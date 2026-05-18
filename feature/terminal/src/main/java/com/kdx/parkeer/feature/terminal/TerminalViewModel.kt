@@ -30,15 +30,19 @@ sealed interface TerminalUiState {
     data object Ready : TerminalUiState
     data object Processing : TerminalUiState
     data class Success(val billing: BillingResult) : TerminalUiState
-    data class InsufficientBalance(val checkInTime: Long, val durationMs: Long, val hoursCharged: Int, val fee: Int, val balance: Int, val deficit: Int) : TerminalUiState
+    data class InsufficientBalance(
+        val checkInTime: Long,
+        val durationMs: Long,
+        val hoursCharged: Int,
+        val fee: Int,
+        val balance: Int,
+        val deficit: Int,
+    ) : TerminalUiState
     data class Error(val message: String) : TerminalUiState
 }
 
 @HiltViewModel
-class TerminalViewModel @Inject constructor(
-    private val cardReader: CardReader,
-    private val nfcTagHolder: NfcTagHolder
-) : ViewModel() {
+class TerminalViewModel @Inject constructor(private val cardReader: CardReader, private val nfcTagHolder: NfcTagHolder) : ViewModel() {
 
     private val _uiState = MutableStateFlow<TerminalUiState>(TerminalUiState.Ready)
     val uiState: StateFlow<TerminalUiState> = _uiState.asStateFlow()
@@ -87,7 +91,8 @@ class TerminalViewModel @Inject constructor(
             val fee = hoursCharged * RATE_PER_HOUR
 
             if (card.balance < fee) {
-                _uiState.value = TerminalUiState.InsufficientBalance(checkedIn.timestamp, durationMs, hoursCharged, fee, card.balance, fee - card.balance)
+                _uiState.value =
+                    TerminalUiState.InsufficientBalance(checkedIn.timestamp, durationMs, hoursCharged, fee, card.balance, fee - card.balance)
                 return@launch
             }
 
@@ -96,7 +101,7 @@ class TerminalViewModel @Inject constructor(
             val updated = card.copy(
                 balance = newBalance,
                 visitState = VisitState.Idle,
-                logs = (listOf(log) + card.logs).take(5)
+                logs = (listOf(log) + card.logs).take(5),
             )
 
             cardReader.write(tag, updated)
@@ -110,13 +115,15 @@ class TerminalViewModel @Inject constructor(
                             hoursCharged = hoursCharged,
                             fee = fee,
                             oldBalance = card.balance,
-                            newBalance = newBalance
-                        )
+                            newBalance = newBalance,
+                        ),
                     )
                 }
                 .onFailure { _uiState.value = TerminalUiState.Error(it.message ?: "Write failed") }
         }
     }
 
-    fun reset() { _uiState.value = TerminalUiState.Ready }
+    fun reset() {
+        _uiState.value = TerminalUiState.Ready
+    }
 }

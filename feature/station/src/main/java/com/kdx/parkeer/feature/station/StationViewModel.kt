@@ -28,10 +28,7 @@ sealed interface StationUiState {
 enum class StationMode { REGISTER, TOP_UP }
 
 @HiltViewModel
-class StationViewModel @Inject constructor(
-    private val cardReader: CardReader,
-    private val nfcTagHolder: NfcTagHolder
-) : ViewModel() {
+class StationViewModel @Inject constructor(private val cardReader: CardReader, private val nfcTagHolder: NfcTagHolder) : ViewModel() {
 
     private val _uiState = MutableStateFlow<StationUiState>(StationUiState.Idle)
     val uiState: StateFlow<StationUiState> = _uiState.asStateFlow()
@@ -94,7 +91,7 @@ class StationViewModel @Inject constructor(
             memberName = memberName,
             balance = 0,
             visitState = VisitState.Idle,
-            logs = listOf(TransactionLog(0, System.currentTimeMillis(), Activity.REGISTRATION))
+            logs = listOf(TransactionLog(0, System.currentTimeMillis(), Activity.REGISTRATION)),
         )
 
         cardReader.write(tag, newCard)
@@ -118,7 +115,7 @@ class StationViewModel @Inject constructor(
         val log = TransactionLog(topUpAmount, System.currentTimeMillis(), Activity.TOP_UP)
         val updated = card.copy(
             balance = newBalance,
-            logs = (listOf(log) + card.logs).take(5)
+            logs = (listOf(log) + card.logs).take(5),
         )
 
         cardReader.write(tag, updated)
@@ -126,5 +123,7 @@ class StationViewModel @Inject constructor(
             .onFailure { _uiState.value = StationUiState.Error(it.message ?: "Write failed") }
     }
 
-    fun reset() { _uiState.value = StationUiState.Idle }
+    fun reset() {
+        _uiState.value = StationUiState.Idle
+    }
 }

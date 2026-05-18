@@ -126,18 +126,18 @@ object CardProtocol {
 
         // Decrypt identity + balance
         val encryptedBlock = ByteArray(ENCRYPTED_SIZE)
-        buf.get(encryptedBlock)
+        buf[encryptedBlock]
         val plaintext = cipher.decrypt(cardUid, writeCounter, encryptedBlock)
         val ptBuf = ByteBuffer.wrap(plaintext).order(ByteOrder.BIG_ENDIAN)
         val memberId = ptBuf.int
         val nameBytes = ByteArray(12)
-        ptBuf.get(nameBytes)
+        ptBuf[nameBytes]
         val memberName = String(nameBytes, Charsets.UTF_8).trimEnd('\u0000')
         val balance = ptBuf.int
 
         // Visit state
         val stateFlag = buf.get()
-        buf.get(ByteArray(3)) // padding
+        buf[ByteArray(3)] // padding
         val timestamp = buf.long
         val visitState = if (stateFlag == 0x01.toByte()) {
             VisitState.CheckedIn(timestamp)
@@ -151,7 +151,7 @@ object CardProtocol {
             val amount = buf.int
             val logTimestamp = buf.long
             val activityCode = buf.get()
-            buf.get(ByteArray(3)) // padding
+            buf[ByteArray(3)] // padding
             if (amount != 0 || logTimestamp != 0L) {
                 val activity = Activity.entries.find { it.code == activityCode } ?: Activity.PARKING
                 logs.add(TransactionLog(amount, logTimestamp, activity))
@@ -160,7 +160,7 @@ object CardProtocol {
 
         // Verify HMAC
         val storedHmac = ByteArray(HMAC_SIZE)
-        buf.get(storedHmac)
+        buf[storedHmac]
         val hmacInput = ByteArray(4 + 4 + 1 + 3 + 8 + (LOG_COUNT * LOG_ENTRY_SIZE))
         System.arraycopy(raw, 0, hmacInput, 0, 4)
         System.arraycopy(raw, 4, hmacInput, 4, 4)
@@ -172,7 +172,7 @@ object CardProtocol {
             memberName = memberName,
             balance = balance,
             visitState = visitState,
-            logs = logs
+            logs = logs,
         )
     }
 

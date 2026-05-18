@@ -24,8 +24,8 @@ class CardProtocolTest {
             visitState = VisitState.CheckedIn(1700000000000L),
             logs = listOf(
                 TransactionLog(10000, 1700000000000L, Activity.PARKING),
-                TransactionLog(50000, 1699999000000L, Activity.TOP_UP)
-            )
+                TransactionLog(50000, 1699999000000L, Activity.TOP_UP),
+            ),
         )
 
         val raw = CardProtocol.serialize(data, cipher, cardUid, previousWriteCounter = 0)

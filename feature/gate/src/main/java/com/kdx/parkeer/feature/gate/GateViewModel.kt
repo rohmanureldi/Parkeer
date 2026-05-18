@@ -22,10 +22,7 @@ sealed interface GateUiState {
 }
 
 @HiltViewModel
-class GateViewModel @Inject constructor(
-    private val cardReader: CardReader,
-    private val nfcTagHolder: NfcTagHolder
-) : ViewModel() {
+class GateViewModel @Inject constructor(private val cardReader: CardReader, private val nfcTagHolder: NfcTagHolder) : ViewModel() {
 
     private val _uiState = MutableStateFlow<GateUiState>(GateUiState.Ready)
     val uiState: StateFlow<GateUiState> = _uiState.asStateFlow()
@@ -72,5 +69,7 @@ class GateViewModel @Inject constructor(
         }
     }
 
-    fun reset() { _uiState.value = GateUiState.Ready }
+    fun reset() {
+        _uiState.value = GateUiState.Ready
+    }
 }

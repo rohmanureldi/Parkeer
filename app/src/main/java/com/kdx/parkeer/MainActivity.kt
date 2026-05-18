@@ -31,9 +31,10 @@ class MainActivity : ComponentActivity() {
         // FLAG_MUTABLE is required here because the NFC foreground dispatch system
         // needs to fill in EXTRA_TAG and EXTRA_NDEF_MESSAGES into this PendingIntent.
         pendingIntent = PendingIntent.getActivity(
-            this, 0,
+            this,
+            0,
             Intent(this, javaClass).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP),
-            PendingIntent.FLAG_MUTABLE
+            PendingIntent.FLAG_MUTABLE,
         )
 
         setContent {

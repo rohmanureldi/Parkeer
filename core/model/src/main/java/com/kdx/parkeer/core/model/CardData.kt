@@ -8,7 +8,7 @@ data class CardData(
     val memberName: String = "",
     val balance: Int = 0,
     val visitState: VisitState = VisitState.Idle,
-    val logs: List<TransactionLog> = emptyList()
+    val logs: List<TransactionLog> = emptyList(),
 )
 
 sealed interface VisitState {
@@ -16,14 +16,10 @@ sealed interface VisitState {
     data class CheckedIn(val timestamp: Long) : VisitState
 }
 
-data class TransactionLog(
-    val amount: Int,
-    val timestamp: Long,
-    val activity: Activity
-)
+data class TransactionLog(val amount: Int, val timestamp: Long, val activity: Activity)
 
 enum class Activity(val code: Byte) {
     PARKING(0x01),
     TOP_UP(0x02),
-    REGISTRATION(0x03)
+    REGISTRATION(0x03),
 }

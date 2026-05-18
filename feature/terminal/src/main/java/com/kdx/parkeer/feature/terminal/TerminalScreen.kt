@@ -33,10 +33,7 @@ import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TerminalScreen(
-    onBack: () -> Unit,
-    viewModel: TerminalViewModel = hiltViewModel()
-) {
+fun TerminalScreen(onBack: () -> Unit, viewModel: TerminalViewModel = hiltViewModel()) {
     val uiState by viewModel.uiState.collectAsState()
     val haptic = rememberHapticFeedback()
     val fmt = remember { DateTimeFormatter.ofPattern("dd MMM yyyy, HH:mm") }
@@ -59,9 +56,9 @@ fun TerminalScreen(
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.terminal_cd_back))
                     }
-                }
+                },
             )
-        }
+        },
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -70,14 +67,14 @@ fun TerminalScreen(
                 .consumeWindowInsets(innerPadding)
                 .padding(horizontal = DX.Spacing.L)
                 .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(DX.Spacing.M)
+            verticalArrangement = Arrangement.spacedBy(DX.Spacing.M),
         ) {
             Text(stringResource(R.string.terminal_subtitle), style = DX.Font.caption, color = DX.Color.text.secondary)
 
             AnimatedContent(
                 targetState = uiState,
                 transitionSpec = { fadeIn() togetherWith fadeOut() },
-                label = "terminal_state"
+                label = "terminal_state",
             ) { state ->
                 when (state) {
                     is TerminalUiState.Ready -> {
@@ -88,7 +85,11 @@ fun TerminalScreen(
                             Text(stringResource(R.string.terminal_ready), style = DX.Font.subHeadingSemiBold, color = DX.Color.text.primary)
                             Text(stringResource(R.string.terminal_tap_to_check_out), style = DX.Font.caption, color = DX.Color.text.secondary)
                             Spacer(Modifier.height(DX.Spacing.M))
-                            Text(stringResource(R.string.terminal_rate_info, 2000.toRupiah()), style = DX.Font.caption, color = DX.Color.text.secondary)
+                            Text(
+                                stringResource(R.string.terminal_rate_info, 2000.toRupiah()),
+                                style = DX.Font.caption,
+                                color = DX.Color.text.secondary,
+                            )
                         }
                     }
                     is TerminalUiState.Processing -> {
@@ -103,67 +104,141 @@ fun TerminalScreen(
                         val b = state.billing
                         Column(
                             Modifier.fillMaxWidth(),
-                            verticalArrangement = Arrangement.spacedBy(DX.Spacing.M)
+                            verticalArrangement = Arrangement.spacedBy(DX.Spacing.M),
                         ) {
                             Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-                                Icon(Icons.Filled.CheckCircle, contentDescription = stringResource(R.string.terminal_cd_success), modifier = Modifier.size(48.dp), tint = DX.Color.text.darkGreen)
+                                Icon(
+                                    Icons.Filled.CheckCircle,
+                                    contentDescription = stringResource(R.string.terminal_cd_success),
+                                    modifier = Modifier.size(48.dp),
+                                    tint = DX.Color.text.darkGreen,
+                                )
                                 Spacer(Modifier.height(DX.Spacing.S))
-                                Text(stringResource(R.string.terminal_checkout_complete), style = DX.Font.subHeadingSemiBold, color = DX.Color.text.primary)
+                                Text(
+                                    stringResource(R.string.terminal_checkout_complete),
+                                    style = DX.Font.subHeadingSemiBold,
+                                    color = DX.Color.text.primary,
+                                )
                             }
                             ParkeerCard(modifier = Modifier.fillMaxWidth()) {
                                 Column(Modifier.padding(DX.Spacing.L), verticalArrangement = Arrangement.spacedBy(DX.Spacing.S)) {
                                     ReceiptRow(stringResource(R.string.terminal_receipt_member), b.memberName)
-                                    ReceiptRow(stringResource(R.string.terminal_receipt_checkin), fmt.format(Instant.ofEpochMilli(b.checkInTime).atZone(zone)))
-                                    ReceiptRow(stringResource(R.string.terminal_receipt_checkout), fmt.format(Instant.ofEpochMilli(b.checkOutTime).atZone(zone)))
+                                    ReceiptRow(
+                                        stringResource(R.string.terminal_receipt_checkin),
+                                        fmt.format(Instant.ofEpochMilli(b.checkInTime).atZone(zone)),
+                                    )
+                                    ReceiptRow(
+                                        stringResource(R.string.terminal_receipt_checkout),
+                                        fmt.format(Instant.ofEpochMilli(b.checkOutTime).atZone(zone)),
+                                    )
                                     ReceiptRow(stringResource(R.string.terminal_receipt_duration), formatDuration(b.durationMs))
-                                    ReceiptRow(stringResource(R.string.terminal_receipt_hours_billed), stringResource(R.string.terminal_receipt_hours_value, b.hoursCharged))
+                                    ReceiptRow(
+                                        stringResource(R.string.terminal_receipt_hours_billed),
+                                        stringResource(R.string.terminal_receipt_hours_value, b.hoursCharged),
+                                    )
                                     HorizontalDivider(color = DX.Color.stroke.divider)
                                     ReceiptRow(stringResource(R.string.terminal_receipt_fee), b.fee.toRupiah(), highlight = true)
                                     ReceiptRow(stringResource(R.string.terminal_receipt_prev_balance), b.oldBalance.toRupiah())
                                     ReceiptRow(stringResource(R.string.terminal_receipt_new_balance), b.newBalance.toRupiah())
                                 }
                             }
-                            DXButton(onClick = { viewModel.reset() }, text = stringResource(R.string.terminal_done), variant = ButtonVariant.Primary.Large, modifier = Modifier.fillMaxWidth())
+                            DXButton(
+                                onClick = {
+                                    viewModel.reset()
+                                },
+                                text = stringResource(
+                                    R.string.terminal_done,
+                                ),
+                                variant = ButtonVariant.Primary.Large,
+                                modifier = Modifier.fillMaxWidth(),
+                            )
                         }
                     }
                     is TerminalUiState.InsufficientBalance -> {
                         Column(
                             Modifier.fillMaxWidth(),
-                            verticalArrangement = Arrangement.spacedBy(DX.Spacing.M)
+                            verticalArrangement = Arrangement.spacedBy(DX.Spacing.M),
                         ) {
                             Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-                                Icon(Icons.Filled.Warning, contentDescription = stringResource(R.string.terminal_cd_insufficient), modifier = Modifier.size(48.dp), tint = DX.Color.text.darkYellow)
+                                Icon(
+                                    Icons.Filled.Warning,
+                                    contentDescription = stringResource(R.string.terminal_cd_insufficient),
+                                    modifier = Modifier.size(48.dp),
+                                    tint = DX.Color.text.darkYellow,
+                                )
                                 Spacer(Modifier.height(DX.Spacing.S))
-                                Text(stringResource(R.string.terminal_insufficient_balance), style = DX.Font.subHeadingSemiBold, color = DX.Color.text.red)
+                                Text(
+                                    stringResource(R.string.terminal_insufficient_balance),
+                                    style = DX.Font.subHeadingSemiBold,
+                                    color = DX.Color.text.red,
+                                )
                             }
                             ParkeerCard(modifier = Modifier.fillMaxWidth()) {
                                 Column(Modifier.padding(DX.Spacing.L), verticalArrangement = Arrangement.spacedBy(DX.Spacing.S)) {
-                                    ReceiptRow(stringResource(R.string.terminal_receipt_checkin), fmt.format(Instant.ofEpochMilli(state.checkInTime).atZone(zone)))
+                                    ReceiptRow(
+                                        stringResource(R.string.terminal_receipt_checkin),
+                                        fmt.format(Instant.ofEpochMilli(state.checkInTime).atZone(zone)),
+                                    )
                                     ReceiptRow(stringResource(R.string.terminal_receipt_duration), formatDuration(state.durationMs))
-                                    ReceiptRow(stringResource(R.string.terminal_receipt_hours_billed), stringResource(R.string.terminal_receipt_hours_value, state.hoursCharged))
+                                    ReceiptRow(
+                                        stringResource(R.string.terminal_receipt_hours_billed),
+                                        stringResource(R.string.terminal_receipt_hours_value, state.hoursCharged),
+                                    )
                                     ReceiptRow(stringResource(R.string.terminal_receipt_fee_required), state.fee.toRupiah())
                                     ReceiptRow(stringResource(R.string.terminal_receipt_your_balance), state.balance.toRupiah())
                                     ReceiptRow(stringResource(R.string.terminal_receipt_need_more), state.deficit.toRupiah(), highlight = true)
                                 }
                             }
                             ParkeerCard(modifier = Modifier.fillMaxWidth()) {
-                                Row(Modifier.padding(DX.Spacing.L), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(DX.Spacing.S)) {
-                                    Icon(Icons.Filled.Lightbulb, contentDescription = stringResource(R.string.terminal_cd_tip), modifier = Modifier.size(16.dp), tint = DX.Color.text.secondary)
+                                Row(
+                                    Modifier.padding(DX.Spacing.L),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(DX.Spacing.S),
+                                ) {
+                                    Icon(
+                                        Icons.Filled.Lightbulb,
+                                        contentDescription = stringResource(R.string.terminal_cd_tip),
+                                        modifier = Modifier.size(16.dp),
+                                        tint = DX.Color.text.secondary,
+                                    )
                                     Text(stringResource(R.string.terminal_topup_hint), style = DX.Font.body, color = DX.Color.text.secondary)
                                 }
                             }
-                            DXButton(onClick = { viewModel.reset() }, text = stringResource(R.string.terminal_dismiss), variant = ButtonVariant.Secondary.Large, modifier = Modifier.fillMaxWidth())
+                            DXButton(
+                                onClick = {
+                                    viewModel.reset()
+                                },
+                                text = stringResource(
+                                    R.string.terminal_dismiss,
+                                ),
+                                variant = ButtonVariant.Secondary.Large,
+                                modifier = Modifier.fillMaxWidth(),
+                            )
                         }
                     }
                     is TerminalUiState.Error -> {
                         Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
                             Spacer(Modifier.height(DX.Spacing.XL2))
-                            Icon(Icons.Filled.Error, contentDescription = stringResource(R.string.terminal_cd_error), modifier = Modifier.size(48.dp), tint = DX.Color.text.red)
+                            Icon(
+                                Icons.Filled.Error,
+                                contentDescription = stringResource(R.string.terminal_cd_error),
+                                modifier = Modifier.size(48.dp),
+                                tint = DX.Color.text.red,
+                            )
                             Spacer(Modifier.height(DX.Spacing.M))
                             Text(stringResource(R.string.terminal_error), style = DX.Font.subHeadingSemiBold, color = DX.Color.text.red)
                             Text(state.message, style = DX.Font.body, color = DX.Color.text.secondary)
                             Spacer(Modifier.height(DX.Spacing.XL))
-                            DXButton(onClick = { viewModel.reset() }, text = stringResource(R.string.terminal_dismiss), variant = ButtonVariant.Secondary.Large, modifier = Modifier.fillMaxWidth())
+                            DXButton(
+                                onClick = {
+                                    viewModel.reset()
+                                },
+                                text = stringResource(
+                                    R.string.terminal_dismiss,
+                                ),
+                                variant = ButtonVariant.Secondary.Large,
+                                modifier = Modifier.fillMaxWidth(),
+                            )
                         }
                     }
                 }
@@ -179,7 +254,7 @@ private fun ReceiptRow(label: String, value: String, highlight: Boolean = false)
         Text(
             value,
             style = if (highlight) DX.Font.bodySemiBold else DX.Font.body,
-            color = if (highlight) DX.Color.text.red else DX.Color.text.primary
+            color = if (highlight) DX.Color.text.red else DX.Color.text.primary,
         )
     }
 }

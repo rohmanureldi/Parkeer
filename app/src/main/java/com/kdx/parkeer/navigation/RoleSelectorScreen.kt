@@ -33,12 +33,7 @@ import com.telkomsel.dexterity.components.molecule.card.customcard.CustomCardVar
 import com.telkomsel.dexterity.theme.DX
 
 @Composable
-fun RoleSelectorScreen(
-    onStationClick: () -> Unit,
-    onGateClick: () -> Unit,
-    onTerminalClick: () -> Unit,
-    onScoutClick: () -> Unit,
-) {
+fun RoleSelectorScreen(onStationClick: () -> Unit, onGateClick: () -> Unit, onTerminalClick: () -> Unit, onScoutClick: () -> Unit) {
     val activity = LocalActivity.current
     BackHandler { activity?.finish() }
 
@@ -46,18 +41,18 @@ fun RoleSelectorScreen(
         modifier = Modifier
             .fillMaxSize()
             .padding(DX.Spacing.L),
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Spacer(Modifier.height(DX.Spacing.XL3))
         Text(
             stringResource(R.string.app_brand),
             style = DX.Font.brandHeadingBold,
-            color = DX.Color.text.primary
+            color = DX.Color.text.primary,
         )
         Text(
             stringResource(R.string.app_tagline),
             style = DX.Font.caption,
-            color = DX.Color.text.secondary
+            color = DX.Color.text.secondary,
         )
         Spacer(Modifier.height(DX.Spacing.XL2))
 
@@ -68,14 +63,14 @@ fun RoleSelectorScreen(
                     stringResource(R.string.role_station),
                     stringResource(R.string.role_station_desc),
                     onStationClick,
-                    Modifier.weight(1f)
+                    Modifier.weight(1f),
                 )
                 RoleCard(
                     Icons.Filled.MeetingRoom,
                     stringResource(R.string.role_gate),
                     stringResource(R.string.role_gate_desc),
                     onGateClick,
-                    Modifier.weight(1f)
+                    Modifier.weight(1f),
                 )
             }
             Row(horizontalArrangement = Arrangement.spacedBy(DX.Spacing.M)) {
@@ -84,14 +79,14 @@ fun RoleSelectorScreen(
                     stringResource(R.string.role_terminal),
                     stringResource(R.string.role_terminal_desc),
                     onTerminalClick,
-                    Modifier.weight(1f)
+                    Modifier.weight(1f),
                 )
                 RoleCard(
                     Icons.Filled.Visibility,
                     stringResource(R.string.role_scout),
                     stringResource(R.string.role_scout_desc),
                     onScoutClick,
-                    Modifier.weight(1f)
+                    Modifier.weight(1f),
                 )
             }
         }
@@ -99,33 +94,28 @@ fun RoleSelectorScreen(
 }
 
 @Composable
-private fun RoleCard(
-    icon: ImageVector,
-    title: String,
-    subtitle: String,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
+private fun RoleCard(icon: ImageVector, title: String, subtitle: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
     DXCard(
         modifier = modifier,
         style = DXCardStyle.CustomLayout(
             style = CustomCardStyle(
                 CustomCardVariant.Custom(
                     { DX.Color.background.white },
-                    { DX.Color.stroke.border })
+                    { DX.Color.stroke.border },
+                ),
             ),
             content = {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(DX.Spacing.L),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                    horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Icon(
                         icon,
                         contentDescription = title,
                         modifier = Modifier.size(32.dp),
-                        tint = DX.Color.text.primary
+                        tint = DX.Color.text.primary,
                     )
                     Spacer(Modifier.height(DX.Spacing.S))
                     Text(title, style = DX.Font.bodySemiBold, color = DX.Color.text.primary)
@@ -133,10 +123,10 @@ private fun RoleCard(
                         subtitle,
                         style = DX.Font.caption,
                         color = DX.Color.text.secondary,
-                        textAlign = TextAlign.Center
+                        textAlign = TextAlign.Center,
                     )
                 }
-            }
+            },
         ),
         onClick = onClick,
     )

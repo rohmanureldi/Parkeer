@@ -10,7 +10,6 @@ pluginManagement {
                 password = System.getenv("JFROG_PASSWORD") ?: ""
             }
         }
-
     }
 }
 

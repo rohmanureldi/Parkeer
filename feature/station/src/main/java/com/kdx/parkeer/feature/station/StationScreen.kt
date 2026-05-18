@@ -37,10 +37,7 @@ import com.telkomsel.dexterity.theme.DX
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun StationScreen(
-    onBack: () -> Unit,
-    viewModel: StationViewModel = hiltViewModel()
-) {
+fun StationScreen(onBack: () -> Unit, viewModel: StationViewModel = hiltViewModel()) {
     val uiState by viewModel.uiState.collectAsState()
     val haptic = rememberHapticFeedback()
     var screen by rememberSaveable { mutableStateOf("home") }
@@ -61,9 +58,9 @@ fun StationScreen(
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.station_cd_back))
                     }
-                }
+                },
             )
-        }
+        },
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -72,7 +69,7 @@ fun StationScreen(
                 .consumeWindowInsets(innerPadding)
                 .padding(horizontal = DX.Spacing.L)
                 .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(DX.Spacing.M)
+            verticalArrangement = Arrangement.spacedBy(DX.Spacing.M),
         ) {
             Text(stringResource(R.string.station_subtitle), style = DX.Font.caption, color = DX.Color.text.secondary)
             Spacer(Modifier.height(DX.Spacing.S))
@@ -80,25 +77,25 @@ fun StationScreen(
             AnimatedContent(
                 targetState = uiState,
                 transitionSpec = { fadeIn() togetherWith fadeOut() },
-                label = "station_state"
+                label = "station_state",
             ) { state ->
                 when (state) {
                     is StationUiState.Idle -> {
                         AnimatedContent(
                             targetState = screen,
                             transitionSpec = { fadeIn() togetherWith fadeOut() },
-                            label = "station_sub"
+                            label = "station_sub",
                         ) { sub ->
                             when (sub) {
                                 "home" -> StationHome(
                                     onRegister = { screen = "register" },
-                                    onTopUp = { screen = "topup" }
+                                    onTopUp = { screen = "topup" },
                                 )
                                 "register" -> RegisterForm(viewModel) { screen = "home" }
                                 "topup" -> TopUpForm(viewModel) { screen = "home" }
                                 else -> StationHome(
                                     onRegister = { screen = "register" },
-                                    onTopUp = { screen = "topup" }
+                                    onTopUp = { screen = "topup" },
                                 )
                             }
                         }
@@ -108,14 +105,26 @@ fun StationScreen(
                     is StationUiState.RegisterSuccess -> {
                         SuccessState(
                             stringResource(R.string.station_register_success),
-                            stringResource(R.string.station_register_detail, state.name, state.id)
-                        ) { viewModel.reset(); screen = "home" }
+                            stringResource(R.string.station_register_detail, state.name, state.id),
+                        ) {
+                            viewModel.reset()
+                            screen = "home"
+                        }
                     }
                     is StationUiState.TopUpSuccess -> {
                         SuccessState(
                             stringResource(R.string.station_topup_success),
-                            stringResource(R.string.station_topup_detail, state.name, state.oldBalance.toRupiah(), state.added.toRupiah(), state.newBalance.toRupiah())
-                        ) { viewModel.reset(); screen = "home" }
+                            stringResource(
+                                R.string.station_topup_detail,
+                                state.name,
+                                state.oldBalance.toRupiah(),
+                                state.added.toRupiah(),
+                                state.newBalance.toRupiah(),
+                            ),
+                        ) {
+                            viewModel.reset()
+                            screen = "home"
+                        }
                     }
                     is StationUiState.Error -> {
                         ErrorState(state.message) { viewModel.reset() }
@@ -129,18 +138,36 @@ fun StationScreen(
 @Composable
 private fun StationHome(onRegister: () -> Unit, onTopUp: () -> Unit) {
     Column(verticalArrangement = Arrangement.spacedBy(DX.Spacing.M)) {
-        DXCard(modifier = Modifier.fillMaxWidth(), style = DXCardStyle.CustomLayout(
-            style = CustomCardStyle(CustomCardVariant.Custom({ DX.Color.background.white }, { DX.Color.stroke.border })),
-            content = {
-                Column(Modifier.padding(DX.Spacing.L), horizontalAlignment = Alignment.CenterHorizontally) {
-                    Icon(Icons.Filled.Store, contentDescription = stringResource(R.string.station_cd_station), modifier = Modifier.size(48.dp), tint = DX.Color.text.primary)
-                    Spacer(Modifier.height(DX.Spacing.S))
-                    Text(stringResource(R.string.station_welcome_admin), style = DX.Font.bodySemiBold, color = DX.Color.text.primary)
-                }
-            }
-        ))
-        DXButton(onClick = onRegister, text = stringResource(R.string.station_register_new), variant = ButtonVariant.Primary.Large, modifier = Modifier.fillMaxWidth())
-        DXButton(onClick = onTopUp, text = stringResource(R.string.station_top_up), variant = ButtonVariant.Secondary.Large, modifier = Modifier.fillMaxWidth())
+        DXCard(
+            modifier = Modifier.fillMaxWidth(),
+            style = DXCardStyle.CustomLayout(
+                style = CustomCardStyle(CustomCardVariant.Custom({ DX.Color.background.white }, { DX.Color.stroke.border })),
+                content = {
+                    Column(Modifier.padding(DX.Spacing.L), horizontalAlignment = Alignment.CenterHorizontally) {
+                        Icon(
+                            Icons.Filled.Store,
+                            contentDescription = stringResource(R.string.station_cd_station),
+                            modifier = Modifier.size(48.dp),
+                            tint = DX.Color.text.primary,
+                        )
+                        Spacer(Modifier.height(DX.Spacing.S))
+                        Text(stringResource(R.string.station_welcome_admin), style = DX.Font.bodySemiBold, color = DX.Color.text.primary)
+                    }
+                },
+            ),
+        )
+        DXButton(
+            onClick = onRegister,
+            text = stringResource(R.string.station_register_new),
+            variant = ButtonVariant.Primary.Large,
+            modifier = Modifier.fillMaxWidth(),
+        )
+        DXButton(
+            onClick = onTopUp,
+            text = stringResource(R.string.station_top_up),
+            variant = ButtonVariant.Secondary.Large,
+            modifier = Modifier.fillMaxWidth(),
+        )
     }
 }
 
@@ -150,24 +177,35 @@ private fun RegisterForm(viewModel: StationViewModel, onCancel: () -> Unit) {
     var id by rememberSaveable { mutableStateOf("") }
 
     Column(verticalArrangement = Arrangement.spacedBy(DX.Spacing.M)) {
-        DXInput(config = DXInputConfig.TextField(
-            value = name, onValueChange = { name = it },
-            placeholder = stringResource(R.string.station_member_name_placeholder),
-            header = HeaderConfig(label = stringResource(R.string.station_member_name_label))
-        ))
-        DXInput(config = DXInputConfig.TextField(
-            value = id, onValueChange = { id = it },
-            placeholder = stringResource(R.string.station_member_id_placeholder),
-            header = HeaderConfig(label = stringResource(R.string.station_member_id_label))
-        ))
+        DXInput(
+            config = DXInputConfig.TextField(
+                value = name,
+                onValueChange = { name = it },
+                placeholder = stringResource(R.string.station_member_name_placeholder),
+                header = HeaderConfig(label = stringResource(R.string.station_member_name_label)),
+            ),
+        )
+        DXInput(
+            config = DXInputConfig.TextField(
+                value = id,
+                onValueChange = { id = it },
+                placeholder = stringResource(R.string.station_member_id_placeholder),
+                header = HeaderConfig(label = stringResource(R.string.station_member_id_label)),
+            ),
+        )
         DXButton(
             onClick = { viewModel.prepareRegister(name, id) },
             text = stringResource(R.string.station_ready_to_write),
             variant = ButtonVariant.Primary.Large,
             state = if (name.isNotBlank() && id.isNotBlank()) ButtonState.Default else ButtonState.Disabled,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         )
-        DXButton(onClick = onCancel, text = stringResource(R.string.station_cancel), variant = ButtonVariant.Secondary.Large, modifier = Modifier.fillMaxWidth())
+        DXButton(
+            onClick = onCancel,
+            text = stringResource(R.string.station_cancel),
+            variant = ButtonVariant.Secondary.Large,
+            modifier = Modifier.fillMaxWidth(),
+        )
     }
 }
 
@@ -176,11 +214,14 @@ private fun TopUpForm(viewModel: StationViewModel, onCancel: () -> Unit) {
     var amount by rememberSaveable { mutableStateOf("") }
 
     Column(verticalArrangement = Arrangement.spacedBy(DX.Spacing.M)) {
-        DXInput(config = DXInputConfig.TextField(
-            value = amount, onValueChange = { amount = it.filter { c -> c.isDigit() } },
-            placeholder = stringResource(R.string.station_topup_placeholder),
-            header = HeaderConfig(label = stringResource(R.string.station_topup_label))
-        ))
+        DXInput(
+            config = DXInputConfig.TextField(
+                value = amount,
+                onValueChange = { amount = it.filter { c -> c.isDigit() } },
+                placeholder = stringResource(R.string.station_topup_placeholder),
+                header = HeaderConfig(label = stringResource(R.string.station_topup_label)),
+            ),
+        )
         Row(horizontalArrangement = Arrangement.spacedBy(DX.Spacing.S)) {
             listOf(10000, 20000, 50000, 100000).forEach { v ->
                 DXButton(onClick = { amount = v.toString() }, text = "${v / 1000}K", variant = ButtonVariant.Secondary.Small)
@@ -191,9 +232,14 @@ private fun TopUpForm(viewModel: StationViewModel, onCancel: () -> Unit) {
             text = stringResource(R.string.station_ready_to_write),
             variant = ButtonVariant.Primary.Large,
             state = if ((amount.toIntOrNull() ?: 0) > 0) ButtonState.Default else ButtonState.Disabled,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         )
-        DXButton(onClick = onCancel, text = stringResource(R.string.station_cancel), variant = ButtonVariant.Secondary.Large, modifier = Modifier.fillMaxWidth())
+        DXButton(
+            onClick = onCancel,
+            text = stringResource(R.string.station_cancel),
+            variant = ButtonVariant.Secondary.Large,
+            modifier = Modifier.fillMaxWidth(),
+        )
     }
 }
 
@@ -222,13 +268,23 @@ private fun ProcessingState() {
 private fun SuccessState(title: String, detail: String, onDone: () -> Unit) {
     Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
         Spacer(Modifier.height(DX.Spacing.XL2))
-        Icon(Icons.Filled.CheckCircle, contentDescription = stringResource(R.string.station_cd_success), modifier = Modifier.size(48.dp), tint = DX.Color.text.darkGreen)
+        Icon(
+            Icons.Filled.CheckCircle,
+            contentDescription = stringResource(R.string.station_cd_success),
+            modifier = Modifier.size(48.dp),
+            tint = DX.Color.text.darkGreen,
+        )
         Spacer(Modifier.height(DX.Spacing.M))
         Text(title, style = DX.Font.subHeadingSemiBold, color = DX.Color.text.primary)
         Spacer(Modifier.height(DX.Spacing.S))
         Text(detail, style = DX.Font.body, color = DX.Color.text.secondary)
         Spacer(Modifier.height(DX.Spacing.XL))
-        DXButton(onClick = onDone, text = stringResource(R.string.station_done), variant = ButtonVariant.Primary.Large, modifier = Modifier.fillMaxWidth())
+        DXButton(
+            onClick = onDone,
+            text = stringResource(R.string.station_done),
+            variant = ButtonVariant.Primary.Large,
+            modifier = Modifier.fillMaxWidth(),
+        )
     }
 }
 
@@ -236,12 +292,22 @@ private fun SuccessState(title: String, detail: String, onDone: () -> Unit) {
 private fun ErrorState(message: String, onDismiss: () -> Unit) {
     Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
         Spacer(Modifier.height(DX.Spacing.XL2))
-        Icon(Icons.Filled.Error, contentDescription = stringResource(R.string.station_cd_error), modifier = Modifier.size(48.dp), tint = DX.Color.text.red)
+        Icon(
+            Icons.Filled.Error,
+            contentDescription = stringResource(R.string.station_cd_error),
+            modifier = Modifier.size(48.dp),
+            tint = DX.Color.text.red,
+        )
         Spacer(Modifier.height(DX.Spacing.M))
         Text(stringResource(R.string.station_error), style = DX.Font.subHeadingSemiBold, color = DX.Color.text.red)
         Spacer(Modifier.height(DX.Spacing.S))
         Text(message, style = DX.Font.body, color = DX.Color.text.secondary)
         Spacer(Modifier.height(DX.Spacing.XL))
-        DXButton(onClick = onDismiss, text = stringResource(R.string.station_try_again), variant = ButtonVariant.Secondary.Large, modifier = Modifier.fillMaxWidth())
+        DXButton(
+            onClick = onDismiss,
+            text = stringResource(R.string.station_try_again),
+            variant = ButtonVariant.Secondary.Large,
+            modifier = Modifier.fillMaxWidth(),
+        )
     }
 }

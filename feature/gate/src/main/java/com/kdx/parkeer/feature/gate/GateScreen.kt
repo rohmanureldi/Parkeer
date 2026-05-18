@@ -36,10 +36,7 @@ import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun GateScreen(
-    onBack: () -> Unit,
-    viewModel: GateViewModel = hiltViewModel()
-) {
+fun GateScreen(onBack: () -> Unit, viewModel: GateViewModel = hiltViewModel()) {
     val uiState by viewModel.uiState.collectAsState()
     val haptic = rememberHapticFeedback()
     var simEnabled by remember { mutableStateOf(false) }
@@ -79,9 +76,9 @@ fun GateScreen(
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.gate_cd_back))
                     }
-                }
+                },
             )
-        }
+        },
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -90,25 +87,25 @@ fun GateScreen(
                 .consumeWindowInsets(innerPadding)
                 .padding(horizontal = DX.Spacing.L)
                 .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(DX.Spacing.M)
+            verticalArrangement = Arrangement.spacedBy(DX.Spacing.M),
         ) {
             Text(
                 if (simEnabled) stringResource(R.string.gate_subtitle_sim) else stringResource(R.string.gate_subtitle),
                 style = DX.Font.caption,
-                color = if (simEnabled) DX.Color.text.darkYellow else DX.Color.text.secondary
+                color = if (simEnabled) DX.Color.text.darkYellow else DX.Color.text.secondary,
             )
 
             AnimatedContent(
                 targetState = uiState,
                 transitionSpec = { fadeIn() togetherWith fadeOut() },
-                label = "gate_state"
+                label = "gate_state",
             ) { state ->
                 when (state) {
                     is GateUiState.Ready -> {
                         Column(
                             Modifier.fillMaxWidth(),
                             horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.spacedBy(DX.Spacing.M)
+                            verticalArrangement = Arrangement.spacedBy(DX.Spacing.M),
                         ) {
                             Spacer(Modifier.height(DX.Spacing.L))
                             NfcPulseAnimation()
@@ -122,27 +119,56 @@ fun GateScreen(
                                     Row(
                                         Modifier.fillMaxWidth(),
                                         horizontalArrangement = Arrangement.SpaceBetween,
-                                        verticalAlignment = Alignment.CenterVertically
+                                        verticalAlignment = Alignment.CenterVertically,
                                     ) {
-                                        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(DX.Spacing.S)) {
-                                            Icon(Icons.Filled.Settings, contentDescription = stringResource(R.string.gate_cd_sim_settings), modifier = Modifier.size(16.dp), tint = DX.Color.text.secondary)
-                                            Text(stringResource(R.string.gate_simulation_mode), style = DX.Font.bodySemiBold, color = DX.Color.text.primary)
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.spacedBy(DX.Spacing.S),
+                                        ) {
+                                            Icon(
+                                                Icons.Filled.Settings,
+                                                contentDescription = stringResource(R.string.gate_cd_sim_settings),
+                                                modifier = Modifier.size(16.dp),
+                                                tint = DX.Color.text.secondary,
+                                            )
+                                            Text(
+                                                stringResource(R.string.gate_simulation_mode),
+                                                style = DX.Font.bodySemiBold,
+                                                color = DX.Color.text.primary,
+                                            )
                                         }
                                         DXSwitch(checked = simEnabled, onCheckedChange = { simEnabled = it })
                                     }
                                     if (simEnabled) {
                                         Spacer(Modifier.height(DX.Spacing.M))
-                                        DXInput(config = DXInputConfig.TextField(
-                                            value = simHoursAgo,
-                                            onValueChange = { simHoursAgo = it.filter { c -> c.isDigit() } },
-                                            placeholder = stringResource(R.string.gate_sim_hours_placeholder),
-                                            header = HeaderConfig(label = stringResource(R.string.gate_sim_hours_label))
-                                        ))
+                                        DXInput(
+                                            config = DXInputConfig.TextField(
+                                                value = simHoursAgo,
+                                                onValueChange = { simHoursAgo = it.filter { c -> c.isDigit() } },
+                                                placeholder = stringResource(R.string.gate_sim_hours_placeholder),
+                                                header = HeaderConfig(label = stringResource(R.string.gate_sim_hours_label)),
+                                            ),
+                                        )
                                         Spacer(Modifier.height(DX.Spacing.S))
                                         val simTime = System.currentTimeMillis() - ((simHoursAgo.toLongOrNull() ?: 0L) * 3_600_000L)
-                                        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(DX.Spacing.XS)) {
-                                            Icon(Icons.Filled.Warning, contentDescription = stringResource(R.string.gate_cd_sim_warning), modifier = Modifier.size(16.dp), tint = DX.Color.text.darkYellow)
-                                            Text(stringResource(R.string.gate_sim_will_record, timeFmt.format(Instant.ofEpochMilli(simTime).atZone(ZoneId.systemDefault()))), style = DX.Font.caption, color = DX.Color.text.darkYellow)
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.spacedBy(DX.Spacing.XS),
+                                        ) {
+                                            Icon(
+                                                Icons.Filled.Warning,
+                                                contentDescription = stringResource(R.string.gate_cd_sim_warning),
+                                                modifier = Modifier.size(16.dp),
+                                                tint = DX.Color.text.darkYellow,
+                                            )
+                                            Text(
+                                                stringResource(
+                                                    R.string.gate_sim_will_record,
+                                                    timeFmt.format(Instant.ofEpochMilli(simTime).atZone(ZoneId.systemDefault())),
+                                                ),
+                                                style = DX.Font.caption,
+                                                color = DX.Color.text.darkYellow,
+                                            )
                                         }
                                     }
                                 }
@@ -160,24 +186,56 @@ fun GateScreen(
                     is GateUiState.Success -> {
                         Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
                             Spacer(Modifier.height(DX.Spacing.XL2))
-                            Icon(Icons.Filled.CheckCircle, contentDescription = stringResource(R.string.gate_cd_success), modifier = Modifier.size(48.dp), tint = DX.Color.text.darkGreen)
+                            Icon(
+                                Icons.Filled.CheckCircle,
+                                contentDescription = stringResource(R.string.gate_cd_success),
+                                modifier = Modifier.size(48.dp),
+                                tint = DX.Color.text.darkGreen,
+                            )
                             Spacer(Modifier.height(DX.Spacing.M))
-                            Text(stringResource(R.string.gate_welcome, state.memberName), style = DX.Font.subHeadingSemiBold, color = DX.Color.text.primary)
-                            Text(stringResource(R.string.gate_checked_in_at, fullFmt.format(Instant.ofEpochMilli(state.checkInTime).atZone(ZoneId.systemDefault()))), style = DX.Font.body, color = DX.Color.text.secondary)
+                            Text(
+                                stringResource(R.string.gate_welcome, state.memberName),
+                                style = DX.Font.subHeadingSemiBold,
+                                color = DX.Color.text.primary,
+                            )
+                            Text(
+                                stringResource(
+                                    R.string.gate_checked_in_at,
+                                    fullFmt.format(Instant.ofEpochMilli(state.checkInTime).atZone(ZoneId.systemDefault())),
+                                ),
+                                style = DX.Font.body,
+                                color = DX.Color.text.secondary,
+                            )
                             if (simEnabled) Text(stringResource(R.string.gate_simulated), style = DX.Font.caption, color = DX.Color.text.darkYellow)
                             Spacer(Modifier.height(DX.Spacing.XL))
-                            DXButton(onClick = { viewModel.reset() }, text = stringResource(R.string.gate_done), variant = ButtonVariant.Primary.Large, modifier = Modifier.fillMaxWidth())
+                            DXButton(onClick = {
+                                viewModel.reset()
+                            }, text = stringResource(R.string.gate_done), variant = ButtonVariant.Primary.Large, modifier = Modifier.fillMaxWidth())
                         }
                     }
                     is GateUiState.Error -> {
                         Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
                             Spacer(Modifier.height(DX.Spacing.XL2))
-                            Icon(Icons.Filled.Error, contentDescription = stringResource(R.string.gate_cd_error), modifier = Modifier.size(48.dp), tint = DX.Color.text.red)
+                            Icon(
+                                Icons.Filled.Error,
+                                contentDescription = stringResource(R.string.gate_cd_error),
+                                modifier = Modifier.size(48.dp),
+                                tint = DX.Color.text.red,
+                            )
                             Spacer(Modifier.height(DX.Spacing.M))
                             Text(stringResource(R.string.gate_error), style = DX.Font.subHeadingSemiBold, color = DX.Color.text.red)
                             Text(state.message, style = DX.Font.body, color = DX.Color.text.secondary)
                             Spacer(Modifier.height(DX.Spacing.XL))
-                            DXButton(onClick = { viewModel.reset() }, text = stringResource(R.string.gate_dismiss), variant = ButtonVariant.Secondary.Large, modifier = Modifier.fillMaxWidth())
+                            DXButton(
+                                onClick = {
+                                    viewModel.reset()
+                                },
+                                text = stringResource(
+                                    R.string.gate_dismiss,
+                                ),
+                                variant = ButtonVariant.Secondary.Large,
+                                modifier = Modifier.fillMaxWidth(),
+                            )
                         }
                     }
                 }

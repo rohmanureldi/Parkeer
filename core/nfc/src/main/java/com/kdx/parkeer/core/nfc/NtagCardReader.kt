@@ -11,9 +11,7 @@ import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import javax.inject.Inject
 
-class NtagCardReader @Inject constructor(
-    private val cipher: CardCipher
-) : CardReader {
+class NtagCardReader @Inject constructor(private val cipher: CardCipher) : CardReader {
 
     override suspend fun read(tag: Tag): Result<CardData> = withContext(Dispatchers.IO) {
         runCatching {
@@ -59,7 +57,7 @@ class NtagCardReader @Inject constructor(
                 val commitPageOffset = (CardProtocol.TOTAL_SIZE - 1) % 4
                 val commitPageData = readBack.copyOfRange(
                     (commitPage - 4) * 4,
-                    (commitPage - 4) * 4 + 4
+                    (commitPage - 4) * 4 + 4,
                 ).also { it[commitPageOffset] = 0x01 }
                 ultralight.writePage(commitPage, commitPageData)
             } finally {

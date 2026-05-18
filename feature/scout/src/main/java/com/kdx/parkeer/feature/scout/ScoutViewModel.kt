@@ -21,10 +21,7 @@ sealed interface ScoutUiState {
 }
 
 @HiltViewModel
-class ScoutViewModel @Inject constructor(
-    private val cardReader: CardReader,
-    private val nfcTagHolder: NfcTagHolder
-) : ViewModel() {
+class ScoutViewModel @Inject constructor(private val cardReader: CardReader, private val nfcTagHolder: NfcTagHolder) : ViewModel() {
 
     private val _uiState = MutableStateFlow<ScoutUiState>(ScoutUiState.Ready)
     val uiState: StateFlow<ScoutUiState> = _uiState.asStateFlow()
@@ -48,5 +45,7 @@ class ScoutViewModel @Inject constructor(
         }
     }
 
-    fun reset() { _uiState.value = ScoutUiState.Ready }
+    fun reset() {
+        _uiState.value = ScoutUiState.Ready
+    }
 }

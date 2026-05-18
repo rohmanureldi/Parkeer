@@ -7,12 +7,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalView
 
-interface ParkeerHapticFeedback {
-    fun success()
-    fun error()
-    fun tick()
-}
-
 @Composable
 fun rememberHapticFeedback(): ParkeerHapticFeedback {
     val view = LocalView.current

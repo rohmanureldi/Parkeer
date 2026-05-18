@@ -9,16 +9,12 @@ import com.telkomsel.dexterity.components.molecule.card.customcard.CustomCardVar
 import com.telkomsel.dexterity.theme.DX
 
 @Composable
-fun ParkeerCard(
-    modifier: Modifier = Modifier,
-    onClick: (() -> Unit)? = null,
-    content: @Composable () -> Unit
-) {
+fun ParkeerCard(modifier: Modifier = Modifier, onClick: (() -> Unit)? = null, content: @Composable () -> Unit) {
     DXCard(
         modifier = modifier,
         style = DXCardStyle.CustomLayout(
             style = CustomCardStyle(
-                CustomCardVariant.Custom({ DX.Color.background.white }, { DX.Color.stroke.border })
+                CustomCardVariant.Custom({ DX.Color.background.white }, { DX.Color.stroke.border }),
             ),
             content = content,
         ),
