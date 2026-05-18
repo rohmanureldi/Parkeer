@@ -33,7 +33,13 @@ import com.telkomsel.dexterity.components.molecule.card.customcard.CustomCardVar
 import com.telkomsel.dexterity.theme.DX
 
 @Composable
-fun RoleSelectorScreen(onStationClick: () -> Unit, onGateClick: () -> Unit, onTerminalClick: () -> Unit, onScoutClick: () -> Unit) {
+fun RoleSelectorScreen(
+    onStationClick: () -> Unit,
+    onGateClick: () -> Unit,
+    onTerminalClick: () -> Unit,
+    onScoutClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     val activity = LocalActivity.current
     BackHandler { activity?.finish() }
 
