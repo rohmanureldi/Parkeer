@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="terminal_title">Terminal</string>
+    <string name="terminal_subtitle">Exit Point – Check-Out</string>
+    <string name="terminal_ready">Ready</string>
+    <string name="terminal_tap_to_check_out">Tap member card to check out</string>
+    <string name="terminal_rate_info">Rate: %1$s/hour (rounded up)</string>
+    <string name="terminal_calculating">Calculating…</string>
+    <string name="terminal_checkout_complete">Checkout Complete!</string>
+    <string name="terminal_done">Done</string>
+    <string name="terminal_insufficient_balance">Insufficient Balance</string>
+    <string name="terminal_topup_hint">Please top-up at the nearest Station, then return here.</string>
+    <string name="terminal_dismiss">Dismiss</string>
+    <string name="terminal_error">Error</string>
+    <string name="terminal_receipt_member">Member</string>
+    <string name="terminal_receipt_checkin">Check-in</string>
+    <string name="terminal_receipt_checkout">Check-out</string>
+    <string name="terminal_receipt_duration">Duration</string>
+    <string name="terminal_receipt_hours_billed">Hours Billed</string>
+    <string name="terminal_receipt_hours_value">%1$d hour(s) ↑</string>
+    <string name="terminal_receipt_fee">Fee</string>
+    <string name="terminal_receipt_prev_balance">Previous Balance</string>
+    <string name="terminal_receipt_new_balance">New Balance</string>
+    <string name="terminal_receipt_fee_required">Fee Required</string>
+    <string name="terminal_receipt_your_balance">Your Balance</string>
+    <string name="terminal_receipt_need_more">Need More</string>
+    <string name="terminal_duration_format">%1$dh %2$dm</string>
+    <string name="terminal_cd_back">Back</string>
+    <string name="terminal_cd_success">Success</string>
+    <string name="terminal_cd_insufficient">Insufficient Balance</string>
+    <string name="terminal_cd_tip">Tip</string>
+    <string name="terminal_cd_error">Error</string>
+</resources>

@@ -15,8 +15,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.kdx.parkeer.R
 import com.telkomsel.dexterity.components.molecule.card.DXCard
 import com.telkomsel.dexterity.components.molecule.card.DXCardStyle
 import com.telkomsel.dexterity.components.molecule.card.customcard.CustomCardStyle
@@ -40,18 +42,18 @@ fun RoleSelectorScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Spacer(Modifier.height(DX.Spacing.XL3))
-        Text("KDX Parkeer", style = DX.Font.brandHeadingBold, color = DX.Color.text.primary)
-        Text("Membership Benefit Card", style = DX.Font.caption, color = DX.Color.text.secondary)
+        Text(stringResource(R.string.app_brand), style = DX.Font.brandHeadingBold, color = DX.Color.text.primary)
+        Text(stringResource(R.string.app_tagline), style = DX.Font.caption, color = DX.Color.text.secondary)
         Spacer(Modifier.height(DX.Spacing.XL2))
 
         Column(verticalArrangement = Arrangement.spacedBy(DX.Spacing.M)) {
             Row(horizontalArrangement = Arrangement.spacedBy(DX.Spacing.M)) {
-                RoleCard(Icons.Filled.Store, "Station", "Register & Top-Up", onStationClick, Modifier.weight(1f))
-                RoleCard(Icons.Filled.MeetingRoom, "Gate", "Check-In", onGateClick, Modifier.weight(1f))
+                RoleCard(Icons.Filled.Store, stringResource(R.string.role_station), stringResource(R.string.role_station_desc), onStationClick, Modifier.weight(1f))
+                RoleCard(Icons.Filled.MeetingRoom, stringResource(R.string.role_gate), stringResource(R.string.role_gate_desc), onGateClick, Modifier.weight(1f))
             }
             Row(horizontalArrangement = Arrangement.spacedBy(DX.Spacing.M)) {
-                RoleCard(Icons.Filled.LocalParking, "Terminal", "Check-Out", onTerminalClick, Modifier.weight(1f))
-                RoleCard(Icons.Filled.Visibility, "Scout", "View Card", onScoutClick, Modifier.weight(1f))
+                RoleCard(Icons.Filled.LocalParking, stringResource(R.string.role_terminal), stringResource(R.string.role_terminal_desc), onTerminalClick, Modifier.weight(1f))
+                RoleCard(Icons.Filled.Visibility, stringResource(R.string.role_scout), stringResource(R.string.role_scout_desc), onScoutClick, Modifier.weight(1f))
             }
         }
     }

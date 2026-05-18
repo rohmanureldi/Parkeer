@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="gate_title">Gate</string>
+    <string name="gate_subtitle">Titik Masuk – Check-In</string>
+    <string name="gate_subtitle_sim">Titik Masuk – Check-In (Simulasi)</string>
+    <string name="gate_ready">Siap</string>
+    <string name="gate_tap_to_check_in">Tempelkan kartu anggota untuk check-in</string>
+    <string name="gate_simulation_mode">Mode Simulasi</string>
+    <string name="gate_sim_hours_placeholder">Jam lalu</string>
+    <string name="gate_sim_hours_label">Atur waktu check-in (jam lalu)</string>
+    <string name="gate_sim_will_record">Akan dicatat: %1$s</string>
+    <string name="gate_processing">Memproses…</string>
+    <string name="gate_welcome">Selamat datang, %1$s!</string>
+    <string name="gate_checked_in_at">Check-in pada %1$s</string>
+    <string name="gate_simulated">(Simulasi)</string>
+    <string name="gate_done">Selesai</string>
+    <string name="gate_error">Error</string>
+    <string name="gate_dismiss">Tutup</string>
+    <string name="gate_busy">Mohon tunggu — masih memproses</string>
+    <string name="gate_cd_back">Kembali</string>
+    <string name="gate_cd_sim_settings">Pengaturan simulasi</string>
+    <string name="gate_cd_sim_warning">Peringatan simulasi</string>
+    <string name="gate_cd_success">Berhasil</string>
+    <string name="gate_cd_error">Error</string>
+</resources>

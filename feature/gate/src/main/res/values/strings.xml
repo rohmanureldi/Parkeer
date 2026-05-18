@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="gate_title">Gate</string>
+    <string name="gate_subtitle">Entry Point – Check-In</string>
+    <string name="gate_subtitle_sim">Entry Point – Check-In (Simulation)</string>
+    <string name="gate_ready">Ready</string>
+    <string name="gate_tap_to_check_in">Tap member card to check in</string>
+    <string name="gate_simulation_mode">Simulation Mode</string>
+    <string name="gate_sim_hours_placeholder">Hours ago</string>
+    <string name="gate_sim_hours_label">Set check-in time (hours ago)</string>
+    <string name="gate_sim_will_record">Will record: %1$s</string>
+    <string name="gate_processing">Processing…</string>
+    <string name="gate_welcome">Welcome, %1$s!</string>
+    <string name="gate_checked_in_at">Checked in at %1$s</string>
+    <string name="gate_simulated">(Simulated)</string>
+    <string name="gate_done">Done</string>
+    <string name="gate_error">Error</string>
+    <string name="gate_dismiss">Dismiss</string>
+    <string name="gate_busy">Please wait — still processing</string>
+    <string name="gate_cd_back">Back</string>
+    <string name="gate_cd_sim_settings">Simulation settings</string>
+    <string name="gate_cd_sim_warning">Simulation warning</string>
+    <string name="gate_cd_success">Success</string>
+    <string name="gate_cd_error">Error</string>
+</resources>

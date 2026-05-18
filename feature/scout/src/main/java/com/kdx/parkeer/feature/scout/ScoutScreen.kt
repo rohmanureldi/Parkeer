@@ -25,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -65,10 +66,10 @@ fun ScoutScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Scout") },
+                title = { Text(stringResource(R.string.scout_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.scout_cd_back))
                     }
                 }
             )
@@ -84,8 +85,8 @@ fun ScoutScreen(
             verticalArrangement = Arrangement.spacedBy(DX.Spacing.M)
         ) {
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(DX.Spacing.XS)) {
-                Icon(Icons.Filled.Lock, contentDescription = "Read only mode", modifier = Modifier.size(16.dp), tint = DX.Color.text.blue)
-                Text("Read Only – Will NOT modify your card", style = DX.Font.caption, color = DX.Color.text.blue)
+                Icon(Icons.Filled.Lock, contentDescription = stringResource(R.string.scout_cd_read_only), modifier = Modifier.size(16.dp), tint = DX.Color.text.blue)
+                Text(stringResource(R.string.scout_read_only), style = DX.Font.caption, color = DX.Color.text.blue)
             }
 
             AnimatedContent(
@@ -99,7 +100,7 @@ fun ScoutScreen(
                             Spacer(Modifier.height(DX.Spacing.XL))
                             NfcPulseAnimation()
                             Spacer(Modifier.height(DX.Spacing.L))
-                            Text("Tap your card to view info", style = DX.Font.subHeadingSemiBold, color = DX.Color.text.primary)
+                            Text(stringResource(R.string.scout_tap_to_view), style = DX.Font.subHeadingSemiBold, color = DX.Color.text.primary)
                         }
                     }
                     is ScoutUiState.Reading -> {
@@ -107,24 +108,24 @@ fun ScoutScreen(
                             Spacer(Modifier.height(DX.Spacing.XL3))
                             CircularProgressIndicator()
                             Spacer(Modifier.height(DX.Spacing.L))
-                            Text("Reading...", style = DX.Font.bodySemiBold, color = DX.Color.text.primary)
+                            Text(stringResource(R.string.scout_reading), style = DX.Font.bodySemiBold, color = DX.Color.text.primary)
                         }
                     }
                     is ScoutUiState.Loaded -> {
                         Column(verticalArrangement = Arrangement.spacedBy(DX.Spacing.M)) {
                             PhysicalCardUi(state.card)
                             CardDetailsSection(state.card, fullFmt, shortFmt)
-                            DXButton(onClick = { viewModel.reset() }, text = "Tap Again to Refresh", variant = ButtonVariant.Secondary.Large, modifier = Modifier.fillMaxWidth())
+                            DXButton(onClick = { viewModel.reset() }, text = stringResource(R.string.scout_tap_again), variant = ButtonVariant.Secondary.Large, modifier = Modifier.fillMaxWidth())
                         }
                     }
                     is ScoutUiState.Error -> {
                         Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
                             Spacer(Modifier.height(DX.Spacing.XL2))
-                            Icon(Icons.Filled.Error, contentDescription = "Error", modifier = Modifier.size(48.dp), tint = DX.Color.text.red)
+                            Icon(Icons.Filled.Error, contentDescription = stringResource(R.string.scout_cd_error), modifier = Modifier.size(48.dp), tint = DX.Color.text.red)
                             Spacer(Modifier.height(DX.Spacing.M))
                             Text(state.message, style = DX.Font.body, color = DX.Color.text.red)
                             Spacer(Modifier.height(DX.Spacing.XL))
-                            DXButton(onClick = { viewModel.reset() }, text = "Try Again", variant = ButtonVariant.Secondary.Large, modifier = Modifier.fillMaxWidth())
+                            DXButton(onClick = { viewModel.reset() }, text = stringResource(R.string.scout_try_again), variant = ButtonVariant.Secondary.Large, modifier = Modifier.fillMaxWidth())
                         }
                     }
                 }
@@ -140,28 +141,25 @@ private fun PhysicalCardUi(card: CardData) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .aspectRatio(1.586f) // standard card ratio (85.6mm x 53.98mm)
+            .aspectRatio(1.586f)
             .clip(RoundedCornerShape(16.dp))
             .background(gradient)
             .padding(24.dp)
     ) {
-        // Top row: logo + NFC icon
         Row(
             Modifier.fillMaxWidth().align(Alignment.TopStart),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text("PARKEER", color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Bold, letterSpacing = 2.sp)
-            Icon(Icons.Filled.Contactless, contentDescription = "NFC", tint = Color.White.copy(alpha = 0.7f), modifier = Modifier.size(28.dp))
+            Text(stringResource(R.string.scout_card_brand), color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Bold, letterSpacing = 2.sp)
+            Icon(Icons.Filled.Contactless, contentDescription = stringResource(R.string.scout_cd_nfc), tint = Color.White.copy(alpha = 0.7f), modifier = Modifier.size(28.dp))
         }
 
-        // Center: balance
         Column(Modifier.align(Alignment.CenterStart)) {
-            Text("BALANCE", color = Color.White.copy(alpha = 0.6f), fontSize = 10.sp, letterSpacing = 1.sp)
+            Text(stringResource(R.string.scout_card_balance_label), color = Color.White.copy(alpha = 0.6f), fontSize = 10.sp, letterSpacing = 1.sp)
             Text(card.balance.toRupiah(), color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.Bold)
         }
 
-        // Bottom row: member info + status
         Row(
             Modifier.fillMaxWidth().align(Alignment.BottomStart),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -169,11 +167,11 @@ private fun PhysicalCardUi(card: CardData) {
         ) {
             Column {
                 Text(card.memberName.uppercase(), color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, letterSpacing = 1.sp)
-                Text("ID ${card.memberId}", color = Color.White.copy(alpha = 0.6f), fontSize = 11.sp)
+                Text(stringResource(R.string.scout_card_id, card.memberId), color = Color.White.copy(alpha = 0.6f), fontSize = 11.sp)
             }
             val statusText = when (card.visitState) {
-                is VisitState.CheckedIn -> "PARKED"
-                is VisitState.Idle -> "IDLE"
+                is VisitState.CheckedIn -> stringResource(R.string.scout_card_status_parked)
+                is VisitState.Idle -> stringResource(R.string.scout_card_status_idle)
             }
             val statusColor = when (card.visitState) {
                 is VisitState.CheckedIn -> Color(0xFF69F0AE)
@@ -188,30 +186,28 @@ private fun PhysicalCardUi(card: CardData) {
 private fun CardDetailsSection(card: CardData, fullFmt: DateTimeFormatter, shortFmt: DateTimeFormatter) {
     val zone = remember { ZoneId.systemDefault() }
 
-    // Visit status
     val visitState = card.visitState
     if (visitState is VisitState.CheckedIn) {
         ParkeerCard(modifier = Modifier.fillMaxWidth()) {
             Column(Modifier.padding(DX.Spacing.L)) {
-                Text("Checked In", style = DX.Font.bodySemiBold, color = DX.Color.text.darkGreen)
+                Text(stringResource(R.string.scout_checked_in), style = DX.Font.bodySemiBold, color = DX.Color.text.darkGreen)
                 Text(
-                    "Since: ${fullFmt.format(Instant.ofEpochMilli(visitState.timestamp).atZone(zone))}",
+                    stringResource(R.string.scout_checked_in_since, fullFmt.format(Instant.ofEpochMilli(visitState.timestamp).atZone(zone))),
                     style = DX.Font.caption, color = DX.Color.text.secondary
                 )
             }
         }
     }
 
-    // Transaction logs
     ParkeerCard(modifier = Modifier.fillMaxWidth()) {
         Column(Modifier.padding(DX.Spacing.L)) {
-            Text("Recent Transactions", style = DX.Font.caption, color = DX.Color.text.secondary)
+            Text(stringResource(R.string.scout_recent_transactions), style = DX.Font.caption, color = DX.Color.text.secondary)
             Spacer(Modifier.height(DX.Spacing.S))
             if (card.logs.isEmpty()) {
                 Column(Modifier.fillMaxWidth().padding(vertical = DX.Spacing.L), horizontalAlignment = Alignment.CenterHorizontally) {
                     Icon(Icons.Filled.Receipt, contentDescription = null, modifier = Modifier.size(24.dp), tint = DX.Color.text.secondary)
                     Spacer(Modifier.height(DX.Spacing.XS))
-                    Text("No transactions yet", style = DX.Font.caption, color = DX.Color.text.secondary)
+                    Text(stringResource(R.string.scout_no_transactions), style = DX.Font.caption, color = DX.Color.text.secondary)
                 }
             } else {
                 card.logs.forEachIndexed { index, log ->
@@ -226,9 +222,9 @@ private fun CardDetailsSection(card: CardData, fullFmt: DateTimeFormatter, short
 @Composable
 private fun TransactionRow(activity: Activity, amount: Int, timestamp: Long, fmt: DateTimeFormatter, zone: ZoneId) {
     val (icon, label, color) = when (activity) {
-        Activity.PARKING -> Triple(Icons.Filled.LocalParking, "Parking", DX.Color.text.red)
-        Activity.TOP_UP -> Triple(Icons.Filled.AccountBalanceWallet, "Top-Up", DX.Color.text.darkGreen)
-        Activity.REGISTRATION -> Triple(Icons.Filled.PersonAdd, "Registration", DX.Color.text.blue)
+        Activity.PARKING -> Triple(Icons.Filled.LocalParking, stringResource(R.string.scout_activity_parking), DX.Color.text.red)
+        Activity.TOP_UP -> Triple(Icons.Filled.AccountBalanceWallet, stringResource(R.string.scout_activity_top_up), DX.Color.text.darkGreen)
+        Activity.REGISTRATION -> Triple(Icons.Filled.PersonAdd, stringResource(R.string.scout_activity_registration), DX.Color.text.blue)
     }
     Row(
         Modifier.fillMaxWidth().padding(vertical = DX.Spacing.S),

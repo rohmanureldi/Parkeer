@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="scout_title">Scout</string>
+    <string name="scout_read_only">Read Only – Will NOT modify your card</string>
+    <string name="scout_tap_to_view">Tap your card to view info</string>
+    <string name="scout_reading">Reading…</string>
+    <string name="scout_tap_again">Tap Again to Refresh</string>
+    <string name="scout_try_again">Try Again</string>
+    <string name="scout_card_brand">PARKEER</string>
+    <string name="scout_card_balance_label">BALANCE</string>
+    <string name="scout_card_id">ID %1$d</string>
+    <string name="scout_card_status_parked">PARKED</string>
+    <string name="scout_card_status_idle">IDLE</string>
+    <string name="scout_checked_in">Checked In</string>
+    <string name="scout_checked_in_since">Since: %1$s</string>
+    <string name="scout_recent_transactions">Recent Transactions</string>
+    <string name="scout_no_transactions">No transactions yet</string>
+    <string name="scout_activity_parking">Parking</string>
+    <string name="scout_activity_top_up">Top-Up</string>
+    <string name="scout_activity_registration">Registration</string>
+    <string name="scout_cd_back">Back</string>
+    <string name="scout_cd_read_only">Read only mode</string>
+    <string name="scout_cd_nfc">NFC</string>
+    <string name="scout_cd_error">Error</string>
+</resources>

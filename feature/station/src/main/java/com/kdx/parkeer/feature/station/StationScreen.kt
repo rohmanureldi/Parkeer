@@ -17,6 +17,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.kdx.parkeer.core.ui.NfcPulseAnimation
@@ -55,10 +56,10 @@ fun StationScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Station") },
+                title = { Text(stringResource(R.string.station_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.station_cd_back))
                     }
                 }
             )
@@ -73,7 +74,7 @@ fun StationScreen(
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(DX.Spacing.M)
         ) {
-            Text("Admin – Register & Top-Up", style = DX.Font.caption, color = DX.Color.text.secondary)
+            Text(stringResource(R.string.station_subtitle), style = DX.Font.caption, color = DX.Color.text.secondary)
             Spacer(Modifier.height(DX.Spacing.S))
 
             AnimatedContent(
@@ -105,14 +106,15 @@ fun StationScreen(
                     is StationUiState.WaitingForTap -> NfcTapPrompt()
                     is StationUiState.Processing -> ProcessingState()
                     is StationUiState.RegisterSuccess -> {
-                        SuccessState("Registration Successful!", "Member: ${state.name} (#${state.id})") {
-                            viewModel.reset(); screen = "home"
-                        }
+                        SuccessState(
+                            stringResource(R.string.station_register_success),
+                            stringResource(R.string.station_register_detail, state.name, state.id)
+                        ) { viewModel.reset(); screen = "home" }
                     }
                     is StationUiState.TopUpSuccess -> {
                         SuccessState(
-                            "Top-Up Successful!",
-                            "${state.name}\n${state.oldBalance.toRupiah()} + ${state.added.toRupiah()} = ${state.newBalance.toRupiah()}"
+                            stringResource(R.string.station_topup_success),
+                            stringResource(R.string.station_topup_detail, state.name, state.oldBalance.toRupiah(), state.added.toRupiah(), state.newBalance.toRupiah())
                         ) { viewModel.reset(); screen = "home" }
                     }
                     is StationUiState.Error -> {
@@ -131,14 +133,14 @@ private fun StationHome(onRegister: () -> Unit, onTopUp: () -> Unit) {
             style = CustomCardStyle(CustomCardVariant.Custom({ DX.Color.background.white }, { DX.Color.stroke.border })),
             content = {
                 Column(Modifier.padding(DX.Spacing.L), horizontalAlignment = Alignment.CenterHorizontally) {
-                    Icon(Icons.Filled.Store, contentDescription = "Station", modifier = Modifier.size(48.dp), tint = DX.Color.text.primary)
+                    Icon(Icons.Filled.Store, contentDescription = stringResource(R.string.station_cd_station), modifier = Modifier.size(48.dp), tint = DX.Color.text.primary)
                     Spacer(Modifier.height(DX.Spacing.S))
-                    Text("Welcome, Admin", style = DX.Font.bodySemiBold, color = DX.Color.text.primary)
+                    Text(stringResource(R.string.station_welcome_admin), style = DX.Font.bodySemiBold, color = DX.Color.text.primary)
                 }
             }
         ))
-        DXButton(onClick = onRegister, text = "Register New Member", variant = ButtonVariant.Primary.Large, modifier = Modifier.fillMaxWidth())
-        DXButton(onClick = onTopUp, text = "Top-Up Balance", variant = ButtonVariant.Secondary.Large, modifier = Modifier.fillMaxWidth())
+        DXButton(onClick = onRegister, text = stringResource(R.string.station_register_new), variant = ButtonVariant.Primary.Large, modifier = Modifier.fillMaxWidth())
+        DXButton(onClick = onTopUp, text = stringResource(R.string.station_top_up), variant = ButtonVariant.Secondary.Large, modifier = Modifier.fillMaxWidth())
     }
 }
 
@@ -150,22 +152,22 @@ private fun RegisterForm(viewModel: StationViewModel, onCancel: () -> Unit) {
     Column(verticalArrangement = Arrangement.spacedBy(DX.Spacing.M)) {
         DXInput(config = DXInputConfig.TextField(
             value = name, onValueChange = { name = it },
-            placeholder = "Enter member name",
-            header = HeaderConfig(label = "Member Name")
+            placeholder = stringResource(R.string.station_member_name_placeholder),
+            header = HeaderConfig(label = stringResource(R.string.station_member_name_label))
         ))
         DXInput(config = DXInputConfig.TextField(
             value = id, onValueChange = { id = it },
-            placeholder = "Enter member ID",
-            header = HeaderConfig(label = "Member ID")
+            placeholder = stringResource(R.string.station_member_id_placeholder),
+            header = HeaderConfig(label = stringResource(R.string.station_member_id_label))
         ))
         DXButton(
             onClick = { viewModel.prepareRegister(name, id) },
-            text = "Ready to Write →",
+            text = stringResource(R.string.station_ready_to_write),
             variant = ButtonVariant.Primary.Large,
             state = if (name.isNotBlank() && id.isNotBlank()) ButtonState.Default else ButtonState.Disabled,
             modifier = Modifier.fillMaxWidth()
         )
-        DXButton(onClick = onCancel, text = "Cancel", variant = ButtonVariant.Secondary.Large, modifier = Modifier.fillMaxWidth())
+        DXButton(onClick = onCancel, text = stringResource(R.string.station_cancel), variant = ButtonVariant.Secondary.Large, modifier = Modifier.fillMaxWidth())
     }
 }
 
@@ -176,8 +178,8 @@ private fun TopUpForm(viewModel: StationViewModel, onCancel: () -> Unit) {
     Column(verticalArrangement = Arrangement.spacedBy(DX.Spacing.M)) {
         DXInput(config = DXInputConfig.TextField(
             value = amount, onValueChange = { amount = it.filter { c -> c.isDigit() } },
-            placeholder = "Enter amount",
-            header = HeaderConfig(label = "Top-Up Amount (Rp)")
+            placeholder = stringResource(R.string.station_topup_placeholder),
+            header = HeaderConfig(label = stringResource(R.string.station_topup_label))
         ))
         Row(horizontalArrangement = Arrangement.spacedBy(DX.Spacing.S)) {
             listOf(10000, 20000, 50000, 100000).forEach { v ->
@@ -186,12 +188,12 @@ private fun TopUpForm(viewModel: StationViewModel, onCancel: () -> Unit) {
         }
         DXButton(
             onClick = { viewModel.prepareTopUp(amount.toIntOrNull() ?: 0) },
-            text = "Ready to Write →",
+            text = stringResource(R.string.station_ready_to_write),
             variant = ButtonVariant.Primary.Large,
             state = if ((amount.toIntOrNull() ?: 0) > 0) ButtonState.Default else ButtonState.Disabled,
             modifier = Modifier.fillMaxWidth()
         )
-        DXButton(onClick = onCancel, text = "Cancel", variant = ButtonVariant.Secondary.Large, modifier = Modifier.fillMaxWidth())
+        DXButton(onClick = onCancel, text = stringResource(R.string.station_cancel), variant = ButtonVariant.Secondary.Large, modifier = Modifier.fillMaxWidth())
     }
 }
 
@@ -201,8 +203,8 @@ private fun NfcTapPrompt() {
         Spacer(Modifier.height(DX.Spacing.XL))
         NfcPulseAnimation()
         Spacer(Modifier.height(DX.Spacing.L))
-        Text("Tap NFC Card", style = DX.Font.subHeadingSemiBold, color = DX.Color.text.primary)
-        Text("Hold card steady on the back of the phone", style = DX.Font.caption, color = DX.Color.text.secondary)
+        Text(stringResource(R.string.station_tap_nfc), style = DX.Font.subHeadingSemiBold, color = DX.Color.text.primary)
+        Text(stringResource(R.string.station_hold_steady), style = DX.Font.caption, color = DX.Color.text.secondary)
     }
 }
 
@@ -212,7 +214,7 @@ private fun ProcessingState() {
         Spacer(Modifier.height(DX.Spacing.XL3))
         CircularProgressIndicator()
         Spacer(Modifier.height(DX.Spacing.L))
-        Text("Processing...", style = DX.Font.bodySemiBold, color = DX.Color.text.primary)
+        Text(stringResource(R.string.station_processing), style = DX.Font.bodySemiBold, color = DX.Color.text.primary)
     }
 }
 
@@ -220,13 +222,13 @@ private fun ProcessingState() {
 private fun SuccessState(title: String, detail: String, onDone: () -> Unit) {
     Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
         Spacer(Modifier.height(DX.Spacing.XL2))
-        Icon(Icons.Filled.CheckCircle, contentDescription = "Success", modifier = Modifier.size(48.dp), tint = DX.Color.text.darkGreen)
+        Icon(Icons.Filled.CheckCircle, contentDescription = stringResource(R.string.station_cd_success), modifier = Modifier.size(48.dp), tint = DX.Color.text.darkGreen)
         Spacer(Modifier.height(DX.Spacing.M))
         Text(title, style = DX.Font.subHeadingSemiBold, color = DX.Color.text.primary)
         Spacer(Modifier.height(DX.Spacing.S))
         Text(detail, style = DX.Font.body, color = DX.Color.text.secondary)
         Spacer(Modifier.height(DX.Spacing.XL))
-        DXButton(onClick = onDone, text = "Done", variant = ButtonVariant.Primary.Large, modifier = Modifier.fillMaxWidth())
+        DXButton(onClick = onDone, text = stringResource(R.string.station_done), variant = ButtonVariant.Primary.Large, modifier = Modifier.fillMaxWidth())
     }
 }
 
@@ -234,12 +236,12 @@ private fun SuccessState(title: String, detail: String, onDone: () -> Unit) {
 private fun ErrorState(message: String, onDismiss: () -> Unit) {
     Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
         Spacer(Modifier.height(DX.Spacing.XL2))
-        Icon(Icons.Filled.Error, contentDescription = "Error", modifier = Modifier.size(48.dp), tint = DX.Color.text.red)
+        Icon(Icons.Filled.Error, contentDescription = stringResource(R.string.station_cd_error), modifier = Modifier.size(48.dp), tint = DX.Color.text.red)
         Spacer(Modifier.height(DX.Spacing.M))
-        Text("Error", style = DX.Font.subHeadingSemiBold, color = DX.Color.text.red)
+        Text(stringResource(R.string.station_error), style = DX.Font.subHeadingSemiBold, color = DX.Color.text.red)
         Spacer(Modifier.height(DX.Spacing.S))
         Text(message, style = DX.Font.body, color = DX.Color.text.secondary)
         Spacer(Modifier.height(DX.Spacing.XL))
-        DXButton(onClick = onDismiss, text = "Try Again", variant = ButtonVariant.Secondary.Large, modifier = Modifier.fillMaxWidth())
+        DXButton(onClick = onDismiss, text = stringResource(R.string.station_try_again), variant = ButtonVariant.Secondary.Large, modifier = Modifier.fillMaxWidth())
     }
 }

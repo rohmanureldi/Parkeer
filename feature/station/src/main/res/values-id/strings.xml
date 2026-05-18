@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="station_title">Station</string>
+    <string name="station_subtitle">Admin – Registrasi &amp; Isi Saldo</string>
+    <string name="station_welcome_admin">Selamat datang, Admin</string>
+    <string name="station_register_new">Daftarkan Anggota Baru</string>
+    <string name="station_top_up">Isi Saldo</string>
+    <string name="station_member_name_label">Nama Anggota</string>
+    <string name="station_member_name_placeholder">Masukkan nama anggota</string>
+    <string name="station_member_id_label">ID Anggota</string>
+    <string name="station_member_id_placeholder">Masukkan ID anggota</string>
+    <string name="station_ready_to_write">Siap Menulis →</string>
+    <string name="station_cancel">Batal</string>
+    <string name="station_topup_label">Jumlah Isi Saldo (Rp)</string>
+    <string name="station_topup_placeholder">Masukkan jumlah</string>
+    <string name="station_tap_nfc">Tempelkan Kartu NFC</string>
+    <string name="station_hold_steady">Tahan kartu di belakang ponsel</string>
+    <string name="station_processing">Memproses…</string>
+    <string name="station_register_success">Registrasi Berhasil!</string>
+    <string name="station_register_detail">Anggota: %1$s (#%2$d)</string>
+    <string name="station_topup_success">Isi Saldo Berhasil!</string>
+    <string name="station_topup_detail">%1$s\n%2$s + %3$s = %4$s</string>
+    <string name="station_done">Selesai</string>
+    <string name="station_error">Error</string>
+    <string name="station_try_again">Coba Lagi</string>
+    <string name="station_cd_back">Kembali</string>
+    <string name="station_cd_station">Station</string>
+    <string name="station_cd_success">Berhasil</string>
+    <string name="station_cd_error">Error</string>
+</resources>

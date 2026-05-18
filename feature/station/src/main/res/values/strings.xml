@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="station_title">Station</string>
+    <string name="station_subtitle">Admin – Register &amp; Top-Up</string>
+    <string name="station_welcome_admin">Welcome, Admin</string>
+    <string name="station_register_new">Register New Member</string>
+    <string name="station_top_up">Top-Up Balance</string>
+    <string name="station_member_name_label">Member Name</string>
+    <string name="station_member_name_placeholder">Enter member name</string>
+    <string name="station_member_id_label">Member ID</string>
+    <string name="station_member_id_placeholder">Enter member ID</string>
+    <string name="station_ready_to_write">Ready to Write →</string>
+    <string name="station_cancel">Cancel</string>
+    <string name="station_topup_label">Top-Up Amount (Rp)</string>
+    <string name="station_topup_placeholder">Enter amount</string>
+    <string name="station_tap_nfc">Tap NFC Card</string>
+    <string name="station_hold_steady">Hold card steady on the back of the phone</string>
+    <string name="station_processing">Processing…</string>
+    <string name="station_register_success">Registration Successful!</string>
+    <string name="station_register_detail">Member: %1$s (#%2$d)</string>
+    <string name="station_topup_success">Top-Up Successful!</string>
+    <string name="station_topup_detail">%1$s\n%2$s + %3$s = %4$s</string>
+    <string name="station_done">Done</string>
+    <string name="station_error">Error</string>
+    <string name="station_try_again">Try Again</string>
+    <string name="station_cd_back">Back</string>
+    <string name="station_cd_station">Station</string>
+    <string name="station_cd_success">Success</string>
+    <string name="station_cd_error">Error</string>
+</resources>
