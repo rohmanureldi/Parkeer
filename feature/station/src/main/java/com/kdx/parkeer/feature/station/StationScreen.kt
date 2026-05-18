@@ -37,7 +37,8 @@ import com.telkomsel.dexterity.theme.DX
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun StationScreen(onBack: () -> Unit, viewModel: StationViewModel = hiltViewModel()) {
+fun StationScreen(onBack: () -> Unit) {
+    val viewModel: StationViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsState()
     val haptic = rememberHapticFeedback()
     var screen by rememberSaveable { mutableStateOf("home") }
@@ -87,10 +88,6 @@ fun StationScreen(onBack: () -> Unit, viewModel: StationViewModel = hiltViewMode
                             label = "station_sub",
                         ) { sub ->
                             when (sub) {
-                                "home" -> StationHome(
-                                    onRegister = { screen = "register" },
-                                    onTopUp = { screen = "topup" },
-                                )
                                 "register" -> RegisterForm(viewModel) { screen = "home" }
                                 "topup" -> TopUpForm(viewModel) { screen = "home" }
                                 else -> StationHome(
@@ -127,7 +124,7 @@ fun StationScreen(onBack: () -> Unit, viewModel: StationViewModel = hiltViewMode
                         }
                     }
                     is StationUiState.Error -> {
-                        ErrorState(state.message) { viewModel.reset() }
+                        ErrorState(state.error) { viewModel.reset() }
                     }
                 }
             }
@@ -289,7 +286,14 @@ private fun SuccessState(title: String, detail: String, onDone: () -> Unit) {
 }
 
 @Composable
-private fun ErrorState(message: String, onDismiss: () -> Unit) {
+private fun ErrorState(error: StationError, onDismiss: () -> Unit) {
+    val message = when (error) {
+        is StationError.AlreadyRegistered -> stringResource(R.string.station_error_already_registered)
+        is StationError.InvalidMemberId -> stringResource(R.string.station_error_invalid_member_id)
+        is StationError.CardNotRecognized -> stringResource(R.string.station_error_card_not_recognized, error.reason.orEmpty())
+        is StationError.MaxBalanceExceeded -> stringResource(R.string.station_error_max_balance, error.currentBalance)
+        is StationError.WriteFailed -> stringResource(R.string.station_error_write_failed, error.reason.orEmpty())
+    }
     Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
         Spacer(Modifier.height(DX.Spacing.XL2))
         Icon(

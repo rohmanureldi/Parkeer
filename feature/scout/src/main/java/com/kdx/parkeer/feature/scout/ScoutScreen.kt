@@ -46,7 +46,8 @@ import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ScoutScreen(onBack: () -> Unit, viewModel: ScoutViewModel = hiltViewModel()) {
+fun ScoutScreen(onBack: () -> Unit) {
+    val viewModel: ScoutViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsState()
     val haptic = rememberHapticFeedback()
     val fullFmt = remember { DateTimeFormatter.ofPattern("dd MMM yyyy, HH:mm:ss") }
@@ -139,7 +140,7 @@ fun ScoutScreen(onBack: () -> Unit, viewModel: ScoutViewModel = hiltViewModel())
                                 tint = DX.Color.text.red,
                             )
                             Spacer(Modifier.height(DX.Spacing.M))
-                            Text(state.message, style = DX.Font.body, color = DX.Color.text.red)
+                            Text(stringResource(R.string.scout_error_read_failed, state.reason.orEmpty()), style = DX.Font.body, color = DX.Color.text.red)
                             Spacer(Modifier.height(DX.Spacing.XL))
                             DXButton(
                                 onClick = {

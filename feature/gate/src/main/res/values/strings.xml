@@ -22,4 +22,7 @@
     <string name="gate_cd_sim_warning">Simulation warning</string>
     <string name="gate_cd_success">Success</string>
     <string name="gate_cd_error">Error</string>
+    <string name="gate_error_card_not_recognized">Card not recognized: %1$s</string>
+    <string name="gate_error_already_checked_in">Already checked in. Please proceed to Terminal.</string>
+    <string name="gate_error_write_failed">Write failed: %1$s</string>
 </resources>

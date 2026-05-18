@@ -3,7 +3,6 @@ package com.kdx.parkeer.feature.scout
 import android.nfc.Tag
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.kdx.parkeer.core.model.CardData
 import com.kdx.parkeer.core.nfc.CardReader
 import com.kdx.parkeer.core.nfc.NfcTagHolder
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -12,13 +11,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-
-sealed interface ScoutUiState {
-    data object Ready : ScoutUiState
-    data object Reading : ScoutUiState
-    data class Loaded(val card: CardData) : ScoutUiState
-    data class Error(val message: String) : ScoutUiState
-}
 
 @HiltViewModel
 class ScoutViewModel @Inject constructor(private val cardReader: CardReader, private val nfcTagHolder: NfcTagHolder) : ViewModel() {
@@ -41,7 +33,7 @@ class ScoutViewModel @Inject constructor(private val cardReader: CardReader, pri
             _uiState.value = ScoutUiState.Reading
             cardReader.read(tag)
                 .onSuccess { _uiState.value = ScoutUiState.Loaded(it) }
-                .onFailure { _uiState.value = ScoutUiState.Error(it.message ?: "Read failed") }
+                .onFailure { _uiState.value = ScoutUiState.Error(it.message) }
         }
     }
 

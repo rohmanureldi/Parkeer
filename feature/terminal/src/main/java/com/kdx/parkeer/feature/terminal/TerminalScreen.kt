@@ -33,7 +33,8 @@ import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TerminalScreen(onBack: () -> Unit, viewModel: TerminalViewModel = hiltViewModel()) {
+fun TerminalScreen(onBack: () -> Unit) {
+    val viewModel: TerminalViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsState()
     val haptic = rememberHapticFeedback()
     val fmt = remember { DateTimeFormatter.ofPattern("dd MMM yyyy, HH:mm") }
@@ -227,7 +228,13 @@ fun TerminalScreen(onBack: () -> Unit, viewModel: TerminalViewModel = hiltViewMo
                             )
                             Spacer(Modifier.height(DX.Spacing.M))
                             Text(stringResource(R.string.terminal_error), style = DX.Font.subHeadingSemiBold, color = DX.Color.text.red)
-                            Text(state.message, style = DX.Font.body, color = DX.Color.text.secondary)
+                            val message = when (state.error) {
+                                is TerminalError.CardNotRecognized -> stringResource(R.string.terminal_error_card_not_recognized, state.error.reason.orEmpty())
+                                is TerminalError.NotCheckedIn -> stringResource(R.string.terminal_error_not_checked_in)
+                                is TerminalError.InvalidTime -> stringResource(R.string.terminal_error_invalid_time)
+                                is TerminalError.WriteFailed -> stringResource(R.string.terminal_error_write_failed, state.error.reason.orEmpty())
+                            }
+                            Text(message, style = DX.Font.body, color = DX.Color.text.secondary)
                             Spacer(Modifier.height(DX.Spacing.XL))
                             DXButton(
                                 onClick = {

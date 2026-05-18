@@ -22,4 +22,5 @@
     <string name="scout_cd_read_only">Read only mode</string>
     <string name="scout_cd_nfc">NFC</string>
     <string name="scout_cd_error">Error</string>
+    <string name="scout_error_read_failed">Read failed: %1$s</string>
 </resources>

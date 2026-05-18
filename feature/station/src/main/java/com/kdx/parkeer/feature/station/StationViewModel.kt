@@ -16,17 +16,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-sealed interface StationUiState {
-    data object Idle : StationUiState
-    data object WaitingForTap : StationUiState
-    data object Processing : StationUiState
-    data class RegisterSuccess(val name: String, val id: Int) : StationUiState
-    data class TopUpSuccess(val name: String, val oldBalance: Int, val added: Int, val newBalance: Int) : StationUiState
-    data class Error(val message: String) : StationUiState
-}
-
-enum class StationMode { REGISTER, TOP_UP }
-
 @HiltViewModel
 class StationViewModel @Inject constructor(private val cardReader: CardReader, private val nfcTagHolder: NfcTagHolder) : ViewModel() {
 
@@ -77,12 +66,12 @@ class StationViewModel @Inject constructor(private val cardReader: CardReader, p
         // Check if card already has data
         val readResult = cardReader.read(tag)
         if (readResult.isSuccess) {
-            _uiState.value = StationUiState.Error("Card already registered. Use a blank card.")
+            _uiState.value = StationUiState.Error(StationError.AlreadyRegistered)
             return
         }
 
         val id = memberId.toIntOrNull() ?: run {
-            _uiState.value = StationUiState.Error("Invalid member ID")
+            _uiState.value = StationUiState.Error(StationError.InvalidMemberId)
             return
         }
 
@@ -96,19 +85,19 @@ class StationViewModel @Inject constructor(private val cardReader: CardReader, p
 
         cardReader.write(tag, newCard)
             .onSuccess { _uiState.value = StationUiState.RegisterSuccess(memberName, id) }
-            .onFailure { _uiState.value = StationUiState.Error(it.message ?: "Write failed") }
+            .onFailure { _uiState.value = StationUiState.Error(StationError.WriteFailed(it.message)) }
     }
 
     private suspend fun doTopUp(tag: Tag) {
         val card = cardReader.read(tag).getOrElse {
-            _uiState.value = StationUiState.Error("Card not recognized: ${it.message}")
+            _uiState.value = StationUiState.Error(StationError.CardNotRecognized(it.message))
             return
         }
 
         val oldBalance = card.balance
         val newBalance = oldBalance + topUpAmount
         if (newBalance > 1_000_000) {
-            _uiState.value = StationUiState.Error("Max balance Rp 1,000,000 exceeded. Current: Rp $oldBalance")
+            _uiState.value = StationUiState.Error(StationError.MaxBalanceExceeded(oldBalance))
             return
         }
 
@@ -120,7 +109,7 @@ class StationViewModel @Inject constructor(private val cardReader: CardReader, p
 
         cardReader.write(tag, updated)
             .onSuccess { _uiState.value = StationUiState.TopUpSuccess(card.memberName, oldBalance, topUpAmount, newBalance) }
-            .onFailure { _uiState.value = StationUiState.Error(it.message ?: "Write failed") }
+            .onFailure { _uiState.value = StationUiState.Error(StationError.WriteFailed(it.message)) }
     }
 
     fun reset() {

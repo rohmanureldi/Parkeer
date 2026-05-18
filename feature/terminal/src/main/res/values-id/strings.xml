@@ -30,4 +30,8 @@
     <string name="terminal_cd_insufficient">Saldo Tidak Cukup</string>
     <string name="terminal_cd_tip">Tips</string>
     <string name="terminal_cd_error">Error</string>
+    <string name="terminal_error_card_not_recognized">Kartu tidak dikenali: %1$s</string>
+    <string name="terminal_error_not_checked_in">Belum check-in. Silakan check-in di Gate terlebih dahulu.</string>
+    <string name="terminal_error_invalid_time">Waktu tidak valid. Jam perangkat mungkin salah.</string>
+    <string name="terminal_error_write_failed">Gagal menulis: %1$s</string>
 </resources>

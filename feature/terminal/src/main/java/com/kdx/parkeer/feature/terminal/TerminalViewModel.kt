@@ -15,32 +15,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-data class BillingResult(
-    val memberName: String,
-    val checkInTime: Long,
-    val checkOutTime: Long,
-    val durationMs: Long,
-    val hoursCharged: Int,
-    val fee: Int,
-    val oldBalance: Int,
-    val newBalance: Int,
-)
-
-sealed interface TerminalUiState {
-    data object Ready : TerminalUiState
-    data object Processing : TerminalUiState
-    data class Success(val billing: BillingResult) : TerminalUiState
-    data class InsufficientBalance(
-        val checkInTime: Long,
-        val durationMs: Long,
-        val hoursCharged: Int,
-        val fee: Int,
-        val balance: Int,
-        val deficit: Int,
-    ) : TerminalUiState
-    data class Error(val message: String) : TerminalUiState
-}
-
 @HiltViewModel
 class TerminalViewModel @Inject constructor(private val cardReader: CardReader, private val nfcTagHolder: NfcTagHolder) : ViewModel() {
 
@@ -68,21 +42,21 @@ class TerminalViewModel @Inject constructor(private val cardReader: CardReader, 
             _uiState.value = TerminalUiState.Processing
 
             val card = cardReader.read(tag).getOrElse {
-                _uiState.value = TerminalUiState.Error("Card not recognized: ${it.message}")
+                _uiState.value = TerminalUiState.Error(TerminalError.CardNotRecognized(it.message))
                 return@launch
             }
 
             // Sequential loop: reject double tap-out
             val checkedIn = card.visitState as? VisitState.CheckedIn
             if (checkedIn == null) {
-                _uiState.value = TerminalUiState.Error("Not checked in. Please check in at Gate first.")
+                _uiState.value = TerminalUiState.Error(TerminalError.NotCheckedIn)
                 return@launch
             }
 
             val now = System.currentTimeMillis()
             val durationMs = now - checkedIn.timestamp
             if (durationMs <= 0) {
-                _uiState.value = TerminalUiState.Error("Invalid time detected. Device clock may be incorrect.")
+                _uiState.value = TerminalUiState.Error(TerminalError.InvalidTime)
                 return@launch
             }
 
@@ -119,7 +93,7 @@ class TerminalViewModel @Inject constructor(private val cardReader: CardReader, 
                         ),
                     )
                 }
-                .onFailure { _uiState.value = TerminalUiState.Error(it.message ?: "Write failed") }
+                .onFailure { _uiState.value = TerminalUiState.Error(TerminalError.WriteFailed(it.message)) }
         }
     }
 

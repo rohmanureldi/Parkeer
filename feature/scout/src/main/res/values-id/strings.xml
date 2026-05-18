@@ -22,4 +22,5 @@
     <string name="scout_cd_read_only">Mode hanya baca</string>
     <string name="scout_cd_nfc">NFC</string>
     <string name="scout_cd_error">Error</string>
+    <string name="scout_error_read_failed">Gagal membaca: %1$s</string>
 </resources>

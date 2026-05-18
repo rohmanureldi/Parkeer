@@ -22,4 +22,7 @@
     <string name="gate_cd_sim_warning">Peringatan simulasi</string>
     <string name="gate_cd_success">Berhasil</string>
     <string name="gate_cd_error">Error</string>
+    <string name="gate_error_card_not_recognized">Kartu tidak dikenali: %1$s</string>
+    <string name="gate_error_already_checked_in">Sudah check-in. Silakan ke Terminal.</string>
+    <string name="gate_error_write_failed">Gagal menulis: %1$s</string>
 </resources>

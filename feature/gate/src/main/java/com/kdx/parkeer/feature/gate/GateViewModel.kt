@@ -14,13 +14,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-sealed interface GateUiState {
-    data object Ready : GateUiState
-    data object Processing : GateUiState
-    data class Success(val memberName: String, val checkInTime: Long) : GateUiState
-    data class Error(val message: String) : GateUiState
-}
-
 @HiltViewModel
 class GateViewModel @Inject constructor(private val cardReader: CardReader, private val nfcTagHolder: NfcTagHolder) : ViewModel() {
 
@@ -28,8 +21,13 @@ class GateViewModel @Inject constructor(private val cardReader: CardReader, priv
     val uiState: StateFlow<GateUiState> = _uiState.asStateFlow()
     val busyTaps: SharedFlow<Unit> = nfcTagHolder.busyTaps
 
-    var simulationEnabled: Boolean = false
-    var simulatedTime: Long = System.currentTimeMillis()
+    private var simulationEnabled: Boolean = false
+    private var simulatedTime: Long = System.currentTimeMillis()
+
+    fun updateSimulation(enabled: Boolean, hoursAgo: Long) {
+        simulationEnabled = enabled
+        simulatedTime = System.currentTimeMillis() - (hoursAgo * 3_600_000L)
+    }
 
     init {
         viewModelScope.launch {
@@ -50,13 +48,12 @@ class GateViewModel @Inject constructor(private val cardReader: CardReader, priv
             _uiState.value = GateUiState.Processing
 
             val card = cardReader.read(tag).getOrElse {
-                _uiState.value = GateUiState.Error("Card not recognized: ${it.message}")
+                _uiState.value = GateUiState.Error(GateError.CardNotRecognized(it.message))
                 return@launch
             }
 
-            // Sequential loop: reject double tap-in
             if (card.visitState is VisitState.CheckedIn) {
-                _uiState.value = GateUiState.Error("Already checked in. Please proceed to Terminal.")
+                _uiState.value = GateUiState.Error(GateError.AlreadyCheckedIn)
                 return@launch
             }
 
@@ -65,7 +62,7 @@ class GateViewModel @Inject constructor(private val cardReader: CardReader, priv
 
             cardReader.write(tag, updated)
                 .onSuccess { _uiState.value = GateUiState.Success(card.memberName, timestamp) }
-                .onFailure { _uiState.value = GateUiState.Error(it.message ?: "Write failed") }
+                .onFailure { _uiState.value = GateUiState.Error(GateError.WriteFailed(it.message)) }
         }
     }
 
