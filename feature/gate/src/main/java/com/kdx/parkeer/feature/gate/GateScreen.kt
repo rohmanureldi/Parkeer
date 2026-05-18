@@ -62,11 +62,7 @@ import java.time.format.DateTimeFormatter
 @Suppress("ParamsComparedByRef")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun GateScreen(
-    modifier: Modifier = Modifier,
-    viewModel: GateViewModel = hiltViewModel(),
-    onBack: () -> Unit
-) {
+fun GateScreen(modifier: Modifier = Modifier, viewModel: GateViewModel = hiltViewModel(), onBack: () -> Unit) {
     val uiState by viewModel.uiState.collectAsState()
     val haptic = rememberHapticFeedback()
     var simEnabled by remember { mutableStateOf(false) }
@@ -146,12 +142,7 @@ fun GateScreen(
 }
 
 @Composable
-private fun GateReadyState(
-    simEnabled: Boolean,
-    simHoursAgo: String,
-    onSimToggle: (Boolean) -> Unit,
-    onSimHoursChange: (String) -> Unit
-) {
+private fun GateReadyState(simEnabled: Boolean, simHoursAgo: String, onSimToggle: (Boolean) -> Unit, onSimHoursChange: (String) -> Unit) {
     val timeFmt = remember { DateTimeFormatter.ofPattern("HH:mm") }
 
     Column(

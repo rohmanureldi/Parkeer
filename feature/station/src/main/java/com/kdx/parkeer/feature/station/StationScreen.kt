@@ -59,11 +59,7 @@ import com.telkomsel.dexterity.theme.DX
 @Suppress("ParamsComparedByRef")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun StationScreen(
-    modifier: Modifier = Modifier,
-    viewModel: StationViewModel = hiltViewModel(),
-    onBack: () -> Unit
-) {
+fun StationScreen(modifier: Modifier = Modifier, viewModel: StationViewModel = hiltViewModel(), onBack: () -> Unit) {
     val uiState by viewModel.uiState.collectAsState()
     val haptic = rememberHapticFeedback()
     var screen by rememberSaveable { mutableStateOf("home") }

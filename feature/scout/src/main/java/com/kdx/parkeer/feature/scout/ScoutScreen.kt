@@ -70,11 +70,7 @@ import java.time.format.DateTimeFormatter
 @Suppress("ParamsComparedByRef")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ScoutScreen(
-    modifier: Modifier = Modifier,
-    viewModel: ScoutViewModel = hiltViewModel(),
-    onBack: () -> Unit
-) {
+fun ScoutScreen(modifier: Modifier = Modifier, viewModel: ScoutViewModel = hiltViewModel(), onBack: () -> Unit) {
     val uiState by viewModel.uiState.collectAsState()
     val haptic = rememberHapticFeedback()
     val fullFmt = remember { DateTimeFormatter.ofPattern("dd MMM yyyy, HH:mm:ss") }

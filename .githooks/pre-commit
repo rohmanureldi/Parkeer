@@ -1,0 +1,10 @@
+#!/bin/sh
+# Pre-commit hook: auto-format staged Kotlin files with Spotless
+
+echo "Running spotlessApply..."
+./gradlew spotlessApply --daemon -q
+
+# Re-stage any files that were reformatted
+git diff --name-only | xargs -r git add
+
+exit 0

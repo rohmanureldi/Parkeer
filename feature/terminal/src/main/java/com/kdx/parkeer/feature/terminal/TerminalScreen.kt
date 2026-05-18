@@ -55,11 +55,7 @@ import java.time.format.DateTimeFormatter
 @Suppress("ParamsComparedByRef")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TerminalScreen(
-    modifier: Modifier = Modifier,
-    viewModel: TerminalViewModel = hiltViewModel(),
-    onBack: () -> Unit
-) {
+fun TerminalScreen(modifier: Modifier = Modifier, viewModel: TerminalViewModel = hiltViewModel(), onBack: () -> Unit) {
     val uiState by viewModel.uiState.collectAsState()
     val haptic = rememberHapticFeedback()
     val fmt = remember { DateTimeFormatter.ofPattern("dd MMM yyyy, HH:mm") }
