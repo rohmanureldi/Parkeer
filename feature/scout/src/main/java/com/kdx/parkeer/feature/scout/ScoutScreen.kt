@@ -166,7 +166,14 @@ fun ScoutScreen(
                                 tint = DX.Color.text.red,
                             )
                             Spacer(Modifier.height(DX.Spacing.M))
-                            Text(stringResource(R.string.scout_error_read_failed, state.reason.orEmpty()), style = DX.Font.body, color = DX.Color.text.red)
+                            Text(
+                                stringResource(
+                                    R.string.scout_error_read_failed,
+                                    state.reason.orEmpty()
+                                ),
+                                style = DX.Font.body,
+                                color = DX.Color.text.red,
+                            )
                             Spacer(Modifier.height(DX.Spacing.XL))
                             DXButton(
                                 onClick = {
@@ -266,9 +273,12 @@ private fun CardDetailsSection(card: CardData, fullFmt: DateTimeFormatter, short
             Text(stringResource(R.string.scout_recent_transactions), style = DX.Font.caption, color = DX.Color.text.secondary)
             Spacer(Modifier.height(DX.Spacing.S))
             if (card.logs.isEmpty()) {
-                Column(Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = DX.Spacing.L), horizontalAlignment = Alignment.CenterHorizontally) {
+                Column(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = DX.Spacing.L),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
                     Icon(Icons.Filled.Receipt, contentDescription = null, modifier = Modifier.size(24.dp), tint = DX.Color.text.secondary)
                     Spacer(Modifier.height(DX.Spacing.XS))
                     Text(stringResource(R.string.scout_no_transactions), style = DX.Font.caption, color = DX.Color.text.secondary)

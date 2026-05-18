@@ -61,7 +61,7 @@ import com.telkomsel.dexterity.theme.DX
 fun StationScreen(
     modifier: Modifier = Modifier,
     viewModel: StationViewModel = hiltViewModel(),
-    onBack: () -> Unit,
+    onBack: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val haptic = rememberHapticFeedback()
