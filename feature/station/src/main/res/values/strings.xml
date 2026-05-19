@@ -9,6 +9,7 @@
     <string name="station_member_name_placeholder">Enter member name</string>
     <string name="station_member_id_label">Member ID</string>
     <string name="station_member_id_placeholder">Enter member ID</string>
+    <string name="station_submit">Submit</string>
     <string name="station_ready_to_write">Ready to Write →</string>
     <string name="station_cancel">Cancel</string>
     <string name="station_topup_label">Top-Up Amount (Rp)</string>

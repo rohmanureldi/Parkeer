@@ -39,10 +39,14 @@ class StationViewModel @Inject constructor(private val cardReader: CardReader, p
         }
     }
 
-    fun prepareRegister(name: String, id: String) {
+    fun prepareRegister(name: String) {
         mode = StationMode.REGISTER
         memberName = name
-        memberId = id
+        memberId = (System.currentTimeMillis() % 1_000_000).toString().padStart(6, '0')
+        _uiState.value = StationUiState.WaitingForTap
+    }
+
+    fun retryLastOperation() {
         _uiState.value = StationUiState.WaitingForTap
     }
 

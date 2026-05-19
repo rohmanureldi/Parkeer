@@ -6,16 +6,16 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.CheckCircle
@@ -23,11 +23,14 @@ import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Store
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -37,6 +40,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -55,18 +59,25 @@ import com.telkomsel.dexterity.components.molecule.card.DXCardStyle
 import com.telkomsel.dexterity.components.molecule.card.customcard.CustomCardStyle
 import com.telkomsel.dexterity.components.molecule.card.customcard.CustomCardVariant
 import com.telkomsel.dexterity.theme.DX
+import kotlinx.coroutines.delay
 
-@Suppress("ParamsComparedByRef")
-@OptIn(ExperimentalMaterial3Api::class)
+private enum class SheetType { REGISTER, TOP_UP }
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun StationScreen(modifier: Modifier = Modifier, viewModel: StationViewModel = hiltViewModel(), onBack: () -> Unit) {
     val uiState by viewModel.uiState.collectAsState()
     val haptic = rememberHapticFeedback()
-    var screen by rememberSaveable { mutableStateOf("home") }
+    var activeSheet by rememberSaveable { mutableStateOf<SheetType?>(null) }
 
     LaunchedEffect(uiState) {
         when (uiState) {
-            is StationUiState.RegisterSuccess, is StationUiState.TopUpSuccess -> haptic.success()
+            is StationUiState.RegisterSuccess, is StationUiState.TopUpSuccess -> {
+                haptic.success()
+                delay(3000)
+                activeSheet = null
+                viewModel.reset()
+            }
             is StationUiState.Error -> haptic.error()
             else -> {}
         }
@@ -89,64 +100,54 @@ fun StationScreen(modifier: Modifier = Modifier, viewModel: StationViewModel = h
                 .fillMaxSize()
                 .padding(innerPadding)
                 .consumeWindowInsets(innerPadding)
-                .padding(horizontal = DX.Spacing.L)
-                .verticalScroll(rememberScrollState()),
+                .padding(horizontal = DX.Spacing.L),
             verticalArrangement = Arrangement.spacedBy(DX.Spacing.M),
         ) {
             Text(stringResource(R.string.station_subtitle), style = DX.Font.caption, color = DX.Color.text.secondary)
             Spacer(Modifier.height(DX.Spacing.S))
+            StationHome(
+                onRegister = { activeSheet = SheetType.REGISTER },
+                onTopUp = { activeSheet = SheetType.TOP_UP },
+            )
+        }
+    }
 
+    if (activeSheet != null) {
+        val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+        ModalBottomSheet(
+            onDismissRequest = {
+                activeSheet = null
+                viewModel.reset()
+            },
+            sheetState = sheetState,
+        ) {
+            val minSheetHeight = (LocalConfiguration.current.screenHeightDp / 3).dp
             AnimatedContent(
                 targetState = uiState,
                 transitionSpec = { fadeIn() togetherWith fadeOut() },
-                label = "station_state",
+                label = "sheet_content",
+                modifier = Modifier.heightIn(min = minSheetHeight),
             ) { state ->
                 when (state) {
                     is StationUiState.Idle -> {
-                        AnimatedContent(
-                            targetState = screen,
-                            transitionSpec = { fadeIn() togetherWith fadeOut() },
-                            label = "station_sub",
-                        ) { sub ->
-                            when (sub) {
-                                "register" -> RegisterForm(viewModel) { screen = "home" }
-                                "topup" -> TopUpForm(viewModel) { screen = "home" }
-                                else -> StationHome(
-                                    onRegister = { screen = "register" },
-                                    onTopUp = { screen = "topup" },
-                                )
-                            }
+                        when (activeSheet) {
+                            SheetType.REGISTER -> RegisterSheetContent(viewModel)
+                            SheetType.TOP_UP -> TopUpSheetContent(viewModel)
+                            else -> {}
                         }
                     }
-                    is StationUiState.WaitingForTap -> NfcTapPrompt()
-                    is StationUiState.Processing -> ProcessingState()
-                    is StationUiState.RegisterSuccess -> {
-                        SuccessState(
-                            stringResource(R.string.station_register_success),
-                            stringResource(R.string.station_register_detail, state.name, state.id),
-                        ) {
-                            viewModel.reset()
-                            screen = "home"
-                        }
-                    }
-                    is StationUiState.TopUpSuccess -> {
-                        SuccessState(
-                            stringResource(R.string.station_topup_success),
-                            stringResource(
-                                R.string.station_topup_detail,
-                                state.name,
-                                state.oldBalance.toRupiah(),
-                                state.added.toRupiah(),
-                                state.newBalance.toRupiah(),
-                            ),
-                        ) {
-                            viewModel.reset()
-                            screen = "home"
-                        }
-                    }
-                    is StationUiState.Error -> {
-                        ErrorState(state.error) { viewModel.reset() }
-                    }
+
+                    is StationUiState.WaitingForTap -> SheetNfcTap()
+                    is StationUiState.Processing -> SheetProcessing()
+                    is StationUiState.RegisterSuccess -> SheetSuccess(
+                        stringResource(R.string.station_register_success),
+                    )
+
+                    is StationUiState.TopUpSuccess -> SheetSuccess(
+                        stringResource(R.string.station_topup_success),
+                    )
+
+                    is StationUiState.Error -> SheetError(state.error) { viewModel.retryLastOperation() }
                 }
             }
         }
@@ -190,11 +191,20 @@ private fun StationHome(onRegister: () -> Unit, onTopUp: () -> Unit) {
 }
 
 @Composable
-private fun RegisterForm(viewModel: StationViewModel, onCancel: () -> Unit) {
+private fun RegisterSheetContent(viewModel: StationViewModel) {
     var name by rememberSaveable { mutableStateOf("") }
-    var id by rememberSaveable { mutableStateOf("") }
 
-    Column(verticalArrangement = Arrangement.spacedBy(DX.Spacing.M)) {
+    Column(
+        modifier = Modifier
+            .padding(horizontal = DX.Spacing.L)
+            .padding(bottom = DX.Spacing.XL),
+        verticalArrangement = Arrangement.spacedBy(DX.Spacing.M),
+    ) {
+        Text(
+            stringResource(R.string.station_register_new),
+            style = DX.Font.subHeadingSemiBold,
+            color = DX.Color.text.primary,
+        )
         DXInput(
             config = DXInputConfig.TextField(
                 value = name,
@@ -203,68 +213,52 @@ private fun RegisterForm(viewModel: StationViewModel, onCancel: () -> Unit) {
                 header = HeaderConfig(label = stringResource(R.string.station_member_name_label)),
             ),
         )
-        DXInput(
-            config = DXInputConfig.TextField(
-                value = id,
-                onValueChange = { id = it },
-                placeholder = stringResource(R.string.station_member_id_placeholder),
-                header = HeaderConfig(label = stringResource(R.string.station_member_id_label)),
-            ),
-        )
         DXButton(
-            onClick = { viewModel.prepareRegister(name, id) },
-            text = stringResource(R.string.station_ready_to_write),
+            onClick = { viewModel.prepareRegister(name) },
+            text = stringResource(R.string.station_submit),
             variant = ButtonVariant.Primary.Large,
-            state = if (name.isNotBlank() && id.isNotBlank()) ButtonState.Default else ButtonState.Disabled,
-            modifier = Modifier.fillMaxWidth(),
-        )
-        DXButton(
-            onClick = onCancel,
-            text = stringResource(R.string.station_cancel),
-            variant = ButtonVariant.Secondary.Large,
+            state = if (name.isNotBlank()) ButtonState.Default else ButtonState.Disabled,
             modifier = Modifier.fillMaxWidth(),
         )
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun TopUpForm(viewModel: StationViewModel, onCancel: () -> Unit) {
-    var amount by rememberSaveable { mutableStateOf("") }
+private fun TopUpSheetContent(viewModel: StationViewModel) {
+    val amounts = (5_000..100_000 step 5_000).toList()
 
-    Column(verticalArrangement = Arrangement.spacedBy(DX.Spacing.M)) {
-        DXInput(
-            config = DXInputConfig.TextField(
-                value = amount,
-                onValueChange = { amount = it.filter { c -> c.isDigit() } },
-                placeholder = stringResource(R.string.station_topup_placeholder),
-                header = HeaderConfig(label = stringResource(R.string.station_topup_label)),
-            ),
+    Column(
+        modifier = Modifier
+            .padding(horizontal = DX.Spacing.L)
+            .padding(bottom = DX.Spacing.XL),
+        verticalArrangement = Arrangement.spacedBy(DX.Spacing.M),
+    ) {
+        Text(
+            stringResource(R.string.station_top_up),
+            style = DX.Font.subHeadingSemiBold,
+            color = DX.Color.text.primary,
         )
-        Row(horizontalArrangement = Arrangement.spacedBy(DX.Spacing.S)) {
-            listOf(10000, 20000, 50000, 100000).forEach { v ->
-                DXButton(onClick = { amount = v.toString() }, text = "${v / 1000}K", variant = ButtonVariant.Secondary.Small)
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(DX.Spacing.S)) {
+            amounts.forEach { amount ->
+                FilterChip(
+                    selected = false,
+                    onClick = { viewModel.prepareTopUp(amount) },
+                    label = { Text(amount.toRupiah()) },
+                )
             }
         }
-        DXButton(
-            onClick = { viewModel.prepareTopUp(amount.toIntOrNull() ?: 0) },
-            text = stringResource(R.string.station_ready_to_write),
-            variant = ButtonVariant.Primary.Large,
-            state = if ((amount.toIntOrNull() ?: 0) > 0) ButtonState.Default else ButtonState.Disabled,
-            modifier = Modifier.fillMaxWidth(),
-        )
-        DXButton(
-            onClick = onCancel,
-            text = stringResource(R.string.station_cancel),
-            variant = ButtonVariant.Secondary.Large,
-            modifier = Modifier.fillMaxWidth(),
-        )
     }
 }
 
 @Composable
-private fun NfcTapPrompt() {
-    Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-        Spacer(Modifier.height(DX.Spacing.XL))
+private fun SheetNfcTap() {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = DX.Spacing.XL),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
         NfcPulseAnimation()
         Spacer(Modifier.height(DX.Spacing.L))
         Text(stringResource(R.string.station_tap_nfc), style = DX.Font.subHeadingSemiBold, color = DX.Color.text.primary)
@@ -273,9 +267,13 @@ private fun NfcTapPrompt() {
 }
 
 @Composable
-private fun ProcessingState() {
-    Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-        Spacer(Modifier.height(DX.Spacing.XL3))
+private fun SheetProcessing() {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = DX.Spacing.XL),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
         CircularProgressIndicator()
         Spacer(Modifier.height(DX.Spacing.L))
         Text(stringResource(R.string.station_processing), style = DX.Font.bodySemiBold, color = DX.Color.text.primary)
@@ -288,9 +286,13 @@ private fun ProcessingState() {
 }
 
 @Composable
-private fun SuccessState(title: String, detail: String, onDone: () -> Unit) {
-    Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-        Spacer(Modifier.height(DX.Spacing.XL2))
+private fun SheetSuccess(title: String) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = DX.Spacing.XL),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
         Icon(
             Icons.Filled.CheckCircle,
             contentDescription = stringResource(R.string.station_cd_success),
@@ -299,20 +301,11 @@ private fun SuccessState(title: String, detail: String, onDone: () -> Unit) {
         )
         Spacer(Modifier.height(DX.Spacing.M))
         Text(title, style = DX.Font.subHeadingSemiBold, color = DX.Color.text.primary)
-        Spacer(Modifier.height(DX.Spacing.S))
-        Text(detail, style = DX.Font.body, color = DX.Color.text.secondary)
-        Spacer(Modifier.height(DX.Spacing.XL))
-        DXButton(
-            onClick = onDone,
-            text = stringResource(R.string.station_done),
-            variant = ButtonVariant.Primary.Large,
-            modifier = Modifier.fillMaxWidth(),
-        )
     }
 }
 
 @Composable
-private fun ErrorState(error: StationError, onDismiss: () -> Unit) {
+private fun SheetError(error: StationError, onRetry: () -> Unit) {
     val message = when (error) {
         is StationError.AlreadyRegistered -> stringResource(R.string.station_error_already_registered)
         is StationError.InvalidMemberId -> stringResource(R.string.station_error_invalid_member_id)
@@ -328,8 +321,13 @@ private fun ErrorState(error: StationError, onDismiss: () -> Unit) {
         }
         ErrorLogger.log("Station", message, reason)
     }
-    Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-        Spacer(Modifier.height(DX.Spacing.XL2))
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = DX.Spacing.L)
+            .padding(bottom = DX.Spacing.XL),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
         Icon(
             Icons.Filled.Error,
             contentDescription = stringResource(R.string.station_cd_error),
@@ -342,7 +340,7 @@ private fun ErrorState(error: StationError, onDismiss: () -> Unit) {
         Text(message, style = DX.Font.body, color = DX.Color.text.secondary)
         Spacer(Modifier.height(DX.Spacing.XL))
         DXButton(
-            onClick = onDismiss,
+            onClick = onRetry,
             text = stringResource(R.string.station_try_again),
             variant = ButtonVariant.Secondary.Large,
             modifier = Modifier.fillMaxWidth(),
