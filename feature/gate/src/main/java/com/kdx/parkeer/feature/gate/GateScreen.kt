@@ -18,7 +18,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Warning
@@ -48,6 +47,8 @@ import com.kdx.parkeer.core.ui.ErrorLogger
 import com.kdx.parkeer.core.ui.NfcPulseAnimation
 import com.kdx.parkeer.core.ui.ParkeerCard
 import com.kdx.parkeer.core.ui.rememberHapticFeedback
+import com.lottiefiles.dotlottie.core.compose.ui.DotLottieAnimation
+import com.lottiefiles.dotlottie.core.util.DotLottieSource
 import com.telkomsel.dexterity.components.atom.button.DXButton
 import com.telkomsel.dexterity.components.atom.button.model.ButtonVariant
 import com.telkomsel.dexterity.components.atom.input.DXInput
@@ -232,11 +233,11 @@ private fun GateSuccessState(memberName: String, checkInTime: Long, simEnabled: 
 
     Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
         Spacer(Modifier.height(DX.Spacing.XL2))
-        Icon(
-            Icons.Filled.CheckCircle,
-            contentDescription = stringResource(R.string.gate_cd_success),
-            modifier = Modifier.size(48.dp),
-            tint = DX.Color.text.darkGreen,
+        DotLottieAnimation(
+            source = DotLottieSource.Asset("success.lottie"),
+            autoplay = true,
+            loop = false,
+            modifier = Modifier.size(120.dp),
         )
         Spacer(Modifier.height(DX.Spacing.M))
         Text(stringResource(R.string.gate_welcome, memberName), style = DX.Font.subHeadingSemiBold, color = DX.Color.text.primary)
