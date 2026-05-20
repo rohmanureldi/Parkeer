@@ -21,7 +21,7 @@
     <string name="terminal_receipt_hours_value">%1$d jam ↑</string>
     <string name="terminal_receipt_fee">Biaya</string>
     <string name="terminal_receipt_prev_balance">Saldo Sebelumnya</string>
-    <string name="terminal_receipt_new_balance">Saldo Baru</string>
+    <string name="terminal_receipt_new_balance">Sisa saldo</string>
     <string name="terminal_receipt_fee_required">Biaya Diperlukan</string>
     <string name="terminal_receipt_your_balance">Saldo Anda</string>
     <string name="terminal_receipt_need_more">Kurang</string>

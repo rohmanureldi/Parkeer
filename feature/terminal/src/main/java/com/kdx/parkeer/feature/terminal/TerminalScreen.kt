@@ -4,6 +4,7 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -18,16 +19,15 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -37,12 +37,17 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.kdx.parkeer.core.ui.ErrorLogger
 import com.kdx.parkeer.core.ui.NfcPulseAnimation
 import com.kdx.parkeer.core.ui.ParkeerCard
+import com.kdx.parkeer.core.ui.TornPaperShape
 import com.kdx.parkeer.core.ui.rememberHapticFeedback
 import com.kdx.parkeer.core.ui.toRupiah
 import com.telkomsel.dexterity.components.atom.button.DXButton
@@ -132,50 +137,95 @@ fun TerminalScreen(modifier: Modifier = Modifier, viewModel: TerminalViewModel =
                         Column(
                             Modifier.fillMaxWidth(),
                             verticalArrangement = Arrangement.spacedBy(DX.Spacing.M),
+                            horizontalAlignment = Alignment.CenterHorizontally,
                         ) {
-                            Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-                                Icon(
-                                    Icons.Filled.CheckCircle,
-                                    contentDescription = stringResource(R.string.terminal_cd_success),
-                                    modifier = Modifier.size(48.dp),
-                                    tint = DX.Color.text.darkGreen,
-                                )
-                                Spacer(Modifier.height(DX.Spacing.S))
-                                Text(
-                                    stringResource(R.string.terminal_checkout_complete),
-                                    style = DX.Font.subHeadingSemiBold,
-                                    color = DX.Color.text.primary,
-                                )
-                            }
-                            ParkeerCard(modifier = Modifier.fillMaxWidth()) {
-                                Column(Modifier.padding(DX.Spacing.L), verticalArrangement = Arrangement.spacedBy(DX.Spacing.S)) {
-                                    ReceiptRow(stringResource(R.string.terminal_receipt_member), b.memberName)
-                                    ReceiptRow(
-                                        stringResource(R.string.terminal_receipt_checkin),
-                                        fmt.format(Instant.ofEpochMilli(b.checkInTime).atZone(zone)),
+                            Spacer(Modifier.height(DX.Spacing.M))
+                            Surface(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clip(TornPaperShape()),
+                                color = Color(0xFFF5F0E8),
+                                shadowElevation = 2.dp,
+                            ) {
+                                Column(
+                                    modifier = Modifier.padding(
+                                        top = 20.dp,
+                                        bottom = 20.dp,
+                                        start = DX.Spacing.L,
+                                        end = DX.Spacing.L,
+                                    ),
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                ) {
+                                    Text(
+                                        "PARKEER",
+                                        style = DX.Font.bodySemiBold.copy(fontFamily = FontFamily.Monospace),
+                                        color = DX.Color.text.primary,
                                     )
-                                    ReceiptRow(
-                                        stringResource(R.string.terminal_receipt_checkout),
-                                        fmt.format(Instant.ofEpochMilli(b.checkOutTime).atZone(zone)),
+                                    Spacer(Modifier.height(DX.Spacing.XS))
+                                    Text(
+                                        "✓ " + stringResource(R.string.terminal_checkout_complete),
+                                        style = DX.Font.caption.copy(fontFamily = FontFamily.Monospace),
+                                        color = DX.Color.text.secondary,
                                     )
-                                    ReceiptRow(stringResource(R.string.terminal_receipt_duration), formatDuration(b.durationMs))
-                                    ReceiptRow(
-                                        stringResource(R.string.terminal_receipt_hours_billed),
-                                        stringResource(R.string.terminal_receipt_hours_value, b.hoursCharged),
-                                    )
-                                    HorizontalDivider(color = DX.Color.stroke.divider)
-                                    ReceiptRow(stringResource(R.string.terminal_receipt_fee), b.fee.toRupiah(), highlight = true)
-                                    ReceiptRow(stringResource(R.string.terminal_receipt_prev_balance), b.oldBalance.toRupiah())
-                                    ReceiptRow(stringResource(R.string.terminal_receipt_new_balance), b.newBalance.toRupiah())
+                                    Spacer(Modifier.height(DX.Spacing.M))
+                                    DashedDivider()
+                                    Spacer(Modifier.height(DX.Spacing.M))
+                                    Column(verticalArrangement = Arrangement.spacedBy(DX.Spacing.S)) {
+                                        ReceiptRow(
+                                            stringResource(R.string.terminal_receipt_member),
+                                            b.memberName,
+                                        )
+                                        ReceiptRow(
+                                            stringResource(R.string.terminal_receipt_checkin),
+                                            fmt.format(
+                                                Instant.ofEpochMilli(b.checkInTime).atZone(zone),
+                                            ),
+                                        )
+                                        ReceiptRow(
+                                            stringResource(R.string.terminal_receipt_checkout),
+                                            fmt.format(
+                                                Instant.ofEpochMilli(b.checkOutTime).atZone(zone),
+                                            ),
+                                        )
+                                        ReceiptRow(
+                                            stringResource(R.string.terminal_receipt_duration),
+                                            formatDuration(b.durationMs),
+                                        )
+                                        ReceiptRow(
+                                            stringResource(R.string.terminal_receipt_hours_billed),
+                                            stringResource(
+                                                R.string.terminal_receipt_hours_value,
+                                                b.hoursCharged,
+                                            ),
+                                        )
+                                    }
+                                    Spacer(Modifier.height(DX.Spacing.M))
+                                    DashedDivider()
+                                    Spacer(Modifier.height(DX.Spacing.M))
+                                    Column(verticalArrangement = Arrangement.spacedBy(DX.Spacing.S)) {
+                                        ReceiptRow(
+                                            stringResource(R.string.terminal_receipt_fee),
+                                            b.fee.toRupiah(),
+                                            highlight = true,
+                                        )
+                                        ReceiptRow(
+                                            stringResource(R.string.terminal_receipt_prev_balance),
+                                            b.oldBalance.toRupiah(),
+                                        )
+                                        ReceiptRow(
+                                            stringResource(R.string.terminal_receipt_new_balance),
+                                            b.newBalance.toRupiah(),
+                                            highlight = true,
+                                            highlightColor = DX.Color.text.darkGreen,
+                                        )
+                                    }
+                                    Spacer(Modifier.height(DX.Spacing.M))
+                                    DashedDivider()
                                 }
                             }
                             DXButton(
-                                onClick = {
-                                    viewModel.reset()
-                                },
-                                text = stringResource(
-                                    R.string.terminal_done,
-                                ),
+                                onClick = { viewModel.reset() },
+                                text = stringResource(R.string.terminal_done),
                                 variant = ButtonVariant.Primary.Large,
                                 modifier = Modifier.fillMaxWidth(),
                             )
@@ -289,13 +339,23 @@ fun TerminalScreen(modifier: Modifier = Modifier, viewModel: TerminalViewModel =
 }
 
 @Composable
-private fun ReceiptRow(label: String, value: String, highlight: Boolean = false) {
+private fun ReceiptRow(label: String, value: String, highlight: Boolean = false, highlightColor: Color = DX.Color.text.red) {
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-        Text(label, style = DX.Font.body, color = DX.Color.text.secondary)
+        Text(
+            label,
+            style = DX.Font.body.copy(fontFamily = FontFamily.Monospace),
+            color = DX.Color.text.secondary,
+        )
         Text(
             value,
-            style = if (highlight) DX.Font.bodySemiBold else DX.Font.body,
-            color = if (highlight) DX.Color.text.red else DX.Color.text.primary,
+            style = if (highlight) {
+                DX.Font.bodySemiBold.copy(fontFamily = FontFamily.Monospace)
+            } else {
+                DX.Font.body.copy(
+                    fontFamily = FontFamily.Monospace,
+                )
+            },
+            color = if (highlight) highlightColor else DX.Color.text.primary,
         )
     }
 }
@@ -306,4 +366,21 @@ private fun formatDuration(ms: Long): String {
     val hours = totalMinutes / 60
     val minutes = totalMinutes % 60
     return stringResource(R.string.terminal_duration_format, hours, minutes)
+}
+
+@Composable
+private fun DashedDivider() {
+    Canvas(
+        Modifier
+            .fillMaxWidth()
+            .height(1.dp),
+    ) {
+        drawLine(
+            color = Color.LightGray,
+            start = androidx.compose.ui.geometry.Offset(0f, 0f),
+            end = androidx.compose.ui.geometry.Offset(size.width, 0f),
+            strokeWidth = 2f,
+            pathEffect = PathEffect.dashPathEffect(floatArrayOf(8f, 8f)),
+        )
+    }
 }
