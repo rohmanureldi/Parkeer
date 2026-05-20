@@ -10,6 +10,9 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.runtime.CompositionLocalProvider
+import com.eldirohmanur.parkeer.core.firebase.AnalyticsHelper
+import com.eldirohmanur.parkeer.core.firebase.LocalAnalytics
 import com.eldirohmanur.parkeer.core.nfc.NfcTagHolder
 import com.eldirohmanur.parkeer.navigation.ParkeerNavHost
 import com.telkomsel.dexterity.theme.DexterityTheme
@@ -21,6 +24,9 @@ class MainActivity : ComponentActivity() {
 
     @Inject
     lateinit var nfcTagHolder: NfcTagHolder
+
+    @Inject
+    lateinit var analyticsHelper: AnalyticsHelper
 
     private var nfcAdapter: NfcAdapter? = null
     private lateinit var pendingIntent: PendingIntent
@@ -39,8 +45,10 @@ class MainActivity : ComponentActivity() {
         )
 
         setContent {
-            DexterityTheme {
-                ParkeerNavHost()
+            CompositionLocalProvider(LocalAnalytics provides analyticsHelper) {
+                DexterityTheme {
+                    ParkeerNavHost()
+                }
             }
         }
 

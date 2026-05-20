@@ -1,4 +1,4 @@
-package com.eldirohmanur.parkeer.navigation
+package com.eldirohmanur.parkeer.screen
 
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalActivity

@@ -52,6 +52,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.eldirohmanur.parkeer.core.firebase.LocalAnalytics
 import com.eldirohmanur.parkeer.core.model.Activity
 import com.eldirohmanur.parkeer.core.model.CardData
 import com.eldirohmanur.parkeer.core.model.VisitState
@@ -73,6 +74,7 @@ import java.time.format.DateTimeFormatter
 fun ScoutScreen(modifier: Modifier = Modifier, viewModel: ScoutViewModel = hiltViewModel(), onBack: () -> Unit) {
     val uiState by viewModel.uiState.collectAsState()
     val haptic = rememberHapticFeedback()
+    val analytics = LocalAnalytics.current
     val fullFmt = remember { DateTimeFormatter.ofPattern("dd MMM yyyy, HH:mm:ss") }
     val shortFmt = remember { DateTimeFormatter.ofPattern("dd MMM, HH:mm") }
 

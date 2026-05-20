@@ -48,6 +48,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.eldirohmanur.parkeer.core.firebase.LocalAnalytics
 import com.eldirohmanur.parkeer.core.ui.ErrorLogger
 import com.eldirohmanur.parkeer.core.ui.NfcPulseAnimation
 import com.eldirohmanur.parkeer.core.ui.ParkeerCard
@@ -67,6 +68,7 @@ import java.time.format.DateTimeFormatter
 fun TerminalScreen(modifier: Modifier = Modifier, viewModel: TerminalViewModel = hiltViewModel(), onBack: () -> Unit) {
     val uiState by viewModel.uiState.collectAsState()
     val haptic = rememberHapticFeedback()
+    val analytics = LocalAnalytics.current
     val fmt = remember { DateTimeFormatter.ofPattern("dd MMM yyyy, HH:mm") }
     val zone = remember { ZoneId.systemDefault() }
 
@@ -250,7 +252,10 @@ fun TerminalScreen(modifier: Modifier = Modifier, viewModel: TerminalViewModel =
                                 }
                             }
                             DXButton(
-                                onClick = { viewModel.reset() },
+                                onClick = {
+                                    analytics.logButtonClick("Done", "Terminal")
+                                    viewModel.reset()
+                                },
                                 text = stringResource(R.string.terminal_done),
                                 variant = ButtonVariant.Primary.Large,
                                 modifier = Modifier.fillMaxWidth(),

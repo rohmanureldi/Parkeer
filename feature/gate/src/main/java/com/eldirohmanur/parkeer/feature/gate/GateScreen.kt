@@ -43,6 +43,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.eldirohmanur.parkeer.core.firebase.LocalAnalytics
 import com.eldirohmanur.parkeer.core.ui.ErrorLogger
 import com.eldirohmanur.parkeer.core.ui.NfcPulseAnimation
 import com.eldirohmanur.parkeer.core.ui.ParkeerCard
@@ -66,6 +67,7 @@ import java.time.format.DateTimeFormatter
 fun GateScreen(modifier: Modifier = Modifier, viewModel: GateViewModel = hiltViewModel(), onBack: () -> Unit) {
     val uiState by viewModel.uiState.collectAsState()
     val haptic = rememberHapticFeedback()
+    val analytics = LocalAnalytics.current
     var simEnabled by remember { mutableStateOf(false) }
     var simHoursAgo by remember { mutableStateOf("2") }
     val snackbarHostState = remember { SnackbarHostState() }
@@ -134,8 +136,20 @@ fun GateScreen(modifier: Modifier = Modifier, viewModel: GateViewModel = hiltVie
                         },
                     )
                     is GateUiState.Processing -> GateProcessingState()
-                    is GateUiState.Success -> GateSuccessState(state.memberName, state.checkInTime, simEnabled, onDone = { viewModel.reset() })
-                    is GateUiState.Error -> GateErrorState(state.error, onDismiss = { viewModel.reset() })
+                    is GateUiState.Success -> GateSuccessState(
+                        state.memberName,
+                        state.checkInTime,
+                        simEnabled,
+                        onDone = {
+                            analytics.logButtonClick("Done", "Gate")
+                            viewModel.reset()
+                        },
+                    )
+
+                    is GateUiState.Error -> GateErrorState(state.error, onDismiss = {
+                        analytics.logButtonClick("Dismiss", "Gate")
+                        viewModel.reset()
+                    })
                 }
             }
         }

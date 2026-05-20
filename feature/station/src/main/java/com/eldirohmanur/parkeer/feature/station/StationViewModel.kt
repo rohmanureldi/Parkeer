@@ -3,6 +3,7 @@ package com.eldirohmanur.parkeer.feature.station
 import android.nfc.Tag
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.eldirohmanur.parkeer.core.firebase.PerfTracer
 import com.eldirohmanur.parkeer.core.model.Activity
 import com.eldirohmanur.parkeer.core.model.CardData
 import com.eldirohmanur.parkeer.core.model.TransactionLog
@@ -17,7 +18,11 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class StationViewModel @Inject constructor(private val cardReader: CardReader, private val nfcTagHolder: NfcTagHolder) : ViewModel() {
+class StationViewModel @Inject constructor(
+    private val cardReader: CardReader,
+    private val nfcTagHolder: NfcTagHolder,
+    private val perfTracer: PerfTracer,
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow<StationUiState>(StationUiState.Idle)
     val uiState: StateFlow<StationUiState> = _uiState.asStateFlow()
@@ -61,10 +66,12 @@ class StationViewModel @Inject constructor(private val cardReader: CardReader, p
     private fun onTagDiscovered(tag: Tag) {
         viewModelScope.launch {
             _uiState.value = StationUiState.Processing
+            val trace = perfTracer.startTrace("nfc_${mode.name.lowercase()}")
             when (mode) {
                 StationMode.REGISTER -> doRegister(tag)
                 StationMode.TOP_UP -> doTopUp(tag)
             }
+            trace.stop()
         }
     }
 

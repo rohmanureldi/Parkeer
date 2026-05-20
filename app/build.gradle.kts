@@ -5,6 +5,9 @@ plugins {
     alias(libs.plugins.hilt)
     alias(libs.plugins.ksp)
     alias(libs.plugins.stability.analyzer)
+    id("com.google.gms.google-services")
+    alias(libs.plugins.firebase.crashlytics)
+    alias(libs.plugins.firebase.perf)
 }
 
 android {
@@ -49,6 +52,7 @@ dependencies {
     implementation(project(":core:nfc"))
     implementation(project(":core:crypto"))
     implementation(project(":core:cardprotocol"))
+    implementation(project(":core:firebase"))
     implementation(project(":feature:station"))
     implementation(project(":feature:gate"))
     implementation(project(":feature:terminal"))

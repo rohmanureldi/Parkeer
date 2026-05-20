@@ -46,6 +46,7 @@ import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.eldirohmanur.parkeer.core.firebase.LocalAnalytics
 import com.eldirohmanur.parkeer.core.ui.ErrorLogger
 import com.eldirohmanur.parkeer.core.ui.NfcPulseAnimation
 import com.eldirohmanur.parkeer.core.ui.rememberHapticFeedback
@@ -72,6 +73,7 @@ private enum class SheetType { REGISTER, TOP_UP }
 fun StationScreen(modifier: Modifier = Modifier, viewModel: StationViewModel = hiltViewModel(), onBack: () -> Unit) {
     val uiState by viewModel.uiState.collectAsState()
     val haptic = rememberHapticFeedback()
+    val analytics = LocalAnalytics.current
     var activeSheet by rememberSaveable { mutableStateOf<SheetType?>(null) }
 
     LaunchedEffect(uiState) {
@@ -108,8 +110,14 @@ fun StationScreen(modifier: Modifier = Modifier, viewModel: StationViewModel = h
             verticalArrangement = Arrangement.Center,
         ) {
             StationHome(
-                onRegister = { activeSheet = SheetType.REGISTER },
-                onTopUp = { activeSheet = SheetType.TOP_UP },
+                onRegister = {
+                    analytics.logButtonClick("Register New Member", "Station")
+                    activeSheet = SheetType.REGISTER
+                },
+                onTopUp = {
+                    analytics.logButtonClick("Top-Up Balance", "Station")
+                    activeSheet = SheetType.TOP_UP
+                },
             )
         }
     }

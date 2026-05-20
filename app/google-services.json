@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "630373293213",
+    "project_id": "parkeer-5ef64",
+    "storage_bucket": "parkeer-5ef64.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:630373293213:android:949ff9a6fc7438147bc874",
+        "android_client_info": {
+          "package_name": "com.eldirohmanur.parkeer"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCXhd3KO120XlUO5mdBtM8ocbDs4mVZsQU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

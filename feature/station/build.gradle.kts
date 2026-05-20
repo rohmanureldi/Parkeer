@@ -27,6 +27,7 @@ dependencies {
     implementation(project(":core:model"))
     implementation(project(":core:nfc"))
     implementation(project(":core:ui"))
+    implementation(project(":core:firebase"))
     implementation(platform(libs.compose.bom))
     implementation(libs.compose.ui)
     implementation(libs.compose.material3)

@@ -9,6 +9,7 @@ import com.eldirohmanur.parkeer.feature.gate.GateScreen
 import com.eldirohmanur.parkeer.feature.scout.ScoutScreen
 import com.eldirohmanur.parkeer.feature.station.StationScreen
 import com.eldirohmanur.parkeer.feature.terminal.TerminalScreen
+import com.eldirohmanur.parkeer.screen.RoleSelectorScreen
 
 object Routes {
     const val ROLE_SELECTOR = "role_selector"
