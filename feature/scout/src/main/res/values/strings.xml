@@ -1,27 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="scout_title">Scout</string>
-    <string name="scout_read_only">Read Only – Will NOT modify your card</string>
-    <string name="scout_tap_to_view">Tap your card to view info</string>
-    <string name="scout_reading">Reading card…</string>
-    <string name="scout_reading_hint">Don\'t remove the card</string>
-    <string name="scout_tap_again">Tap Again to Refresh</string>
-    <string name="scout_try_again">Try Again</string>
+    <string name="scout_read_only">Hanya Baca – TIDAK akan mengubah kartu Anda</string>
+    <string name="scout_tap_to_view">Tempelkan kartu untuk melihat info</string>
+    <string name="scout_reading">Membaca kartu…</string>
+    <string name="scout_reading_hint">Jangan lepas kartu</string>
+    <string name="scout_tap_again">Tempelkan Lagi untuk Refresh</string>
+    <string name="scout_try_again">Coba Lagi</string>
     <string name="scout_card_brand">PARKEER</string>
-    <string name="scout_card_balance_label">BALANCE</string>
+    <string name="scout_card_balance_label">SALDO</string>
     <string name="scout_card_id">ID %1$d</string>
-    <string name="scout_card_status_parked">PARKED</string>
+    <string name="scout_card_status_parked">PARKIR</string>
     <string name="scout_card_status_idle">IDLE</string>
-    <string name="scout_checked_in">Checked In</string>
-    <string name="scout_checked_in_since">Since: %1$s</string>
-    <string name="scout_recent_transactions">Recent Transactions</string>
-    <string name="scout_no_transactions">No transactions yet</string>
-    <string name="scout_activity_parking">Parking</string>
-    <string name="scout_activity_top_up">Top-Up</string>
-    <string name="scout_activity_registration">Registration</string>
-    <string name="scout_cd_back">Back</string>
-    <string name="scout_cd_read_only">Read only mode</string>
+    <string name="scout_checked_in">Sudah Check-In</string>
+    <string name="scout_checked_in_since">Sejak: %1$s</string>
+    <string name="scout_recent_transactions">Transaksi Terakhir</string>
+    <string name="scout_no_transactions">Belum ada transaksi</string>
+    <string name="scout_activity_parking">Parkir</string>
+    <string name="scout_activity_top_up">Isi Saldo</string>
+    <string name="scout_activity_registration">Registrasi</string>
+    <string name="scout_cd_back">Kembali</string>
+    <string name="scout_cd_read_only">Mode hanya baca</string>
     <string name="scout_cd_nfc">NFC</string>
     <string name="scout_cd_error">Error</string>
-    <string name="scout_error_read_failed">Unable to read this card. Make sure it\'s a registered Parkeer card and hold it steady.</string>
+    <string name="scout_error_read_failed">Kartu tidak dapat dibaca. Pastikan ini kartu Parkeer terdaftar dan tahan dengan stabil.</string>
 </resources>

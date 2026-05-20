@@ -27,6 +27,8 @@ class StationViewModel @Inject constructor(private val cardReader: CardReader, p
     private var memberId: String = ""
     private var topUpAmount: Int = 0
 
+    val pendingTopUpAmount: Int get() = topUpAmount
+
     init {
         viewModelScope.launch {
             nfcTagHolder.tags.collect { tag ->

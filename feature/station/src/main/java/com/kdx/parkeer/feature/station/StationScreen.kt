@@ -146,7 +146,16 @@ fun StationScreen(modifier: Modifier = Modifier, viewModel: StationViewModel = h
                             }
                         }
 
-                        is StationUiState.WaitingForTap -> SheetNfcTap()
+                        is StationUiState.WaitingForTap -> SheetNfcTap(
+                            subtitle = if (activeSheet == SheetType.TOP_UP) {
+                                stringResource(
+                                    R.string.station_topup_amount,
+                                    viewModel.pendingTopUpAmount.toRupiah(),
+                                )
+                            } else {
+                                null
+                            },
+                        )
                         is StationUiState.Processing -> SheetProcessing()
                         is StationUiState.RegisterSuccess -> SheetSuccess(
                             stringResource(R.string.station_register_success),
@@ -282,7 +291,7 @@ private fun TopUpSheetContent(viewModel: StationViewModel) {
 }
 
 @Composable
-private fun SheetNfcTap() {
+private fun SheetNfcTap(subtitle: String? = null) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -291,7 +300,15 @@ private fun SheetNfcTap() {
     ) {
         NfcPulseAnimation()
         Spacer(Modifier.height(DX.Spacing.L))
-        Text(stringResource(R.string.station_tap_nfc), style = DX.Font.subHeadingSemiBold, color = DX.Color.text.primary)
+        if (subtitle != null) {
+            Text(subtitle, style = DX.Font.subHeadingSemiBold, color = DX.Color.text.primary)
+            Spacer(Modifier.height(DX.Spacing.S))
+        }
+        Text(
+            stringResource(R.string.station_tap_nfc),
+            style = DX.Font.bodySemiBold,
+            color = DX.Color.text.primary,
+        )
         Text(stringResource(R.string.station_hold_steady), style = DX.Font.caption, color = DX.Color.text.secondary)
     }
 }
