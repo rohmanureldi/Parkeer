@@ -128,7 +128,7 @@ fun TerminalScreen(modifier: Modifier = Modifier, viewModel: TerminalViewModel =
                                             fontWeight = FontWeight.Bold,
                                         ),
                                     ) {
-                                        append(TerminalViewModel.RATE_PER_HOUR.toRupiah())
+                                        append(viewModel.ratePerHour.toRupiah())
                                     }
                                     append(stringResource(R.string.terminal_rate_suffix))
                                     withStyle(

@@ -2,6 +2,7 @@ package com.kdx.parkeer.core.nfc.di
 
 import com.kdx.parkeer.core.crypto.AesGcmCardCipher
 import com.kdx.parkeer.core.crypto.CardCipher
+import com.kdx.parkeer.core.model.AppConfig
 import com.kdx.parkeer.core.nfc.CardReader
 import com.kdx.parkeer.core.nfc.NtagCardReader
 import dagger.Module
@@ -24,4 +25,14 @@ object NfcModule {
     @Provides
     @Singleton
     fun provideCardReader(cipher: CardCipher): CardReader = NtagCardReader(cipher)
+
+    /**
+     * Future: replace with
+     *     fun provideAppConfig(remoteConfig: FirebaseRemoteConfig): AppConfig = object : AppConfig {
+     *         override val ratePerHour: Int get() = remoteConfig.getLong("rate_per_hour").toInt()
+     *     }
+     */
+    @Provides
+    @Singleton
+    fun provideAppConfig(): AppConfig = object : AppConfig {}
 }

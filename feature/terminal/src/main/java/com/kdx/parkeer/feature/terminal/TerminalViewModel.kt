@@ -4,6 +4,7 @@ import android.nfc.Tag
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kdx.parkeer.core.model.Activity
+import com.kdx.parkeer.core.model.AppConfig
 import com.kdx.parkeer.core.model.TransactionLog
 import com.kdx.parkeer.core.model.VisitState
 import com.kdx.parkeer.core.nfc.CardReader
@@ -16,14 +17,16 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class TerminalViewModel @Inject constructor(private val cardReader: CardReader, private val nfcTagHolder: NfcTagHolder) : ViewModel() {
+class TerminalViewModel @Inject constructor(
+    private val cardReader: CardReader,
+    private val nfcTagHolder: NfcTagHolder,
+    private val appConfig: AppConfig,
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow<TerminalUiState>(TerminalUiState.Ready)
     val uiState: StateFlow<TerminalUiState> = _uiState.asStateFlow()
 
-    companion object {
-        const val RATE_PER_HOUR = 2000
-    }
+    val ratePerHour: Int get() = appConfig.ratePerHour
 
     init {
         viewModelScope.launch {
@@ -62,7 +65,7 @@ class TerminalViewModel @Inject constructor(private val cardReader: CardReader, 
 
             val durationSeconds = durationMs / 1000
             val hoursCharged = ((durationSeconds + 3599) / 3600).toInt() // ceiling
-            val fee = hoursCharged * RATE_PER_HOUR
+            val fee = hoursCharged * appConfig.ratePerHour
 
             if (card.balance < fee) {
                 _uiState.value =
