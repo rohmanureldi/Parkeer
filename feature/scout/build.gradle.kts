@@ -7,7 +7,7 @@ plugins {
 }
 
 android {
-    namespace = "com.kdx.parkeer.feature.scout"
+    namespace = "com.eldirohmanur.parkeer.feature.scout"
     compileSdk = 36
     defaultConfig { minSdk = 26 }
     compileOptions {

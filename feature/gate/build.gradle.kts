@@ -7,7 +7,7 @@ plugins {
 }
 
 android {
-    namespace = "com.kdx.parkeer.feature.gate"
+    namespace = "com.eldirohmanur.parkeer.feature.gate"
     compileSdk = 36
     defaultConfig { minSdk = 26 }
     compileOptions {

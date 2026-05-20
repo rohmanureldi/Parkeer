@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.kdx.parkeer.core.cardprotocol"
+    namespace = "com.eldirohmanur.parkeer.core.cardprotocol"
     compileSdk = 36
     defaultConfig { minSdk = 26 }
     compileOptions {

@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.kdx.parkeer.core.crypto"
+    namespace = "com.eldirohmanur.parkeer.core.crypto"
     compileSdk = 36
     defaultConfig { minSdk = 26 }
     compileOptions {

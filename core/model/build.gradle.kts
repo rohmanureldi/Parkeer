@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.kdx.parkeer.core.model"
+    namespace = "com.eldirohmanur.parkeer.core.model"
     compileSdk = 36
     defaultConfig { minSdk = 26 }
     compileOptions {

@@ -7,7 +7,7 @@ plugins {
 }
 
 android {
-    namespace = "com.kdx.parkeer.feature.terminal"
+    namespace = "com.eldirohmanur.parkeer.feature.terminal"
     compileSdk = 36
     defaultConfig { minSdk = 26 }
     compileOptions {

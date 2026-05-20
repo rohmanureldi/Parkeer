@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.kdx.parkeer.core.nfc"
+    namespace = "com.eldirohmanur.parkeer.core.nfc"
     compileSdk = 36
     defaultConfig { minSdk = 26 }
     compileOptions {

@@ -8,11 +8,11 @@ plugins {
 }
 
 android {
-    namespace = "com.kdx.parkeer"
+    namespace = "com.eldirohmanur.parkeer"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.kdx.parkeer"
+        applicationId = "com.eldirohmanur.parkeer"
         minSdk = 26
         targetSdk = 35
         versionCode = 1
