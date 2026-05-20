@@ -18,7 +18,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Store
 import androidx.compose.material3.CircularProgressIndicator
@@ -40,7 +39,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -48,6 +47,8 @@ import com.kdx.parkeer.core.ui.ErrorLogger
 import com.kdx.parkeer.core.ui.NfcPulseAnimation
 import com.kdx.parkeer.core.ui.rememberHapticFeedback
 import com.kdx.parkeer.core.ui.toRupiah
+import com.lottiefiles.dotlottie.core.compose.ui.DotLottieAnimation
+import com.lottiefiles.dotlottie.core.util.DotLottieSource
 import com.telkomsel.dexterity.components.atom.button.DXButton
 import com.telkomsel.dexterity.components.atom.button.model.ButtonState
 import com.telkomsel.dexterity.components.atom.button.model.ButtonVariant
@@ -116,38 +117,45 @@ fun StationScreen(modifier: Modifier = Modifier, viewModel: StationViewModel = h
         val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
         ModalBottomSheet(
             onDismissRequest = {
-                activeSheet = null
                 viewModel.reset()
             },
             sheetState = sheetState,
         ) {
-            val minSheetHeight = (LocalConfiguration.current.screenHeightDp / 3).dp
+            val minSheetHeight = (LocalWindowInfo.current.containerDpSize.height.value / 3).dp
             AnimatedContent(
                 targetState = uiState,
                 transitionSpec = { fadeIn() togetherWith fadeOut() },
                 label = "sheet_content",
-                modifier = Modifier.heightIn(min = minSheetHeight),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = minSheetHeight),
             ) { state ->
-                when (state) {
-                    is StationUiState.Idle -> {
-                        when (activeSheet) {
-                            SheetType.REGISTER -> RegisterSheetContent(viewModel)
-                            SheetType.TOP_UP -> TopUpSheetContent(viewModel)
-                            else -> {}
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    when (state) {
+                        is StationUiState.Idle -> {
+                            when (activeSheet) {
+                                SheetType.REGISTER -> RegisterSheetContent(viewModel)
+                                SheetType.TOP_UP -> TopUpSheetContent(viewModel)
+                                else -> {}
+                            }
                         }
+
+                        is StationUiState.WaitingForTap -> SheetNfcTap()
+                        is StationUiState.Processing -> SheetProcessing()
+                        is StationUiState.RegisterSuccess -> SheetSuccess(
+                            stringResource(R.string.station_register_success),
+                        )
+
+                        is StationUiState.TopUpSuccess -> SheetSuccess(
+                            stringResource(R.string.station_topup_success),
+                        )
+
+                        is StationUiState.Error -> SheetError(state.error) { viewModel.retryLastOperation() }
                     }
-
-                    is StationUiState.WaitingForTap -> SheetNfcTap()
-                    is StationUiState.Processing -> SheetProcessing()
-                    is StationUiState.RegisterSuccess -> SheetSuccess(
-                        stringResource(R.string.station_register_success),
-                    )
-
-                    is StationUiState.TopUpSuccess -> SheetSuccess(
-                        stringResource(R.string.station_topup_success),
-                    )
-
-                    is StationUiState.Error -> SheetError(state.error) { viewModel.retryLastOperation() }
                 }
             }
         }
@@ -293,13 +301,12 @@ private fun SheetSuccess(title: String) {
             .padding(vertical = DX.Spacing.XL),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Icon(
-            Icons.Filled.CheckCircle,
-            contentDescription = stringResource(R.string.station_cd_success),
-            modifier = Modifier.size(48.dp),
-            tint = DX.Color.text.darkGreen,
+        DotLottieAnimation(
+            source = DotLottieSource.Asset("success.lottie"),
+            autoplay = true,
+            loop = false,
+            modifier = Modifier.size(150.dp),
         )
-        Spacer(Modifier.height(DX.Spacing.M))
         Text(title, style = DX.Font.subHeadingSemiBold, color = DX.Color.text.primary)
     }
 }
