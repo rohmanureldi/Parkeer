@@ -41,7 +41,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.kdx.parkeer.core.ui.ErrorLogger
@@ -109,11 +113,33 @@ fun TerminalScreen(modifier: Modifier = Modifier, viewModel: TerminalViewModel =
                             Spacer(Modifier.height(DX.Spacing.XL))
                             NfcPulseAnimation()
                             Spacer(Modifier.height(DX.Spacing.L))
-                            Text(stringResource(R.string.terminal_ready), style = DX.Font.subHeadingSemiBold, color = DX.Color.text.primary)
-                            Text(stringResource(R.string.terminal_tap_to_check_out), style = DX.Font.caption, color = DX.Color.text.secondary)
+                            Text(
+                                stringResource(R.string.terminal_tap_to_check_out),
+                                style = DX.Font.subHeadingSemiBold,
+                                color = DX.Color.text.primary,
+                            )
                             Spacer(Modifier.height(DX.Spacing.M))
                             Text(
-                                stringResource(R.string.terminal_rate_info, 2000.toRupiah()),
+                                buildAnnotatedString {
+                                    append(stringResource(R.string.terminal_rate_prefix))
+                                    withStyle(
+                                        SpanStyle(
+                                            color = DX.Color.text.red,
+                                            fontWeight = FontWeight.Bold,
+                                        ),
+                                    ) {
+                                        append(TerminalViewModel.RATE_PER_HOUR.toRupiah())
+                                    }
+                                    append(stringResource(R.string.terminal_rate_suffix))
+                                    withStyle(
+                                        SpanStyle(
+                                            color = DX.Color.text.primary,
+                                            fontWeight = FontWeight.Bold,
+                                        ),
+                                    ) {
+                                        append(stringResource(R.string.terminal_rate_rounded))
+                                    }
+                                },
                                 style = DX.Font.caption,
                                 color = DX.Color.text.secondary,
                             )

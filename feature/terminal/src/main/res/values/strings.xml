@@ -3,8 +3,10 @@
     <string name="terminal_title">Terminal</string>
     <string name="terminal_subtitle">Titik Keluar – Check-Out</string>
     <string name="terminal_ready">Siap</string>
-    <string name="terminal_tap_to_check_out">Tempelkan kartu anggota untuk check-out</string>
-    <string name="terminal_rate_info">Tarif: %1$s/jam (dibulatkan ke atas)</string>
+    <string name="terminal_tap_to_check_out">Tempelkan kartu untuk check-out</string>
+    <string name="terminal_rate_prefix">Tarif: </string>
+    <string name="terminal_rate_suffix">/jam </string>
+    <string name="terminal_rate_rounded">(dibulatkan ke atas)</string>
     <string name="terminal_calculating">Menulis ke kartu…</string>
     <string name="terminal_calculating_hint">Jangan lepas kartu</string>
     <string name="terminal_checkout_complete">Checkout Selesai!</string>
