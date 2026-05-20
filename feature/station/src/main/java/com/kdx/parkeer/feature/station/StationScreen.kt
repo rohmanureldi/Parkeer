@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,8 +19,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.AccountBalanceWallet
 import androidx.compose.material.icons.filled.Error
-import androidx.compose.material.icons.filled.Store
+import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
@@ -39,6 +41,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -102,10 +105,8 @@ fun StationScreen(modifier: Modifier = Modifier, viewModel: StationViewModel = h
                 .padding(innerPadding)
                 .consumeWindowInsets(innerPadding)
                 .padding(horizontal = DX.Spacing.L),
-            verticalArrangement = Arrangement.spacedBy(DX.Spacing.M),
+            verticalArrangement = Arrangement.Center,
         ) {
-            Text(stringResource(R.string.station_subtitle), style = DX.Font.caption, color = DX.Color.text.secondary)
-            Spacer(Modifier.height(DX.Spacing.S))
             StationHome(
                 onRegister = { activeSheet = SheetType.REGISTER },
                 onTopUp = { activeSheet = SheetType.TOP_UP },
@@ -117,6 +118,7 @@ fun StationScreen(modifier: Modifier = Modifier, viewModel: StationViewModel = h
         val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
         ModalBottomSheet(
             onDismissRequest = {
+                activeSheet = null
                 viewModel.reset()
             },
             sheetState = sheetState,
@@ -152,6 +154,10 @@ fun StationScreen(modifier: Modifier = Modifier, viewModel: StationViewModel = h
 
                         is StationUiState.TopUpSuccess -> SheetSuccess(
                             stringResource(R.string.station_topup_success),
+                            subtitle = stringResource(
+                                R.string.station_topup_balance,
+                                state.newBalance.toRupiah(),
+                            ),
                         )
 
                         is StationUiState.Error -> SheetError(state.error) { viewModel.retryLastOperation() }
@@ -165,37 +171,53 @@ fun StationScreen(modifier: Modifier = Modifier, viewModel: StationViewModel = h
 @Composable
 private fun StationHome(onRegister: () -> Unit, onTopUp: () -> Unit) {
     Column(verticalArrangement = Arrangement.spacedBy(DX.Spacing.M)) {
-        DXCard(
-            modifier = Modifier.fillMaxWidth(),
-            style = DXCardStyle.CustomLayout(
-                style = CustomCardStyle(CustomCardVariant.Custom({ DX.Color.background.white }, { DX.Color.stroke.border })),
-                content = {
-                    Column(Modifier.padding(DX.Spacing.L), horizontalAlignment = Alignment.CenterHorizontally) {
-                        Icon(
-                            Icons.Filled.Store,
-                            contentDescription = stringResource(R.string.station_cd_station),
-                            modifier = Modifier.size(48.dp),
-                            tint = DX.Color.text.primary,
-                        )
-                        Spacer(Modifier.height(DX.Spacing.S))
-                        Text(stringResource(R.string.station_welcome_admin), style = DX.Font.bodySemiBold, color = DX.Color.text.primary)
-                    }
-                },
-            ),
-        )
-        DXButton(
+        ActionCard(
+            icon = Icons.Filled.PersonAdd,
+            title = stringResource(R.string.station_register_new),
+            description = stringResource(R.string.station_register_desc),
             onClick = onRegister,
-            text = stringResource(R.string.station_register_new),
-            variant = ButtonVariant.Primary.Large,
-            modifier = Modifier.fillMaxWidth(),
         )
-        DXButton(
+        ActionCard(
+            icon = Icons.Filled.AccountBalanceWallet,
+            title = stringResource(R.string.station_top_up),
+            description = stringResource(R.string.station_topup_desc),
             onClick = onTopUp,
-            text = stringResource(R.string.station_top_up),
-            variant = ButtonVariant.Secondary.Large,
-            modifier = Modifier.fillMaxWidth(),
         )
     }
+}
+
+@Composable
+private fun ActionCard(icon: ImageVector, title: String, description: String, onClick: () -> Unit) {
+    DXCard(
+        modifier = Modifier.fillMaxWidth(),
+        onClick = onClick,
+        style = DXCardStyle.CustomLayout(
+            style = CustomCardStyle(
+                CustomCardVariant.Custom(
+                    { DX.Color.background.white },
+                    { DX.Color.stroke.border },
+                ),
+            ),
+            content = {
+                Row(
+                    modifier = Modifier.padding(DX.Spacing.L),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(DX.Spacing.M),
+                ) {
+                    Icon(
+                        icon,
+                        contentDescription = null,
+                        modifier = Modifier.size(32.dp),
+                        tint = DX.Color.text.primary,
+                    )
+                    Column {
+                        Text(title, style = DX.Font.bodySemiBold, color = DX.Color.text.primary)
+                        Text(description, style = DX.Font.caption, color = DX.Color.text.secondary)
+                    }
+                }
+            },
+        ),
+    )
 }
 
 @Composable
@@ -294,7 +316,7 @@ private fun SheetProcessing() {
 }
 
 @Composable
-private fun SheetSuccess(title: String) {
+private fun SheetSuccess(title: String, subtitle: String? = null) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -308,6 +330,9 @@ private fun SheetSuccess(title: String) {
             modifier = Modifier.size(150.dp),
         )
         Text(title, style = DX.Font.subHeadingSemiBold, color = DX.Color.text.primary)
+        if (subtitle != null) {
+            Text(subtitle, style = DX.Font.body, color = DX.Color.text.secondary)
+        }
     }
 }
 

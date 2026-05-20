@@ -4,7 +4,9 @@
     <string name="station_subtitle">Admin – Register &amp; Top-Up</string>
     <string name="station_welcome_admin">Welcome, Admin</string>
     <string name="station_register_new">Register New Member</string>
+    <string name="station_register_desc">Write a new member card via NFC</string>
     <string name="station_top_up">Top-Up Balance</string>
+    <string name="station_topup_desc">Add balance to an existing member card</string>
     <string name="station_member_name_label">Member Name</string>
     <string name="station_member_name_placeholder">Enter member name</string>
     <string name="station_member_id_label">Member ID</string>
@@ -21,6 +23,7 @@
     <string name="station_register_success">Registration Successful!</string>
     <string name="station_register_detail">Member: %1$s (#%2$d)</string>
     <string name="station_topup_success">Top-Up Successful!</string>
+    <string name="station_topup_balance">Current Balance: %1$s</string>
     <string name="station_topup_detail">%1$s\n%2$s + %3$s = %4$s</string>
     <string name="station_done">Done</string>
     <string name="station_error">Something went wrong</string>
