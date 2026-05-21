@@ -5,6 +5,12 @@ on:
     branches: [ main, develop ]
   pull_request:
     branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      distribute:
+        description: 'Distribute to Firebase App Distribution'
+        type: boolean
+        default: false
 
 env:
   JAVA_VERSION: '21'
@@ -73,7 +79,7 @@ jobs:
     name: Firebase Distribution
     runs-on: ubuntu-latest
     needs: [ build, sonar ]
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    if: github.event_name == 'workflow_dispatch' && inputs.distribute
     steps:
       - uses: actions/checkout@v4
         with:
