@@ -19,7 +19,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBalanceWallet
-import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -46,6 +45,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.eldirohmanur.parkeer.core.firebase.LocalAnalytics
 import com.eldirohmanur.parkeer.core.ui.NfcPulseAnimation
+import com.eldirohmanur.parkeer.core.ui.ParkeerErrorState
 import com.eldirohmanur.parkeer.core.ui.ParkeerTopAppBar
 import com.eldirohmanur.parkeer.core.ui.rememberHapticFeedback
 import com.eldirohmanur.parkeer.core.ui.toRupiah
@@ -399,33 +399,13 @@ private fun SheetError(error: StationError, onRetry: () -> Unit) {
             ),
         )
     }
-    Column(
+    ParkeerErrorState(
+        title = stringResource(R.string.station_error),
+        message = message,
+        buttonText = stringResource(R.string.station_try_again),
+        onAction = onRetry,
         modifier = Modifier
-            .fillMaxWidth()
             .padding(horizontal = DX.Spacing.L)
             .padding(bottom = DX.Spacing.XL),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Icon(
-            Icons.Filled.Error,
-            contentDescription = stringResource(R.string.station_cd_error),
-            modifier = Modifier.size(48.dp),
-            tint = DX.Color.text.red,
-        )
-        Spacer(Modifier.height(DX.Spacing.M))
-        Text(
-            stringResource(R.string.station_error),
-            style = DX.Font.subHeadingSemiBold,
-            color = DX.Color.text.red,
-        )
-        Spacer(Modifier.height(DX.Spacing.S))
-        Text(message, style = DX.Font.body, color = DX.Color.text.secondary)
-        Spacer(Modifier.height(DX.Spacing.XL))
-        DXButton(
-            onClick = onRetry,
-            text = stringResource(R.string.station_try_again),
-            variant = ButtonVariant.Secondary.Large,
-            modifier = Modifier.fillMaxWidth(),
-        )
-    }
+    )
 }

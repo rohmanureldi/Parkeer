@@ -23,7 +23,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBalanceWallet
 import androidx.compose.material.icons.filled.Contactless
-import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.LocalParking
 import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material.icons.filled.Receipt
@@ -54,6 +53,7 @@ import com.eldirohmanur.parkeer.core.model.CardData
 import com.eldirohmanur.parkeer.core.model.VisitState
 import com.eldirohmanur.parkeer.core.ui.NfcPulseAnimation
 import com.eldirohmanur.parkeer.core.ui.ParkeerCard
+import com.eldirohmanur.parkeer.core.ui.ParkeerErrorState
 import com.eldirohmanur.parkeer.core.ui.ParkeerTopAppBar
 import com.eldirohmanur.parkeer.core.ui.rememberHapticFeedback
 import com.eldirohmanur.parkeer.core.ui.toRupiah
@@ -171,44 +171,20 @@ fun ScoutScreen(modifier: Modifier = Modifier, viewModel: ScoutViewModel = hiltV
                         }
 
                         is ScoutUiState.Error -> {
-                            Column(
-                                modifier = Modifier.fillMaxSize(),
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.Center,
-                            ) {
-                                Spacer(Modifier.height(DX.Spacing.XL2))
-                                Icon(
-                                    Icons.Filled.Error,
-                                    contentDescription = stringResource(R.string.scout_cd_error),
-                                    modifier = Modifier.size(48.dp),
-                                    tint = DX.Color.text.red,
-                                )
-                                Spacer(Modifier.height(DX.Spacing.M))
-                                LaunchedEffect(state.reason) {
-                                    analytics.logEvent(
-                                        name = "scout_failed",
-                                        params = mapOf(
-                                            "reason" to state.reason.orEmpty(),
-                                        ),
-                                    )
-                                }
-                                Text(
-                                    stringResource(R.string.scout_error_read_failed),
-                                    style = DX.Font.body,
-                                    color = DX.Color.text.red,
-                                )
-                                Spacer(Modifier.height(DX.Spacing.XL))
-                                DXButton(
-                                    onClick = {
-                                        viewModel.reset()
-                                    },
-                                    text = stringResource(
-                                        R.string.scout_try_again,
+                            LaunchedEffect(state.reason) {
+                                analytics.logEvent(
+                                    name = "scout_failed",
+                                    params = mapOf(
+                                        "reason" to state.reason.orEmpty(),
                                     ),
-                                    variant = ButtonVariant.Secondary.Large,
-                                    modifier = Modifier.fillMaxWidth(),
                                 )
                             }
+                            ParkeerErrorState(
+                                modifier = Modifier.fillMaxSize(),
+                                message = stringResource(R.string.scout_error_read_failed),
+                                buttonText = stringResource(R.string.scout_try_again),
+                                onAction = { viewModel.reset() },
+                            )
                         }
                     }
                 }

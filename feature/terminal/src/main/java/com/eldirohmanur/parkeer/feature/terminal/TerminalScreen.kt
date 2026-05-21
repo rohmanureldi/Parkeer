@@ -19,7 +19,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.CircularProgressIndicator
@@ -49,6 +48,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.eldirohmanur.parkeer.core.firebase.LocalAnalytics
 import com.eldirohmanur.parkeer.core.ui.NfcPulseAnimation
 import com.eldirohmanur.parkeer.core.ui.ParkeerCard
+import com.eldirohmanur.parkeer.core.ui.ParkeerErrorState
 import com.eldirohmanur.parkeer.core.ui.ParkeerTopAppBar
 import com.eldirohmanur.parkeer.core.ui.TornPaperShape
 import com.eldirohmanur.parkeer.core.ui.rememberHapticFeedback
@@ -386,58 +386,33 @@ fun TerminalScreen(modifier: Modifier = Modifier, viewModel: TerminalViewModel =
                         }
 
                         is TerminalUiState.Error -> {
-                            Column(
-                                modifier = Modifier.fillMaxSize(),
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.Center,
-                            ) {
-                                Spacer(Modifier.height(DX.Spacing.XL2))
-                                Icon(
-                                    Icons.Filled.Error,
-                                    contentDescription = stringResource(R.string.terminal_cd_error),
-                                    modifier = Modifier.size(48.dp),
-                                    tint = DX.Color.text.red,
-                                )
-                                Spacer(Modifier.height(DX.Spacing.M))
-                                Text(
-                                    stringResource(R.string.terminal_error),
-                                    style = DX.Font.subHeadingSemiBold,
-                                    color = DX.Color.text.red,
-                                )
-                                val message = when (state.error) {
-                                    is TerminalError.CardNotRecognized -> stringResource(R.string.terminal_error_card_not_recognized)
-                                    is TerminalError.NotCheckedIn -> stringResource(R.string.terminal_error_not_checked_in)
-                                    is TerminalError.InvalidTime -> stringResource(R.string.terminal_error_invalid_time)
-                                    is TerminalError.WriteFailed -> stringResource(R.string.terminal_error_write_failed)
+                            val message = when (state.error) {
+                                is TerminalError.CardNotRecognized -> stringResource(R.string.terminal_error_card_not_recognized)
+                                is TerminalError.NotCheckedIn -> stringResource(R.string.terminal_error_not_checked_in)
+                                is TerminalError.InvalidTime -> stringResource(R.string.terminal_error_invalid_time)
+                                is TerminalError.WriteFailed -> stringResource(R.string.terminal_error_write_failed)
+                            }
+                            LaunchedEffect(state.error) {
+                                val reason = when (state.error) {
+                                    is TerminalError.CardNotRecognized -> state.error.reason
+                                    is TerminalError.WriteFailed -> state.error.reason
+                                    else -> null
                                 }
-                                LaunchedEffect(state.error) {
-                                    val reason = when (state.error) {
-                                        is TerminalError.CardNotRecognized -> state.error.reason
-                                        is TerminalError.WriteFailed -> state.error.reason
-                                        else -> null
-                                    }
-
-                                    analytics.logEvent(
-                                        "check_out_failed",
-                                        params = mapOf(
-                                            "message" to message,
-                                            "reason" to reason.orEmpty().ifEmpty { "unknown" },
-                                        ),
-                                    )
-                                }
-                                Text(message, style = DX.Font.body, color = DX.Color.text.secondary)
-                                Spacer(Modifier.height(DX.Spacing.XL))
-                                DXButton(
-                                    onClick = {
-                                        viewModel.reset()
-                                    },
-                                    text = stringResource(
-                                        R.string.terminal_dismiss,
+                                analytics.logEvent(
+                                    "check_out_failed",
+                                    params = mapOf(
+                                        "message" to message,
+                                        "reason" to reason.orEmpty().ifEmpty { "unknown" },
                                     ),
-                                    variant = ButtonVariant.Secondary.Large,
-                                    modifier = Modifier.fillMaxWidth(),
                                 )
                             }
+                            ParkeerErrorState(
+                                modifier = Modifier.fillMaxSize(),
+                                title = stringResource(R.string.terminal_error),
+                                message = message,
+                                buttonText = stringResource(R.string.terminal_dismiss),
+                                onAction = viewModel::reset,
+                            )
                         }
                     }
                 }

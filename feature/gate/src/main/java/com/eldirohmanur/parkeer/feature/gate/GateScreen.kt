@@ -18,7 +18,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.CircularProgressIndicator
@@ -45,6 +44,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.eldirohmanur.parkeer.core.firebase.LocalAnalytics
 import com.eldirohmanur.parkeer.core.ui.NfcPulseAnimation
 import com.eldirohmanur.parkeer.core.ui.ParkeerCard
+import com.eldirohmanur.parkeer.core.ui.ParkeerErrorState
 import com.eldirohmanur.parkeer.core.ui.ParkeerTopAppBar
 import com.eldirohmanur.parkeer.core.ui.rememberHapticFeedback
 import com.lottiefiles.dotlottie.core.compose.ui.DotLottieAnimation
@@ -346,37 +346,11 @@ private fun GateErrorState(error: GateError, onDismiss: () -> Unit) {
             ),
         )
     }
-    Column(
+    ParkeerErrorState(
         modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-    ) {
-        Spacer(Modifier.height(DX.Spacing.XL2))
-        Icon(
-            Icons.Filled.Error,
-            contentDescription = stringResource(R.string.gate_cd_error),
-            modifier = Modifier.size(48.dp),
-            tint = DX.Color.text.red,
-        )
-        Spacer(Modifier.height(DX.Spacing.M))
-        Text(
-            stringResource(R.string.gate_error),
-            style = DX.Font.subHeadingSemiBold,
-            color = DX.Color.text.red,
-        )
-        Text(message, style = DX.Font.body, color = DX.Color.text.secondary)
-        Spacer(Modifier.height(DX.Spacing.XL))
-        DXButton(
-            onClick = onDismiss,
-            text = stringResource(R.string.gate_dismiss),
-            variant = ButtonVariant.Secondary.Large,
-            modifier = Modifier.fillMaxWidth(),
-            metadata = {
-                ButtonMetadata.Regular(
-                    "Dismiss",
-                    "Close Check In Error Screen",
-                )
-            },
-        )
-    }
+        title = stringResource(R.string.gate_error),
+        message = message,
+        buttonText = stringResource(R.string.gate_dismiss),
+        onAction = onDismiss,
+    )
 }
