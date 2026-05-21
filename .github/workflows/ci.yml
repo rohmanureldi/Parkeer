@@ -78,7 +78,7 @@ jobs:
 
   distribute:
     name: Firebase Distribution
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: [ build ]
     if: always() && needs.build.result == 'success' && github.event_name == 'workflow_dispatch' && inputs.distribute
     steps:
