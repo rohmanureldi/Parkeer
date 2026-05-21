@@ -1,12 +1,13 @@
 package com.eldirohmanur.parkeer.feature.terminal
 
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
 class BillingLogicTest {
 
     companion object {
-        const val RATE_PER_HOUR = TerminalViewModel.RATE_PER_HOUR
+        const val RATE_PER_HOUR = 2000
     }
 
     private fun calculateFee(durationMs: Long): Pair<Int, Int> {
