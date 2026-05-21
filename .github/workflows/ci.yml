@@ -78,7 +78,7 @@ jobs:
   distribute:
     name: Firebase Distribution
     runs-on: ubuntu-latest
-    needs: [ build, sonar ]
+    needs: [ build ]
     if: github.event_name == 'workflow_dispatch' && inputs.distribute
     steps:
       - uses: actions/checkout@v4
