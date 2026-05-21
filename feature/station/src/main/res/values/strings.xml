@@ -3,7 +3,7 @@
     <string name="station_title">Station</string>
     <string name="station_subtitle">Admin – Registrasi &amp; Isi Saldo</string>
     <string name="station_welcome_admin">Selamat datang, Admin</string>
-    <string name="station_register_new">Daftarkan Anggota Baru</string>
+    <string name="station_register_new">Registrasi</string>
     <string name="station_register_desc">Tulis kartu anggota baru via NFC</string>
     <string name="station_top_up">Isi Saldo</string>
     <string name="station_topup_desc">Tambah saldo ke kartu anggota</string>
