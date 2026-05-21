@@ -1,0 +1,33 @@
+default_platform(:android)
+
+platform :android do
+  desc "Build and distribute to Firebase App Distribution"
+  lane :distribute do
+    gradle(
+      task: "assembleRelease",
+      print_command: false
+    )
+
+    firebase_app_distribution(
+      app: ENV["FIREBASE_APP_ID"],
+      groups: "internal-testers",
+      release_notes: changelog_from_git_commits(
+        commits_count: 5,
+        pretty: "- %s"
+      ),
+      android_artifact_type: "APK",
+      android_artifact_path: "app/build/outputs/apk/release/app-release.apk",
+      service_credentials_file: ENV["FIREBASE_SERVICE_ACCOUNT_JSON"]
+    )
+  end
+
+  desc "Build debug APK"
+  lane :build_debug do
+    gradle(task: "assembleDebug")
+  end
+
+  desc "Run unit tests"
+  lane :test do
+    gradle(task: "testDebugUnitTest")
+  end
+end
