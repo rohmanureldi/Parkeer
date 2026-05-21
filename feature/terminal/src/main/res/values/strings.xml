@@ -37,4 +37,5 @@
     <string name="terminal_error_not_checked_in">Kartu ini belum check-in. Silakan check-in di Gate terlebih dahulu.</string>
     <string name="terminal_error_invalid_time">Ada masalah dengan waktu. Periksa jam perangkat Anda.</string>
     <string name="terminal_error_write_failed">Gagal menyimpan ke kartu. Tahan kartu dengan stabil dan coba lagi.</string>
+    <string name="terminal_brand_name">PARKEER</string>
 </resources>

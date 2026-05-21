@@ -6,6 +6,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -18,18 +19,15 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -51,6 +49,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.eldirohmanur.parkeer.core.firebase.LocalAnalytics
 import com.eldirohmanur.parkeer.core.ui.NfcPulseAnimation
 import com.eldirohmanur.parkeer.core.ui.ParkeerCard
+import com.eldirohmanur.parkeer.core.ui.ParkeerTopAppBar
 import com.eldirohmanur.parkeer.core.ui.TornPaperShape
 import com.eldirohmanur.parkeer.core.ui.rememberHapticFeedback
 import com.eldirohmanur.parkeer.core.ui.toRupiah
@@ -85,17 +84,12 @@ fun TerminalScreen(modifier: Modifier = Modifier, viewModel: TerminalViewModel =
         }
 
         Scaffold(
+            containerColor = Color.Transparent,
             topBar = {
-                TopAppBar(
-                    title = { Text(stringResource(R.string.terminal_title)) },
-                    navigationIcon = {
-                        IconButton(onClick = onBack) {
-                            Icon(
-                                Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = stringResource(R.string.terminal_cd_back),
-                            )
-                        }
-                    },
+                ParkeerTopAppBar(
+                    title = stringResource(R.string.terminal_title),
+                    subtitle = stringResource(R.string.terminal_subtitle),
+                    onBack = onBack,
                 )
             },
         ) { innerPadding ->
@@ -108,13 +102,8 @@ fun TerminalScreen(modifier: Modifier = Modifier, viewModel: TerminalViewModel =
                     .verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(DX.Spacing.M),
             ) {
-                Text(
-                    stringResource(R.string.terminal_subtitle),
-                    style = DX.Font.caption,
-                    color = DX.Color.text.secondary,
-                )
-
                 AnimatedContent(
+                    modifier = Modifier.weight(1f),
                     targetState = uiState,
                     transitionSpec = { fadeIn() togetherWith fadeOut() },
                     label = "terminal_state",
@@ -122,8 +111,9 @@ fun TerminalScreen(modifier: Modifier = Modifier, viewModel: TerminalViewModel =
                     when (state) {
                         is TerminalUiState.Ready -> {
                             Column(
-                                Modifier.fillMaxWidth(),
+                                modifier = Modifier.fillMaxWidth(),
                                 horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center,
                             ) {
                                 Spacer(Modifier.height(DX.Spacing.XL))
                                 NfcPulseAnimation()
@@ -136,7 +126,7 @@ fun TerminalScreen(modifier: Modifier = Modifier, viewModel: TerminalViewModel =
                                 Spacer(Modifier.height(DX.Spacing.M))
                                 Text(
                                     buildAnnotatedString {
-                                        append(stringResource(R.string.terminal_rate_prefix))
+                                        append(stringResource(R.string.terminal_rate_prefix) + " ")
                                         withStyle(
                                             SpanStyle(
                                                 color = DX.Color.text.red,
@@ -145,7 +135,7 @@ fun TerminalScreen(modifier: Modifier = Modifier, viewModel: TerminalViewModel =
                                         ) {
                                             append(viewModel.ratePerHour.toRupiah())
                                         }
-                                        append(stringResource(R.string.terminal_rate_suffix))
+                                        append(stringResource(R.string.terminal_rate_suffix) + " ")
                                         withStyle(
                                             SpanStyle(
                                                 color = DX.Color.text.primary,
@@ -163,8 +153,9 @@ fun TerminalScreen(modifier: Modifier = Modifier, viewModel: TerminalViewModel =
 
                         is TerminalUiState.Processing -> {
                             Column(
-                                Modifier.fillMaxWidth(),
+                                modifier = Modifier.fillMaxSize(),
                                 horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center,
                             ) {
                                 Spacer(Modifier.height(DX.Spacing.XL3))
                                 CircularProgressIndicator()
@@ -184,209 +175,221 @@ fun TerminalScreen(modifier: Modifier = Modifier, viewModel: TerminalViewModel =
 
                         is TerminalUiState.Success -> {
                             val b = state.billing
-                            Column(
-                                Modifier.fillMaxWidth(),
-                                verticalArrangement = Arrangement.spacedBy(DX.Spacing.M),
-                                horizontalAlignment = Alignment.CenterHorizontally,
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center,
                             ) {
-                                Spacer(Modifier.height(DX.Spacing.M))
-                                Surface(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .clip(TornPaperShape()),
-                                    color = Color(0xFFF5F0E8),
-                                    shadowElevation = 2.dp,
+                                Column(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    verticalArrangement = Arrangement.spacedBy(DX.Spacing.M),
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                ) {
+                                    Spacer(Modifier.height(DX.Spacing.M))
+                                    Surface(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .clip(TornPaperShape()),
+                                        color = Color(0xFFF5F0E8),
+                                        shadowElevation = 2.dp,
+                                    ) {
+                                        Column(
+                                            modifier = Modifier.padding(
+                                                top = 20.dp,
+                                                bottom = 20.dp,
+                                                start = DX.Spacing.L,
+                                                end = DX.Spacing.L,
+                                            ),
+                                            horizontalAlignment = Alignment.CenterHorizontally,
+                                        ) {
+                                            Text(
+                                                text = stringResource(R.string.terminal_brand_name),
+                                                style = DX.Font.bodySemiBold.copy(fontFamily = FontFamily.Monospace),
+                                                color = DX.Color.text.primary,
+                                            )
+                                            Spacer(Modifier.height(DX.Spacing.XS))
+                                            Text(
+                                                "✓ " + stringResource(R.string.terminal_checkout_complete),
+                                                style = DX.Font.caption.copy(fontFamily = FontFamily.Monospace),
+                                                color = DX.Color.text.secondary,
+                                            )
+                                            Spacer(Modifier.height(DX.Spacing.M))
+                                            DashedDivider()
+                                            Spacer(Modifier.height(DX.Spacing.M))
+                                            Column(verticalArrangement = Arrangement.spacedBy(DX.Spacing.S)) {
+                                                ReceiptRow(
+                                                    stringResource(R.string.terminal_receipt_member),
+                                                    b.memberName,
+                                                )
+                                                ReceiptRow(
+                                                    stringResource(R.string.terminal_receipt_checkin),
+                                                    fmt.format(
+                                                        Instant.ofEpochMilli(b.checkInTime)
+                                                            .atZone(zone),
+                                                    ),
+                                                )
+                                                ReceiptRow(
+                                                    stringResource(R.string.terminal_receipt_checkout),
+                                                    fmt.format(
+                                                        Instant.ofEpochMilli(b.checkOutTime)
+                                                            .atZone(zone),
+                                                    ),
+                                                )
+                                                ReceiptRow(
+                                                    stringResource(R.string.terminal_receipt_duration),
+                                                    formatDuration(b.durationMs),
+                                                )
+                                                ReceiptRow(
+                                                    stringResource(R.string.terminal_receipt_hours_billed),
+                                                    stringResource(
+                                                        R.string.terminal_receipt_hours_value,
+                                                        b.hoursCharged,
+                                                    ),
+                                                )
+                                            }
+                                            Spacer(Modifier.height(DX.Spacing.M))
+                                            DashedDivider()
+                                            Spacer(Modifier.height(DX.Spacing.M))
+                                            Column(verticalArrangement = Arrangement.spacedBy(DX.Spacing.S)) {
+                                                ReceiptRow(
+                                                    stringResource(R.string.terminal_receipt_fee),
+                                                    b.fee.toRupiah(),
+                                                    highlight = true,
+                                                )
+                                                ReceiptRow(
+                                                    stringResource(R.string.terminal_receipt_prev_balance),
+                                                    b.oldBalance.toRupiah(),
+                                                )
+                                                ReceiptRow(
+                                                    stringResource(R.string.terminal_receipt_new_balance),
+                                                    b.newBalance.toRupiah(),
+                                                    highlight = true,
+                                                    highlightColor = DX.Color.text.darkGreen,
+                                                )
+                                            }
+                                            Spacer(Modifier.height(DX.Spacing.M))
+                                            DashedDivider()
+                                        }
+                                    }
+                                    DXButton(
+                                        onClick = {
+                                            viewModel.reset()
+                                        },
+                                        text = stringResource(R.string.terminal_done),
+                                        variant = ButtonVariant.Primary.Large,
+                                        modifier = Modifier.fillMaxWidth(),
+                                        metadata = {
+                                            ButtonMetadata.Regular(
+                                                buttonName = "Done",
+                                                buttonPurpose = "Dismiss Terminal Success Checkout",
+                                            )
+                                        },
+                                    )
+                                }
+                            }
+                        }
+
+                        is TerminalUiState.InsufficientBalance -> {
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                Column(
+                                    Modifier.fillMaxWidth(),
+                                    verticalArrangement = Arrangement.spacedBy(DX.Spacing.M),
                                 ) {
                                     Column(
-                                        modifier = Modifier.padding(
-                                            top = 20.dp,
-                                            bottom = 20.dp,
-                                            start = DX.Spacing.L,
-                                            end = DX.Spacing.L,
-                                        ),
+                                        Modifier.fillMaxWidth(),
                                         horizontalAlignment = Alignment.CenterHorizontally,
                                     ) {
-                                        Text(
-                                            "PARKEER",
-                                            style = DX.Font.bodySemiBold.copy(fontFamily = FontFamily.Monospace),
-                                            color = DX.Color.text.primary,
+                                        Icon(
+                                            Icons.Filled.Warning,
+                                            contentDescription = stringResource(R.string.terminal_cd_insufficient),
+                                            modifier = Modifier.size(48.dp),
+                                            tint = DX.Color.text.darkYellow,
                                         )
-                                        Spacer(Modifier.height(DX.Spacing.XS))
+                                        Spacer(Modifier.height(DX.Spacing.S))
                                         Text(
-                                            "✓ " + stringResource(R.string.terminal_checkout_complete),
-                                            style = DX.Font.caption.copy(fontFamily = FontFamily.Monospace),
-                                            color = DX.Color.text.secondary,
+                                            stringResource(R.string.terminal_insufficient_balance),
+                                            style = DX.Font.subHeadingSemiBold,
+                                            color = DX.Color.text.red,
                                         )
-                                        Spacer(Modifier.height(DX.Spacing.M))
-                                        DashedDivider()
-                                        Spacer(Modifier.height(DX.Spacing.M))
-                                        Column(verticalArrangement = Arrangement.spacedBy(DX.Spacing.S)) {
-                                            ReceiptRow(
-                                                stringResource(R.string.terminal_receipt_member),
-                                                b.memberName,
-                                            )
+                                    }
+                                    ParkeerCard(modifier = Modifier.fillMaxWidth()) {
+                                        Column(
+                                            Modifier.padding(DX.Spacing.L),
+                                            verticalArrangement = Arrangement.spacedBy(DX.Spacing.S),
+                                        ) {
                                             ReceiptRow(
                                                 stringResource(R.string.terminal_receipt_checkin),
                                                 fmt.format(
-                                                    Instant.ofEpochMilli(b.checkInTime)
-                                                        .atZone(zone),
-                                                ),
-                                            )
-                                            ReceiptRow(
-                                                stringResource(R.string.terminal_receipt_checkout),
-                                                fmt.format(
-                                                    Instant.ofEpochMilli(b.checkOutTime)
+                                                    Instant.ofEpochMilli(state.checkInTime)
                                                         .atZone(zone),
                                                 ),
                                             )
                                             ReceiptRow(
                                                 stringResource(R.string.terminal_receipt_duration),
-                                                formatDuration(b.durationMs),
+                                                formatDuration(state.durationMs),
                                             )
                                             ReceiptRow(
                                                 stringResource(R.string.terminal_receipt_hours_billed),
                                                 stringResource(
                                                     R.string.terminal_receipt_hours_value,
-                                                    b.hoursCharged,
+                                                    state.hoursCharged,
                                                 ),
                                             )
-                                        }
-                                        Spacer(Modifier.height(DX.Spacing.M))
-                                        DashedDivider()
-                                        Spacer(Modifier.height(DX.Spacing.M))
-                                        Column(verticalArrangement = Arrangement.spacedBy(DX.Spacing.S)) {
                                             ReceiptRow(
-                                                stringResource(R.string.terminal_receipt_fee),
-                                                b.fee.toRupiah(),
+                                                stringResource(R.string.terminal_receipt_fee_required),
+                                                state.fee.toRupiah(),
+                                            )
+                                            ReceiptRow(
+                                                stringResource(R.string.terminal_receipt_your_balance),
+                                                state.balance.toRupiah(),
+                                            )
+                                            ReceiptRow(
+                                                stringResource(R.string.terminal_receipt_need_more),
+                                                state.deficit.toRupiah(),
                                                 highlight = true,
                                             )
-                                            ReceiptRow(
-                                                stringResource(R.string.terminal_receipt_prev_balance),
-                                                b.oldBalance.toRupiah(),
+                                        }
+                                    }
+                                    ParkeerCard(modifier = Modifier.fillMaxWidth()) {
+                                        Row(
+                                            Modifier.padding(DX.Spacing.L),
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.spacedBy(DX.Spacing.S),
+                                        ) {
+                                            Icon(
+                                                Icons.Filled.Lightbulb,
+                                                contentDescription = stringResource(R.string.terminal_cd_tip),
+                                                modifier = Modifier.size(16.dp),
+                                                tint = DX.Color.text.secondary,
                                             )
-                                            ReceiptRow(
-                                                stringResource(R.string.terminal_receipt_new_balance),
-                                                b.newBalance.toRupiah(),
-                                                highlight = true,
-                                                highlightColor = DX.Color.text.darkGreen,
+                                            Text(
+                                                stringResource(R.string.terminal_topup_hint),
+                                                style = DX.Font.body,
+                                                color = DX.Color.text.secondary,
                                             )
                                         }
-                                        Spacer(Modifier.height(DX.Spacing.M))
-                                        DashedDivider()
                                     }
-                                }
-                                DXButton(
-                                    onClick = {
-                                        viewModel.reset()
-                                    },
-                                    text = stringResource(R.string.terminal_done),
-                                    variant = ButtonVariant.Primary.Large,
-                                    modifier = Modifier.fillMaxWidth(),
-                                    metadata = {
-                                        ButtonMetadata.Regular(
-                                            buttonName = "Done",
-                                            buttonPurpose = "Dismiss Terminal Success Checkout",
-                                        )
-                                    },
-                                )
-                            }
-                        }
-
-                        is TerminalUiState.InsufficientBalance -> {
-                            Column(
-                                Modifier.fillMaxWidth(),
-                                verticalArrangement = Arrangement.spacedBy(DX.Spacing.M),
-                            ) {
-                                Column(
-                                    Modifier.fillMaxWidth(),
-                                    horizontalAlignment = Alignment.CenterHorizontally,
-                                ) {
-                                    Icon(
-                                        Icons.Filled.Warning,
-                                        contentDescription = stringResource(R.string.terminal_cd_insufficient),
-                                        modifier = Modifier.size(48.dp),
-                                        tint = DX.Color.text.darkYellow,
-                                    )
-                                    Spacer(Modifier.height(DX.Spacing.S))
-                                    Text(
-                                        stringResource(R.string.terminal_insufficient_balance),
-                                        style = DX.Font.subHeadingSemiBold,
-                                        color = DX.Color.text.red,
+                                    DXButton(
+                                        onClick = {
+                                            viewModel.reset()
+                                        },
+                                        text = stringResource(
+                                            R.string.terminal_dismiss,
+                                        ),
+                                        variant = ButtonVariant.Secondary.Large,
+                                        modifier = Modifier.fillMaxWidth(),
                                     )
                                 }
-                                ParkeerCard(modifier = Modifier.fillMaxWidth()) {
-                                    Column(
-                                        Modifier.padding(DX.Spacing.L),
-                                        verticalArrangement = Arrangement.spacedBy(DX.Spacing.S),
-                                    ) {
-                                        ReceiptRow(
-                                            stringResource(R.string.terminal_receipt_checkin),
-                                            fmt.format(
-                                                Instant.ofEpochMilli(state.checkInTime).atZone(zone),
-                                            ),
-                                        )
-                                        ReceiptRow(
-                                            stringResource(R.string.terminal_receipt_duration),
-                                            formatDuration(state.durationMs),
-                                        )
-                                        ReceiptRow(
-                                            stringResource(R.string.terminal_receipt_hours_billed),
-                                            stringResource(
-                                                R.string.terminal_receipt_hours_value,
-                                                state.hoursCharged,
-                                            ),
-                                        )
-                                        ReceiptRow(
-                                            stringResource(R.string.terminal_receipt_fee_required),
-                                            state.fee.toRupiah(),
-                                        )
-                                        ReceiptRow(
-                                            stringResource(R.string.terminal_receipt_your_balance),
-                                            state.balance.toRupiah(),
-                                        )
-                                        ReceiptRow(
-                                            stringResource(R.string.terminal_receipt_need_more),
-                                            state.deficit.toRupiah(),
-                                            highlight = true,
-                                        )
-                                    }
-                                }
-                                ParkeerCard(modifier = Modifier.fillMaxWidth()) {
-                                    Row(
-                                        Modifier.padding(DX.Spacing.L),
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.spacedBy(DX.Spacing.S),
-                                    ) {
-                                        Icon(
-                                            Icons.Filled.Lightbulb,
-                                            contentDescription = stringResource(R.string.terminal_cd_tip),
-                                            modifier = Modifier.size(16.dp),
-                                            tint = DX.Color.text.secondary,
-                                        )
-                                        Text(
-                                            stringResource(R.string.terminal_topup_hint),
-                                            style = DX.Font.body,
-                                            color = DX.Color.text.secondary,
-                                        )
-                                    }
-                                }
-                                DXButton(
-                                    onClick = {
-                                        viewModel.reset()
-                                    },
-                                    text = stringResource(
-                                        R.string.terminal_dismiss,
-                                    ),
-                                    variant = ButtonVariant.Secondary.Large,
-                                    modifier = Modifier.fillMaxWidth(),
-                                )
                             }
                         }
 
                         is TerminalUiState.Error -> {
                             Column(
-                                Modifier.fillMaxWidth(),
+                                modifier = Modifier.fillMaxSize(),
                                 horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center,
                             ) {
                                 Spacer(Modifier.height(DX.Spacing.XL2))
                                 Icon(

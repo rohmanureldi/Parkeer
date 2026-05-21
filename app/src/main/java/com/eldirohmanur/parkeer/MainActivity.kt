@@ -10,10 +10,18 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import com.eldirohmanur.parkeer.core.firebase.AnalyticsHelper
 import com.eldirohmanur.parkeer.core.firebase.LocalAnalytics
 import com.eldirohmanur.parkeer.core.nfc.NfcTagHolder
+import com.eldirohmanur.parkeer.core.ui.ArcBackground
 import com.eldirohmanur.parkeer.navigation.ParkeerNavHost
 import com.telkomsel.dexterity.theme.DexterityTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -47,7 +55,23 @@ class MainActivity : ComponentActivity() {
         setContent {
             CompositionLocalProvider(LocalAnalytics provides analyticsHelper) {
                 DexterityTheme {
-                    ParkeerNavHost()
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .drawBehind {
+                                drawRect(
+                                    Brush.linearGradient(
+                                        colors = listOf(Color(0xFF1F40C2), Color(0xFFABB4E0)),
+                                        start = Offset(0f, size.height),
+                                        end = Offset(size.width, 0f),
+                                    ),
+                                )
+                            },
+                    ) {
+                        ArcBackground {
+                            ParkeerNavHost()
+                        }
+                    }
                 }
             }
         }

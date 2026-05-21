@@ -53,6 +53,7 @@ dependencies {
     implementation(project(":core:crypto"))
     implementation(project(":core:cardprotocol"))
     implementation(project(":core:firebase"))
+    implementation(project(":core:ui"))
     implementation(project(":feature:station"))
     implementation(project(":feature:gate"))
     implementation(project(":feature:terminal"))

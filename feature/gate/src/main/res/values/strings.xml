@@ -4,7 +4,7 @@
     <string name="gate_subtitle">Titik Masuk – Check-In</string>
     <string name="gate_subtitle_sim">Titik Masuk – Check-In (Simulasi)</string>
     <string name="gate_ready">Siap</string>
-    <string name="gate_tap_to_check_in">Tempelkan kartu anggota untuk check-in</string>
+    <string name="gate_tap_to_check_in">Tempelkan kartu untuk check-in</string>
     <string name="gate_simulation_mode">Mode Simulasi</string>
     <string name="gate_sim_hours_placeholder">Jam lalu</string>
     <string name="gate_sim_hours_label">Atur waktu check-in (jam lalu)</string>

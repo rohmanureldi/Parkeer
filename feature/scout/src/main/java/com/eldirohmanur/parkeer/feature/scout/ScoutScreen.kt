@@ -21,22 +21,18 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AccountBalanceWallet
 import androidx.compose.material.icons.filled.Contactless
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.LocalParking
-import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material.icons.filled.Receipt
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -58,6 +54,7 @@ import com.eldirohmanur.parkeer.core.model.CardData
 import com.eldirohmanur.parkeer.core.model.VisitState
 import com.eldirohmanur.parkeer.core.ui.NfcPulseAnimation
 import com.eldirohmanur.parkeer.core.ui.ParkeerCard
+import com.eldirohmanur.parkeer.core.ui.ParkeerTopAppBar
 import com.eldirohmanur.parkeer.core.ui.rememberHapticFeedback
 import com.eldirohmanur.parkeer.core.ui.toRupiah
 import com.telkomsel.dexterity.components.analyticwrapper.DXScreen
@@ -90,18 +87,13 @@ fun ScoutScreen(modifier: Modifier = Modifier, viewModel: ScoutViewModel = hiltV
 
         Scaffold(
             topBar = {
-                TopAppBar(
-                    title = { Text(stringResource(R.string.scout_title)) },
-                    navigationIcon = {
-                        IconButton(onClick = onBack) {
-                            Icon(
-                                Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = stringResource(R.string.scout_cd_back),
-                            )
-                        }
-                    },
+                ParkeerTopAppBar(
+                    title = stringResource(R.string.scout_title),
+                    subtitle = stringResource(R.string.scout_subtitle),
+                    onBack = onBack,
                 )
             },
+            containerColor = Color.Transparent,
         ) { innerPadding ->
             Column(
                 modifier = Modifier
@@ -112,33 +104,18 @@ fun ScoutScreen(modifier: Modifier = Modifier, viewModel: ScoutViewModel = hiltV
                     .verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(DX.Spacing.M),
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(DX.Spacing.XS),
-                ) {
-                    Icon(
-                        Icons.Filled.Lock,
-                        contentDescription = stringResource(R.string.scout_cd_read_only),
-                        modifier = Modifier.size(16.dp),
-                        tint = DX.Color.text.blue,
-                    )
-                    Text(
-                        stringResource(R.string.scout_read_only),
-                        style = DX.Font.caption,
-                        color = DX.Color.text.blue,
-                    )
-                }
-
                 AnimatedContent(
                     targetState = uiState,
                     transitionSpec = { fadeIn() togetherWith fadeOut() },
                     label = "scout_state",
+                    modifier = Modifier.weight(1f),
                 ) { state ->
                     when (state) {
                         is ScoutUiState.Ready -> {
                             Column(
-                                Modifier.fillMaxWidth(),
+                                Modifier.fillMaxSize(),
                                 horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center,
                             ) {
                                 Spacer(Modifier.height(DX.Spacing.XL))
                                 NfcPulseAnimation()
@@ -153,8 +130,9 @@ fun ScoutScreen(modifier: Modifier = Modifier, viewModel: ScoutViewModel = hiltV
 
                         is ScoutUiState.Reading -> {
                             Column(
-                                Modifier.fillMaxWidth(),
+                                modifier = Modifier.fillMaxSize(),
                                 horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center,
                             ) {
                                 Spacer(Modifier.height(DX.Spacing.XL3))
                                 CircularProgressIndicator()
@@ -173,7 +151,10 @@ fun ScoutScreen(modifier: Modifier = Modifier, viewModel: ScoutViewModel = hiltV
                         }
 
                         is ScoutUiState.Loaded -> {
-                            Column(verticalArrangement = Arrangement.spacedBy(DX.Spacing.M)) {
+                            Column(
+                                modifier = Modifier.padding(top = DX.Spacing.L),
+                                verticalArrangement = Arrangement.spacedBy(DX.Spacing.M),
+                            ) {
                                 PhysicalCardUi(state.card)
                                 CardDetailsSection(state.card, fullFmt, shortFmt)
                                 DXButton(
@@ -191,8 +172,9 @@ fun ScoutScreen(modifier: Modifier = Modifier, viewModel: ScoutViewModel = hiltV
 
                         is ScoutUiState.Error -> {
                             Column(
-                                Modifier.fillMaxWidth(),
+                                modifier = Modifier.fillMaxSize(),
                                 horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center,
                             ) {
                                 Spacer(Modifier.height(DX.Spacing.XL2))
                                 Icon(
@@ -208,7 +190,6 @@ fun ScoutScreen(modifier: Modifier = Modifier, viewModel: ScoutViewModel = hiltV
                                         params = mapOf(
                                             "reason" to state.reason.orEmpty(),
                                         ),
-
                                     )
                                 }
                                 Text(
