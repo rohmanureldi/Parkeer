@@ -6,27 +6,14 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountBalanceWallet
-import androidx.compose.material.icons.filled.PersonAdd
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilterChip
-import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -38,38 +25,29 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.eldirohmanur.parkeer.core.firebase.LocalAnalytics
-import com.eldirohmanur.parkeer.core.ui.NfcPulseAnimation
-import com.eldirohmanur.parkeer.core.ui.ParkeerErrorState
 import com.eldirohmanur.parkeer.core.ui.ParkeerTopAppBar
 import com.eldirohmanur.parkeer.core.ui.rememberHapticFeedback
 import com.eldirohmanur.parkeer.core.ui.toRupiah
-import com.lottiefiles.dotlottie.core.compose.ui.DotLottieAnimation
-import com.lottiefiles.dotlottie.core.util.DotLottieSource
+import com.eldirohmanur.parkeer.feature.station.components.RegisterSheetContent
+import com.eldirohmanur.parkeer.feature.station.components.SheetError
+import com.eldirohmanur.parkeer.feature.station.components.SheetNfcTap
+import com.eldirohmanur.parkeer.feature.station.components.SheetProcessing
+import com.eldirohmanur.parkeer.feature.station.components.SheetSuccess
+import com.eldirohmanur.parkeer.feature.station.components.StationHome
+import com.eldirohmanur.parkeer.feature.station.components.TopUpSheetContent
 import com.telkomsel.dexterity.components.analyticwrapper.DXScreen
 import com.telkomsel.dexterity.components.analyticwrapper.DefaultScreenMetadata
-import com.telkomsel.dexterity.components.atom.button.DXButton
-import com.telkomsel.dexterity.components.atom.button.model.ButtonState
-import com.telkomsel.dexterity.components.atom.button.model.ButtonVariant
-import com.telkomsel.dexterity.components.atom.input.DXInput
-import com.telkomsel.dexterity.components.atom.input.DXInputConfig
-import com.telkomsel.dexterity.components.atom.input.HeaderConfig
-import com.telkomsel.dexterity.components.molecule.card.DXCard
-import com.telkomsel.dexterity.components.molecule.card.DXCardStyle
-import com.telkomsel.dexterity.components.molecule.card.customcard.CustomCardStyle
-import com.telkomsel.dexterity.components.molecule.card.customcard.CustomCardVariant
-import com.telkomsel.dexterity.components.molecule.card.model.CardMetadata
 import com.telkomsel.dexterity.theme.DX
 import kotlinx.coroutines.delay
 
 private enum class SheetType { REGISTER, TOP_UP }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StationScreen(modifier: Modifier = Modifier, viewModel: StationViewModel = hiltViewModel(), onBack: () -> Unit) {
     DXScreen(DefaultScreenMetadata("Station", "station", "StationScreen")) {
@@ -184,228 +162,4 @@ fun StationScreen(modifier: Modifier = Modifier, viewModel: StationViewModel = h
             }
         }
     }
-}
-
-@Composable
-private fun StationHome(onRegister: () -> Unit, onTopUp: () -> Unit) {
-    Column(verticalArrangement = Arrangement.spacedBy(DX.Spacing.M)) {
-        ActionCard(
-            icon = Icons.Filled.PersonAdd,
-            title = stringResource(R.string.station_register_new),
-            description = stringResource(R.string.station_register_desc),
-            onClick = onRegister,
-        )
-        ActionCard(
-            icon = Icons.Filled.AccountBalanceWallet,
-            title = stringResource(R.string.station_top_up),
-            description = stringResource(R.string.station_topup_desc),
-            onClick = onTopUp,
-        )
-    }
-}
-
-@Composable
-private fun ActionCard(icon: ImageVector, title: String, description: String, onClick: () -> Unit) {
-    DXCard(
-        modifier = Modifier.fillMaxWidth(),
-        onClick = onClick,
-        style = DXCardStyle.CustomLayout(
-            style = CustomCardStyle(
-                CustomCardVariant.Custom(
-                    { DX.Color.background.white },
-                    { DX.Color.stroke.border },
-                ),
-            ),
-            content = {
-                Row(
-                    modifier = Modifier.padding(DX.Spacing.L),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(DX.Spacing.M),
-                ) {
-                    Icon(
-                        icon,
-                        contentDescription = null,
-                        modifier = Modifier.size(32.dp),
-                        tint = DX.Color.text.primary,
-                    )
-                    Column {
-                        Text(title, style = DX.Font.bodySemiBold, color = DX.Color.text.primary)
-                        Text(description, style = DX.Font.caption, color = DX.Color.text.secondary)
-                    }
-                }
-            },
-        ),
-        metadata = {
-            CardMetadata.Regular(
-                cardName = title,
-                listName = "Station Menu",
-            )
-        },
-    )
-}
-
-@Composable
-private fun RegisterSheetContent(viewModel: StationViewModel) {
-    var name by rememberSaveable { mutableStateOf("") }
-
-    Column(
-        modifier = Modifier
-            .padding(horizontal = DX.Spacing.L)
-            .padding(bottom = DX.Spacing.XL),
-        verticalArrangement = Arrangement.spacedBy(DX.Spacing.M),
-    ) {
-        Text(
-            stringResource(R.string.station_register_new),
-            style = DX.Font.subHeadingSemiBold,
-            color = DX.Color.text.primary,
-        )
-        DXInput(
-            config = DXInputConfig.TextField(
-                value = name,
-                onValueChange = { name = it },
-                placeholder = stringResource(R.string.station_member_name_placeholder),
-                header = HeaderConfig(label = stringResource(R.string.station_member_name_label)),
-            ),
-        )
-        DXButton(
-            onClick = { viewModel.prepareRegister(name) },
-            text = stringResource(R.string.station_submit),
-            variant = ButtonVariant.Primary.Large,
-            state = if (name.isNotBlank()) ButtonState.Default else ButtonState.Disabled,
-            modifier = Modifier.fillMaxWidth(),
-        )
-    }
-}
-
-@OptIn(ExperimentalLayoutApi::class)
-@Composable
-private fun TopUpSheetContent(viewModel: StationViewModel) {
-    val amounts = (5_000..100_000 step 5_000).toList()
-
-    Column(
-        modifier = Modifier
-            .padding(horizontal = DX.Spacing.L)
-            .padding(bottom = DX.Spacing.XL),
-        verticalArrangement = Arrangement.spacedBy(DX.Spacing.M),
-    ) {
-        Text(
-            stringResource(R.string.station_top_up),
-            style = DX.Font.subHeadingSemiBold,
-            color = DX.Color.text.primary,
-        )
-        FlowRow(horizontalArrangement = Arrangement.spacedBy(DX.Spacing.S)) {
-            amounts.forEach { amount ->
-                FilterChip(
-                    selected = false,
-                    onClick = { viewModel.prepareTopUp(amount) },
-                    label = { Text(amount.toRupiah()) },
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun SheetNfcTap(subtitle: String? = null) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(bottom = DX.Spacing.XL),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        NfcPulseAnimation()
-        Spacer(Modifier.height(DX.Spacing.L))
-        if (subtitle != null) {
-            Text(subtitle, style = DX.Font.subHeadingSemiBold, color = DX.Color.text.primary)
-            Spacer(Modifier.height(DX.Spacing.S))
-        }
-        Text(
-            stringResource(R.string.station_tap_nfc),
-            style = DX.Font.caption,
-            color = DX.Color.text.secondary,
-        )
-    }
-}
-
-@Composable
-private fun SheetProcessing() {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = DX.Spacing.XL),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        CircularProgressIndicator()
-        Spacer(Modifier.height(DX.Spacing.L))
-        Text(
-            stringResource(R.string.station_processing),
-            style = DX.Font.bodySemiBold,
-            color = DX.Color.text.primary,
-        )
-        Text(
-            stringResource(R.string.station_processing_hint),
-            style = DX.Font.caption,
-            color = DX.Color.text.secondary,
-        )
-    }
-}
-
-@Composable
-private fun SheetSuccess(title: String, subtitle: String? = null) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = DX.Spacing.XL),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        DotLottieAnimation(
-            source = DotLottieSource.Asset("success.lottie"),
-            autoplay = true,
-            loop = false,
-            modifier = Modifier.size(150.dp),
-        )
-        Text(title, style = DX.Font.subHeadingSemiBold, color = DX.Color.text.primary)
-        if (subtitle != null) {
-            Text(subtitle, style = DX.Font.body, color = DX.Color.text.secondary)
-        }
-    }
-}
-
-@Composable
-private fun SheetError(error: StationError, onRetry: () -> Unit) {
-    val analytics = LocalAnalytics.current
-    val message = when (error) {
-        is StationError.AlreadyRegistered -> stringResource(R.string.station_error_already_registered)
-        is StationError.InvalidMemberId -> stringResource(R.string.station_error_invalid_member_id)
-        is StationError.CardNotRecognized -> stringResource(R.string.station_error_card_not_recognized)
-        is StationError.MaxBalanceExceeded -> stringResource(
-            R.string.station_error_max_balance,
-            error.currentBalance,
-        )
-
-        is StationError.WriteFailed -> stringResource(R.string.station_error_write_failed)
-    }
-    LaunchedEffect(error) {
-        val reason = when (error) {
-            is StationError.CardNotRecognized -> error.reason
-            is StationError.WriteFailed -> error.reason
-            else -> null
-        }
-        analytics.logEvent(
-            name = "station_error",
-            params = mapOf(
-                "message" to message,
-                "reason" to reason.orEmpty(),
-            ),
-        )
-    }
-    ParkeerErrorState(
-        title = stringResource(R.string.station_error),
-        message = message,
-        buttonText = stringResource(R.string.station_try_again),
-        onAction = onRetry,
-        modifier = Modifier
-            .padding(horizontal = DX.Spacing.L)
-            .padding(bottom = DX.Spacing.XL),
-    )
 }
