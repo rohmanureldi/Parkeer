@@ -23,6 +23,8 @@ espressoCore = "3.5.1"
 appcompat = "1.6.1"
 material = "1.10.0"
 firebase-bom = "33.7.0"
+play-integrity = "1.4.0"
+integrity = "1.6.0"
 
 [libraries]
 # Compose
@@ -65,11 +67,13 @@ firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.r
 firebase-analytics = { group = "com.google.firebase", name = "firebase-analytics-ktx" }
 firebase-crashlytics = { group = "com.google.firebase", name = "firebase-crashlytics-ktx" }
 firebase-perf = { group = "com.google.firebase", name = "firebase-perf-ktx" }
+play-integrity = { group = "com.google.android.play", name = "integrity", version.ref = "play-integrity" }
 junit = { group = "junit", name = "junit", version.ref = "junitVersion" }
 ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidxJunit" }
 espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
 appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+integrity = { group = "com.google.android.play", name = "integrity", version.ref = "integrity" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

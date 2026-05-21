@@ -2,6 +2,7 @@ package com.eldirohmanur.parkeer.core.nfc.di
 
 import com.eldirohmanur.parkeer.core.crypto.AesGcmCardCipher
 import com.eldirohmanur.parkeer.core.crypto.CardCipher
+import com.eldirohmanur.parkeer.core.crypto.KeyStoreManager
 import com.eldirohmanur.parkeer.core.model.AppConfig
 import com.eldirohmanur.parkeer.core.nfc.CardReader
 import com.eldirohmanur.parkeer.core.nfc.NtagCardReader
@@ -15,12 +16,9 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object NfcModule {
 
-    // Hardcoded 32-byte key. Production would use Android Keystore.
-    private val MASTER_KEY = "KDX-MBC-PARKEER-2026-MASTER-KEY!".toByteArray()
-
     @Provides
     @Singleton
-    fun provideCipher(): CardCipher = AesGcmCardCipher(MASTER_KEY)
+    fun provideCipher(): CardCipher = AesGcmCardCipher(KeyStoreManager.getMasterKey())
 
     @Provides
     @Singleton

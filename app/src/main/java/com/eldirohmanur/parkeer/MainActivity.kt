@@ -7,16 +7,20 @@ import android.nfc.NfcAdapter
 import android.nfc.Tag
 import android.os.Build
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.lifecycle.lifecycleScope
 import com.eldirohmanur.parkeer.core.firebase.AnalyticsHelper
 import com.eldirohmanur.parkeer.core.firebase.LocalAnalytics
 import com.eldirohmanur.parkeer.core.nfc.NfcTagHolder
 import com.eldirohmanur.parkeer.navigation.ParkeerNavHost
+import com.eldirohmanur.parkeer.security.IntegrityChecker
 import com.telkomsel.dexterity.theme.DexterityTheme
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -28,12 +32,32 @@ class MainActivity : ComponentActivity() {
     @Inject
     lateinit var analyticsHelper: AnalyticsHelper
 
+    @Inject
+    lateinit var integrityChecker: IntegrityChecker
+
     private var nfcAdapter: NfcAdapter? = null
     private lateinit var pendingIntent: PendingIntent
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        lifecycleScope.launch {
+            when (integrityChecker.check()) {
+                is IntegrityChecker.Result.Untrusted -> {
+                    Toast.makeText(this@MainActivity, "Device tidak aman", Toast.LENGTH_LONG).show()
+                    finish()
+                }
+
+                is IntegrityChecker.Result.Error -> {
+                    /* best-effort, allow */
+                }
+
+                is IntegrityChecker.Result.Trusted -> {
+                    /* proceed */
+                }
+            }
+        }
         nfcAdapter = NfcAdapter.getDefaultAdapter(this)
         // FLAG_MUTABLE is required here because the NFC foreground dispatch system
         // needs to fill in EXTRA_TAG and EXTRA_NDEF_MESSAGES into this PendingIntent.
