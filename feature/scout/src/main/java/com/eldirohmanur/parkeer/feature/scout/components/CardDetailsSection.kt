@@ -18,38 +18,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.eldirohmanur.parkeer.core.model.CardData
-import com.eldirohmanur.parkeer.core.model.VisitState
 import com.eldirohmanur.parkeer.core.ui.ParkeerCard
 import com.eldirohmanur.parkeer.feature.scout.R
 import com.telkomsel.dexterity.theme.DX
-import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
 @Composable
-internal fun CardDetailsSection(card: CardData, fullFmt: DateTimeFormatter, shortFmt: DateTimeFormatter) {
+internal fun CardDetailsSection(card: CardData, shortFmt: DateTimeFormatter) {
     val zone = remember { ZoneId.systemDefault() }
-
-    val visitState = card.visitState
-    if (visitState is VisitState.CheckedIn) {
-        ParkeerCard(modifier = Modifier.fillMaxWidth()) {
-            Column(Modifier.padding(DX.Spacing.L)) {
-                Text(
-                    stringResource(R.string.scout_checked_in),
-                    style = DX.Font.bodySemiBold,
-                    color = DX.Color.text.darkGreen,
-                )
-                Text(
-                    stringResource(
-                        R.string.scout_checked_in_since,
-                        fullFmt.format(Instant.ofEpochMilli(visitState.timestamp).atZone(zone)),
-                    ),
-                    style = DX.Font.caption,
-                    color = DX.Color.text.secondary,
-                )
-            }
-        }
-    }
 
     ParkeerCard(modifier = Modifier.fillMaxWidth()) {
         Column(Modifier.padding(DX.Spacing.L)) {

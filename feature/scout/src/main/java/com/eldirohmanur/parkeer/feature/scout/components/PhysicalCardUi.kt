@@ -30,12 +30,12 @@ import com.eldirohmanur.parkeer.core.ui.toRupiah
 import com.eldirohmanur.parkeer.feature.scout.R
 
 @Composable
-internal fun PhysicalCardUi(card: CardData) {
+internal fun PhysicalCardUi(card: CardData, modifier: Modifier = Modifier) {
     val gradient =
         Brush.linearGradient(listOf(Color(0xFF1A237E), Color(0xFF283593), Color(0xFF3949AB)))
 
     Box(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .aspectRatio(1.586f)
             .clip(RoundedCornerShape(16.dp))

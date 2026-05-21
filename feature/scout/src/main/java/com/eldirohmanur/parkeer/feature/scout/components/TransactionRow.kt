@@ -60,11 +60,14 @@ internal fun TransactionRow(activity: Activity, amount: Int, timestamp: Long, fm
             Icon(icon, contentDescription = label, modifier = Modifier.size(16.dp), tint = color)
             Column {
                 Text(label, style = DX.Font.bodySemiBold, color = DX.Color.text.primary)
-                Text(
-                    fmt.format(Instant.ofEpochMilli(timestamp).atZone(zone)),
-                    style = DX.Font.caption,
-                    color = DX.Color.text.secondary,
-                )
+                val timeText = fmt.format(Instant.ofEpochMilli(timestamp).atZone(zone))
+                val subtitle = if (activity == Activity.PARKING) {
+                    val hours = amount / 2000
+                    "$timeText · $hours jam"
+                } else {
+                    timeText
+                }
+                Text(subtitle, style = DX.Font.caption, color = DX.Color.text.secondary)
             }
         }
         val prefix = if (activity == Activity.PARKING) "-" else "+"

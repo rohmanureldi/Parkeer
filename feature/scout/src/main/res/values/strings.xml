@@ -12,8 +12,9 @@
     <string name="scout_card_id">ID %1$d</string>
     <string name="scout_card_status_parked">PARKIR</string>
     <string name="scout_card_status_idle">IDLE</string>
-    <string name="scout_checked_in">Sudah Check-In</string>
-    <string name="scout_checked_in_since">Sejak: %1$s</string>
+    <string name="scout_checked_in">Sedang Parkir</string>
+    <string name="scout_checked_in_since">Check-in: %1$s</string>
+    <string name="scout_checked_in_hours">Durasi: %1$d jam</string>
     <string name="scout_recent_transactions">Transaksi Terakhir</string>
     <string name="scout_no_transactions">Belum ada transaksi</string>
     <string name="scout_activity_parking">Parkir</string>
