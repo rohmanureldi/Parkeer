@@ -56,11 +56,12 @@ import com.eldirohmanur.parkeer.core.firebase.LocalAnalytics
 import com.eldirohmanur.parkeer.core.model.Activity
 import com.eldirohmanur.parkeer.core.model.CardData
 import com.eldirohmanur.parkeer.core.model.VisitState
-import com.eldirohmanur.parkeer.core.ui.ErrorLogger
 import com.eldirohmanur.parkeer.core.ui.NfcPulseAnimation
 import com.eldirohmanur.parkeer.core.ui.ParkeerCard
 import com.eldirohmanur.parkeer.core.ui.rememberHapticFeedback
 import com.eldirohmanur.parkeer.core.ui.toRupiah
+import com.telkomsel.dexterity.components.analyticwrapper.DXScreen
+import com.telkomsel.dexterity.components.analyticwrapper.DefaultScreenMetadata
 import com.telkomsel.dexterity.components.atom.button.DXButton
 import com.telkomsel.dexterity.components.atom.button.model.ButtonVariant
 import com.telkomsel.dexterity.theme.DX
@@ -72,153 +73,161 @@ import java.time.format.DateTimeFormatter
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ScoutScreen(modifier: Modifier = Modifier, viewModel: ScoutViewModel = hiltViewModel(), onBack: () -> Unit) {
-    val uiState by viewModel.uiState.collectAsState()
-    val haptic = rememberHapticFeedback()
-    val analytics = LocalAnalytics.current
-    val fullFmt = remember { DateTimeFormatter.ofPattern("dd MMM yyyy, HH:mm:ss") }
-    val shortFmt = remember { DateTimeFormatter.ofPattern("dd MMM, HH:mm") }
+    DXScreen(DefaultScreenMetadata("Scout", "scout", "ScoutScreen")) {
+        val uiState by viewModel.uiState.collectAsState()
+        val haptic = rememberHapticFeedback()
+        val fullFmt = remember { DateTimeFormatter.ofPattern("dd MMM yyyy, HH:mm:ss") }
+        val shortFmt = remember { DateTimeFormatter.ofPattern("dd MMM, HH:mm") }
+        val analytics = LocalAnalytics.current
 
-    LaunchedEffect(uiState) {
-        when (uiState) {
-            is ScoutUiState.Loaded -> haptic.success()
-            is ScoutUiState.Error -> haptic.error()
-            else -> {}
-        }
-    }
-
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.scout_title)) },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(
-                            Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.scout_cd_back),
-                        )
-                    }
-                },
-            )
-        },
-    ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .consumeWindowInsets(innerPadding)
-                .padding(horizontal = DX.Spacing.L)
-                .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(DX.Spacing.M),
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(DX.Spacing.XS),
-            ) {
-                Icon(
-                    Icons.Filled.Lock,
-                    contentDescription = stringResource(R.string.scout_cd_read_only),
-                    modifier = Modifier.size(16.dp),
-                    tint = DX.Color.text.blue,
-                )
-                Text(
-                    stringResource(R.string.scout_read_only),
-                    style = DX.Font.caption,
-                    color = DX.Color.text.blue,
-                )
+        LaunchedEffect(uiState) {
+            when (uiState) {
+                is ScoutUiState.Loaded -> haptic.success()
+                is ScoutUiState.Error -> haptic.error()
+                else -> {}
             }
+        }
 
-            AnimatedContent(
-                targetState = uiState,
-                transitionSpec = { fadeIn() togetherWith fadeOut() },
-                label = "scout_state",
-            ) { state ->
-                when (state) {
-                    is ScoutUiState.Ready -> {
-                        Column(
-                            Modifier.fillMaxWidth(),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                        ) {
-                            Spacer(Modifier.height(DX.Spacing.XL))
-                            NfcPulseAnimation()
-                            Spacer(Modifier.height(DX.Spacing.L))
-                            Text(
-                                stringResource(R.string.scout_tap_to_view),
-                                style = DX.Font.subHeadingSemiBold,
-                                color = DX.Color.text.primary,
-                            )
-                        }
-                    }
-
-                    is ScoutUiState.Reading -> {
-                        Column(
-                            Modifier.fillMaxWidth(),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                        ) {
-                            Spacer(Modifier.height(DX.Spacing.XL3))
-                            CircularProgressIndicator()
-                            Spacer(Modifier.height(DX.Spacing.L))
-                            Text(
-                                stringResource(R.string.scout_reading),
-                                style = DX.Font.bodySemiBold,
-                                color = DX.Color.text.primary,
-                            )
-                            Text(
-                                stringResource(R.string.scout_reading_hint),
-                                style = DX.Font.caption,
-                                color = DX.Color.text.secondary,
-                            )
-                        }
-                    }
-
-                    is ScoutUiState.Loaded -> {
-                        Column(verticalArrangement = Arrangement.spacedBy(DX.Spacing.M)) {
-                            PhysicalCardUi(state.card)
-                            CardDetailsSection(state.card, fullFmt, shortFmt)
-                            DXButton(
-                                onClick = {
-                                    viewModel.reset()
-                                },
-                                text = stringResource(
-                                    R.string.scout_tap_again,
-                                ),
-                                variant = ButtonVariant.Secondary.Large,
-                                modifier = Modifier.fillMaxWidth(),
-                            )
-                        }
-                    }
-
-                    is ScoutUiState.Error -> {
-                        Column(
-                            Modifier.fillMaxWidth(),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                        ) {
-                            Spacer(Modifier.height(DX.Spacing.XL2))
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = { Text(stringResource(R.string.scout_title)) },
+                    navigationIcon = {
+                        IconButton(onClick = onBack) {
                             Icon(
-                                Icons.Filled.Error,
-                                contentDescription = stringResource(R.string.scout_cd_error),
-                                modifier = Modifier.size(48.dp),
-                                tint = DX.Color.text.red,
+                                Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = stringResource(R.string.scout_cd_back),
                             )
-                            Spacer(Modifier.height(DX.Spacing.M))
-                            LaunchedEffect(state.reason) {
-                                ErrorLogger.log("Scout", "Read failed", state.reason)
+                        }
+                    },
+                )
+            },
+        ) { innerPadding ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+                    .consumeWindowInsets(innerPadding)
+                    .padding(horizontal = DX.Spacing.L)
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(DX.Spacing.M),
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(DX.Spacing.XS),
+                ) {
+                    Icon(
+                        Icons.Filled.Lock,
+                        contentDescription = stringResource(R.string.scout_cd_read_only),
+                        modifier = Modifier.size(16.dp),
+                        tint = DX.Color.text.blue,
+                    )
+                    Text(
+                        stringResource(R.string.scout_read_only),
+                        style = DX.Font.caption,
+                        color = DX.Color.text.blue,
+                    )
+                }
+
+                AnimatedContent(
+                    targetState = uiState,
+                    transitionSpec = { fadeIn() togetherWith fadeOut() },
+                    label = "scout_state",
+                ) { state ->
+                    when (state) {
+                        is ScoutUiState.Ready -> {
+                            Column(
+                                Modifier.fillMaxWidth(),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                            ) {
+                                Spacer(Modifier.height(DX.Spacing.XL))
+                                NfcPulseAnimation()
+                                Spacer(Modifier.height(DX.Spacing.L))
+                                Text(
+                                    stringResource(R.string.scout_tap_to_view),
+                                    style = DX.Font.subHeadingSemiBold,
+                                    color = DX.Color.text.primary,
+                                )
                             }
-                            Text(
-                                stringResource(R.string.scout_error_read_failed),
-                                style = DX.Font.body,
-                                color = DX.Color.text.red,
-                            )
-                            Spacer(Modifier.height(DX.Spacing.XL))
-                            DXButton(
-                                onClick = {
-                                    viewModel.reset()
-                                },
-                                text = stringResource(
-                                    R.string.scout_try_again,
-                                ),
-                                variant = ButtonVariant.Secondary.Large,
-                                modifier = Modifier.fillMaxWidth(),
-                            )
+                        }
+
+                        is ScoutUiState.Reading -> {
+                            Column(
+                                Modifier.fillMaxWidth(),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                            ) {
+                                Spacer(Modifier.height(DX.Spacing.XL3))
+                                CircularProgressIndicator()
+                                Spacer(Modifier.height(DX.Spacing.L))
+                                Text(
+                                    stringResource(R.string.scout_reading),
+                                    style = DX.Font.bodySemiBold,
+                                    color = DX.Color.text.primary,
+                                )
+                                Text(
+                                    stringResource(R.string.scout_reading_hint),
+                                    style = DX.Font.caption,
+                                    color = DX.Color.text.secondary,
+                                )
+                            }
+                        }
+
+                        is ScoutUiState.Loaded -> {
+                            Column(verticalArrangement = Arrangement.spacedBy(DX.Spacing.M)) {
+                                PhysicalCardUi(state.card)
+                                CardDetailsSection(state.card, fullFmt, shortFmt)
+                                DXButton(
+                                    onClick = {
+                                        viewModel.reset()
+                                    },
+                                    text = stringResource(
+                                        R.string.scout_tap_again,
+                                    ),
+                                    variant = ButtonVariant.Secondary.Large,
+                                    modifier = Modifier.fillMaxWidth(),
+                                )
+                            }
+                        }
+
+                        is ScoutUiState.Error -> {
+                            Column(
+                                Modifier.fillMaxWidth(),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                            ) {
+                                Spacer(Modifier.height(DX.Spacing.XL2))
+                                Icon(
+                                    Icons.Filled.Error,
+                                    contentDescription = stringResource(R.string.scout_cd_error),
+                                    modifier = Modifier.size(48.dp),
+                                    tint = DX.Color.text.red,
+                                )
+                                Spacer(Modifier.height(DX.Spacing.M))
+                                LaunchedEffect(state.reason) {
+                                    analytics.logEvent(
+                                        name = "scout_failed",
+                                        params = mapOf(
+                                            "reason" to state.reason.orEmpty(),
+                                        ),
+
+                                    )
+                                }
+                                Text(
+                                    stringResource(R.string.scout_error_read_failed),
+                                    style = DX.Font.body,
+                                    color = DX.Color.text.red,
+                                )
+                                Spacer(Modifier.height(DX.Spacing.XL))
+                                DXButton(
+                                    onClick = {
+                                        viewModel.reset()
+                                    },
+                                    text = stringResource(
+                                        R.string.scout_try_again,
+                                    ),
+                                    variant = ButtonVariant.Secondary.Large,
+                                    modifier = Modifier.fillMaxWidth(),
+                                )
+                            }
                         }
                     }
                 }

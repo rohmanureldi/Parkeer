@@ -29,5 +29,6 @@ dependencies {
     implementation(libs.hilt.android)
     implementation(platform(libs.compose.bom))
     implementation(libs.compose.ui)
+    implementation(libs.telkomsel.dexterity)
     ksp(libs.hilt.compiler)
 }

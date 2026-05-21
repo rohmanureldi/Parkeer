@@ -44,13 +44,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.eldirohmanur.parkeer.core.firebase.LocalAnalytics
-import com.eldirohmanur.parkeer.core.ui.ErrorLogger
 import com.eldirohmanur.parkeer.core.ui.NfcPulseAnimation
 import com.eldirohmanur.parkeer.core.ui.ParkeerCard
 import com.eldirohmanur.parkeer.core.ui.rememberHapticFeedback
 import com.lottiefiles.dotlottie.core.compose.ui.DotLottieAnimation
 import com.lottiefiles.dotlottie.core.util.DotLottieSource
+import com.telkomsel.dexterity.components.analyticwrapper.DXScreen
+import com.telkomsel.dexterity.components.analyticwrapper.DefaultScreenMetadata
 import com.telkomsel.dexterity.components.atom.button.DXButton
+import com.telkomsel.dexterity.components.atom.button.model.ButtonMetadata
 import com.telkomsel.dexterity.components.atom.button.model.ButtonVariant
 import com.telkomsel.dexterity.components.atom.input.DXInput
 import com.telkomsel.dexterity.components.atom.input.DXInputConfig
@@ -65,91 +67,95 @@ import java.time.format.DateTimeFormatter
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GateScreen(modifier: Modifier = Modifier, viewModel: GateViewModel = hiltViewModel(), onBack: () -> Unit) {
-    val uiState by viewModel.uiState.collectAsState()
-    val haptic = rememberHapticFeedback()
-    val analytics = LocalAnalytics.current
-    var simEnabled by remember { mutableStateOf(false) }
-    var simHoursAgo by remember { mutableStateOf("2") }
-    val snackbarHostState = remember { SnackbarHostState() }
-    val busyMsg = stringResource(R.string.gate_busy)
+    DXScreen(DefaultScreenMetadata("Gate", "gate", "GateScreen")) {
+        val uiState by viewModel.uiState.collectAsState()
+        val haptic = rememberHapticFeedback()
+        val analytics = LocalAnalytics.current
+        var simEnabled by remember { mutableStateOf(false) }
+        var simHoursAgo by remember { mutableStateOf("2") }
+        val snackbarHostState = remember { SnackbarHostState() }
+        val busyMsg = stringResource(R.string.gate_busy)
 
-    LaunchedEffect(Unit) {
-        viewModel.busyTaps.collect {
-            haptic.error()
-            snackbarHostState.showSnackbar(busyMsg, duration = SnackbarDuration.Short)
+        LaunchedEffect(Unit) {
+            viewModel.busyTaps.collect {
+                haptic.error()
+                snackbarHostState.showSnackbar(busyMsg, duration = SnackbarDuration.Short)
+            }
         }
-    }
 
-    LaunchedEffect(uiState) {
-        when (uiState) {
-            is GateUiState.Success -> haptic.success()
-            is GateUiState.Error -> haptic.error()
-            else -> {}
+        LaunchedEffect(uiState) {
+            when (uiState) {
+                is GateUiState.Success -> haptic.success()
+                is GateUiState.Error -> haptic.error()
+                else -> {}
+            }
         }
-    }
 
-    LaunchedEffect(simEnabled, simHoursAgo) {
-        viewModel.updateSimulation(simEnabled, simHoursAgo.toLongOrNull() ?: 0L)
-    }
+        LaunchedEffect(simEnabled, simHoursAgo) {
+            viewModel.updateSimulation(simEnabled, simHoursAgo.toLongOrNull() ?: 0L)
+        }
 
-    Scaffold(
-        snackbarHost = { SnackbarHost(snackbarHostState) },
-        topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.gate_title)) },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.gate_cd_back))
-                    }
-                },
-            )
-        },
-    ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .consumeWindowInsets(innerPadding)
-                .padding(horizontal = DX.Spacing.L)
-                .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(DX.Spacing.M),
-        ) {
-            Text(
-                if (simEnabled) stringResource(R.string.gate_subtitle_sim) else stringResource(R.string.gate_subtitle),
-                style = DX.Font.caption,
-                color = if (simEnabled) DX.Color.text.darkYellow else DX.Color.text.secondary,
-            )
+        Scaffold(
+            snackbarHost = { SnackbarHost(snackbarHostState) },
+            topBar = {
+                TopAppBar(
+                    title = { Text(stringResource(R.string.gate_title)) },
+                    navigationIcon = {
+                        IconButton(onClick = onBack) {
+                            Icon(
+                                Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = stringResource(R.string.gate_cd_back),
+                            )
+                        }
+                    },
+                )
+            },
+        ) { innerPadding ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+                    .consumeWindowInsets(innerPadding)
+                    .padding(horizontal = DX.Spacing.L)
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(DX.Spacing.M),
+            ) {
+                Text(
+                    if (simEnabled) stringResource(R.string.gate_subtitle_sim) else stringResource(R.string.gate_subtitle),
+                    style = DX.Font.caption,
+                    color = if (simEnabled) DX.Color.text.darkYellow else DX.Color.text.secondary,
+                )
 
-            AnimatedContent(
-                targetState = uiState,
-                transitionSpec = { fadeIn() togetherWith fadeOut() },
-                label = "gate_state",
-            ) { state ->
-                when (state) {
-                    is GateUiState.Ready -> GateReadyState(
-                        simEnabled,
-                        simHoursAgo,
-                        onSimToggle = { simEnabled = it },
-                        onSimHoursChange = {
-                            simHoursAgo =
-                                it
-                        },
-                    )
-                    is GateUiState.Processing -> GateProcessingState()
-                    is GateUiState.Success -> GateSuccessState(
-                        state.memberName,
-                        state.checkInTime,
-                        simEnabled,
-                        onDone = {
-                            analytics.logButtonClick("Done", "Gate")
+                AnimatedContent(
+                    targetState = uiState,
+                    transitionSpec = { fadeIn() togetherWith fadeOut() },
+                    label = "gate_state",
+                ) { state ->
+                    when (state) {
+                        is GateUiState.Ready -> GateReadyState(
+                            simEnabled,
+                            simHoursAgo,
+                            onSimToggle = { simEnabled = it },
+                            onSimHoursChange = {
+                                simHoursAgo =
+                                    it
+                            },
+                        )
+
+                        is GateUiState.Processing -> GateProcessingState()
+                        is GateUiState.Success -> GateSuccessState(
+                            state.memberName,
+                            state.checkInTime,
+                            simEnabled,
+                            onDone = {
+                                viewModel.reset()
+                            },
+                        )
+
+                        is GateUiState.Error -> GateErrorState(state.error, onDismiss = {
                             viewModel.reset()
-                        },
-                    )
-
-                    is GateUiState.Error -> GateErrorState(state.error, onDismiss = {
-                        analytics.logButtonClick("Dismiss", "Gate")
-                        viewModel.reset()
-                    })
+                        })
+                    }
                 }
             }
         }
@@ -167,8 +173,16 @@ private fun GateReadyState(simEnabled: Boolean, simHoursAgo: String, onSimToggle
     ) {
         Spacer(Modifier.height(DX.Spacing.L))
         NfcPulseAnimation()
-        Text(stringResource(R.string.gate_ready), style = DX.Font.subHeadingSemiBold, color = DX.Color.text.primary)
-        Text(stringResource(R.string.gate_tap_to_check_in), style = DX.Font.caption, color = DX.Color.text.secondary)
+        Text(
+            stringResource(R.string.gate_ready),
+            style = DX.Font.subHeadingSemiBold,
+            color = DX.Color.text.primary,
+        )
+        Text(
+            stringResource(R.string.gate_tap_to_check_in),
+            style = DX.Font.caption,
+            color = DX.Color.text.secondary,
+        )
 
         Spacer(Modifier.height(DX.Spacing.XL))
 
@@ -179,16 +193,27 @@ private fun GateReadyState(simEnabled: Boolean, simHoursAgo: String, onSimToggle
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(DX.Spacing.S)) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(DX.Spacing.S),
+                    ) {
                         Icon(
                             Icons.Filled.Settings,
                             contentDescription = stringResource(R.string.gate_cd_sim_settings),
                             modifier = Modifier.size(16.dp),
                             tint = DX.Color.text.secondary,
                         )
-                        Text(stringResource(R.string.gate_simulation_mode), style = DX.Font.bodySemiBold, color = DX.Color.text.primary)
+                        Text(
+                            stringResource(R.string.gate_simulation_mode),
+                            style = DX.Font.bodySemiBold,
+                            color = DX.Color.text.primary,
+                        )
                     }
-                    DXSwitch(checked = simEnabled, onCheckedChange = onSimToggle)
+                    DXSwitch(
+                        checked = simEnabled,
+                        onCheckedChange = onSimToggle,
+                        eventSwitchName = "Check-in Simulation",
+                    )
                 }
                 if (simEnabled) {
                     Spacer(Modifier.height(DX.Spacing.M))
@@ -201,8 +226,16 @@ private fun GateReadyState(simEnabled: Boolean, simHoursAgo: String, onSimToggle
                         ),
                     )
                     Spacer(Modifier.height(DX.Spacing.S))
-                    val simTime = System.currentTimeMillis() - ((simHoursAgo.toLongOrNull() ?: 0L) * 3_600_000L)
-                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(DX.Spacing.XS)) {
+                    val simTime = System.currentTimeMillis() - (
+                        (
+                            simHoursAgo.toLongOrNull()
+                                ?: 0L
+                            ) * 3_600_000L
+                        )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(DX.Spacing.XS),
+                    ) {
                         Icon(
                             Icons.Filled.Warning,
                             contentDescription = stringResource(R.string.gate_cd_sim_warning),
@@ -232,7 +265,11 @@ private fun GateProcessingState() {
         Spacer(Modifier.height(DX.Spacing.XL3))
         CircularProgressIndicator()
         Spacer(Modifier.height(DX.Spacing.L))
-        Text(stringResource(R.string.gate_processing), style = DX.Font.bodySemiBold, color = DX.Color.text.primary)
+        Text(
+            stringResource(R.string.gate_processing),
+            style = DX.Font.bodySemiBold,
+            color = DX.Color.text.primary,
+        )
         Text(
             stringResource(R.string.gate_processing_hint),
             style = DX.Font.caption,
@@ -254,25 +291,45 @@ private fun GateSuccessState(memberName: String, checkInTime: Long, simEnabled: 
             modifier = Modifier.size(120.dp),
         )
         Spacer(Modifier.height(DX.Spacing.M))
-        Text(stringResource(R.string.gate_welcome, memberName), style = DX.Font.subHeadingSemiBold, color = DX.Color.text.primary)
         Text(
-            stringResource(R.string.gate_checked_in_at, fullFmt.format(Instant.ofEpochMilli(checkInTime).atZone(ZoneId.systemDefault()))),
+            stringResource(R.string.gate_welcome, memberName),
+            style = DX.Font.subHeadingSemiBold,
+            color = DX.Color.text.primary,
+        )
+        Text(
+            stringResource(
+                R.string.gate_checked_in_at,
+                fullFmt.format(Instant.ofEpochMilli(checkInTime).atZone(ZoneId.systemDefault())),
+            ),
             style = DX.Font.body,
             color = DX.Color.text.secondary,
         )
-        if (simEnabled) Text(stringResource(R.string.gate_simulated), style = DX.Font.caption, color = DX.Color.text.darkYellow)
+        if (simEnabled) {
+            Text(
+                stringResource(R.string.gate_simulated),
+                style = DX.Font.caption,
+                color = DX.Color.text.darkYellow,
+            )
+        }
         Spacer(Modifier.height(DX.Spacing.XL))
         DXButton(
             onClick = onDone,
             text = stringResource(R.string.gate_done),
             variant = ButtonVariant.Primary.Large,
             modifier = Modifier.fillMaxWidth(),
+            metadata = {
+                ButtonMetadata.Regular(
+                    "Done",
+                    "check_in",
+                )
+            },
         )
     }
 }
 
 @Composable
 private fun GateErrorState(error: GateError, onDismiss: () -> Unit) {
+    val analytics = LocalAnalytics.current
     val message = when (error) {
         is GateError.CardNotRecognized -> stringResource(R.string.gate_error_card_not_recognized)
         is GateError.AlreadyCheckedIn -> stringResource(R.string.gate_error_already_checked_in)
@@ -284,7 +341,13 @@ private fun GateErrorState(error: GateError, onDismiss: () -> Unit) {
             is GateError.WriteFailed -> error.reason
             else -> null
         }
-        ErrorLogger.log("Gate", message, reason)
+        analytics.logEvent(
+            "check_in_failed",
+            params = mapOf(
+                "message" to message,
+                "reason" to reason.orEmpty().ifEmpty { "unknown" },
+            ),
+        )
     }
     Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
         Spacer(Modifier.height(DX.Spacing.XL2))
@@ -295,7 +358,11 @@ private fun GateErrorState(error: GateError, onDismiss: () -> Unit) {
             tint = DX.Color.text.red,
         )
         Spacer(Modifier.height(DX.Spacing.M))
-        Text(stringResource(R.string.gate_error), style = DX.Font.subHeadingSemiBold, color = DX.Color.text.red)
+        Text(
+            stringResource(R.string.gate_error),
+            style = DX.Font.subHeadingSemiBold,
+            color = DX.Color.text.red,
+        )
         Text(message, style = DX.Font.body, color = DX.Color.text.secondary)
         Spacer(Modifier.height(DX.Spacing.XL))
         DXButton(
@@ -303,6 +370,12 @@ private fun GateErrorState(error: GateError, onDismiss: () -> Unit) {
             text = stringResource(R.string.gate_dismiss),
             variant = ButtonVariant.Secondary.Large,
             modifier = Modifier.fillMaxWidth(),
+            metadata = {
+                ButtonMetadata.Regular(
+                    "Dismiss",
+                    "Close Check In Error Screen",
+                )
+            },
         )
     }
 }

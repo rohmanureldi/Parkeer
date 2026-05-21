@@ -3,6 +3,7 @@ package com.eldirohmanur.parkeer.feature.gate
 import android.nfc.Tag
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.eldirohmanur.parkeer.core.firebase.AnalyticsHelper
 import com.eldirohmanur.parkeer.core.firebase.PerfTracer
 import com.eldirohmanur.parkeer.core.model.VisitState
 import com.eldirohmanur.parkeer.core.nfc.CardReader
@@ -20,6 +21,7 @@ class GateViewModel @Inject constructor(
     private val cardReader: CardReader,
     private val nfcTagHolder: NfcTagHolder,
     private val perfTracer: PerfTracer,
+    private val analyticsHelper: AnalyticsHelper,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<GateUiState>(GateUiState.Ready)
@@ -67,7 +69,19 @@ class GateViewModel @Inject constructor(
                 val updated = card.copy(visitState = VisitState.CheckedIn(timestamp))
 
                 cardReader.write(tag, updated)
-                    .onSuccess { _uiState.value = GateUiState.Success(card.memberName, timestamp) }
+                    .onSuccess {
+                        analyticsHelper.logEvent(
+                            "check_in_success",
+                            mapOf(
+                                "event_category" to "check_in",
+                                "screen_name" to "Gate",
+                                "checkin_timestamp" to timestamp.toString(),
+                                "user_id" to card.memberId.toString(),
+                                "user_name" to card.memberName,
+                            ),
+                        )
+                        _uiState.value = GateUiState.Success(card.memberName, timestamp)
+                    }
                     .onFailure {
                         _uiState.value = GateUiState.Error(GateError.WriteFailed(it.message))
                     }

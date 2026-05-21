@@ -16,7 +16,7 @@
     <string name="station_cancel">Batal</string>
     <string name="station_topup_label">Jumlah Isi Saldo (Rp)</string>
     <string name="station_topup_placeholder">Masukkan jumlah</string>
-    <string name="station_tap_nfc">Tempelkan Kartu NFC</string>
+    <string name="station_tap_nfc">Tempelkan Kartu NFC di belakang ponsel</string>
     <string name="station_topup_amount">Isi Saldo %1$s</string>
     <string name="station_hold_steady">Tahan kartu di belakang ponsel</string>
     <string name="station_processing">Menulis ke kartu…</string>

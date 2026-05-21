@@ -3,6 +3,7 @@ package com.eldirohmanur.parkeer.feature.station
 import android.nfc.Tag
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.eldirohmanur.parkeer.core.firebase.AnalyticsHelper
 import com.eldirohmanur.parkeer.core.firebase.PerfTracer
 import com.eldirohmanur.parkeer.core.model.Activity
 import com.eldirohmanur.parkeer.core.model.CardData
@@ -22,6 +23,7 @@ class StationViewModel @Inject constructor(
     private val cardReader: CardReader,
     private val nfcTagHolder: NfcTagHolder,
     private val perfTracer: PerfTracer,
+    private val analyticsHelper: AnalyticsHelper,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<StationUiState>(StationUiState.Idle)
@@ -54,6 +56,13 @@ class StationViewModel @Inject constructor(
     }
 
     fun retryLastOperation() {
+        analyticsHelper.logEvent(
+            "nfc_retry",
+            mapOf(
+                "screen_name" to "Station",
+                "operation" to mode.name.lowercase(),
+            ),
+        )
         _uiState.value = StationUiState.WaitingForTap
     }
 

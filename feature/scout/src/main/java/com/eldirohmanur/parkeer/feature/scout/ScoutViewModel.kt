@@ -3,6 +3,7 @@ package com.eldirohmanur.parkeer.feature.scout
 import android.nfc.Tag
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.eldirohmanur.parkeer.core.firebase.AnalyticsHelper
 import com.eldirohmanur.parkeer.core.nfc.CardReader
 import com.eldirohmanur.parkeer.core.nfc.NfcTagHolder
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -13,7 +14,11 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class ScoutViewModel @Inject constructor(private val cardReader: CardReader, private val nfcTagHolder: NfcTagHolder) : ViewModel() {
+class ScoutViewModel @Inject constructor(
+    private val cardReader: CardReader,
+    private val nfcTagHolder: NfcTagHolder,
+    private val analyticsHelper: AnalyticsHelper,
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow<ScoutUiState>(ScoutUiState.Ready)
     val uiState: StateFlow<ScoutUiState> = _uiState.asStateFlow()
@@ -32,7 +37,18 @@ class ScoutViewModel @Inject constructor(private val cardReader: CardReader, pri
         viewModelScope.launch {
             _uiState.value = ScoutUiState.Reading
             cardReader.read(tag)
-                .onSuccess { _uiState.value = ScoutUiState.Loaded(it) }
+                .onSuccess {
+                    analyticsHelper.logEvent(
+                        "nfc_read_success",
+                        mapOf(
+                            "event_category" to "scout",
+                            "screen_name" to "Scout",
+                            "user_id" to it.memberId.toString(),
+                            "user_name" to it.memberName,
+                        ),
+                    )
+                    _uiState.value = ScoutUiState.Loaded(it)
+                }
                 .onFailure { _uiState.value = ScoutUiState.Error(it.message) }
         }
     }

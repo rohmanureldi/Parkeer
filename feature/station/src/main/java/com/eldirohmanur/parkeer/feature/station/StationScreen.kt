@@ -47,12 +47,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.eldirohmanur.parkeer.core.firebase.LocalAnalytics
-import com.eldirohmanur.parkeer.core.ui.ErrorLogger
 import com.eldirohmanur.parkeer.core.ui.NfcPulseAnimation
 import com.eldirohmanur.parkeer.core.ui.rememberHapticFeedback
 import com.eldirohmanur.parkeer.core.ui.toRupiah
 import com.lottiefiles.dotlottie.core.compose.ui.DotLottieAnimation
 import com.lottiefiles.dotlottie.core.util.DotLottieSource
+import com.telkomsel.dexterity.components.analyticwrapper.DXScreen
+import com.telkomsel.dexterity.components.analyticwrapper.DefaultScreenMetadata
 import com.telkomsel.dexterity.components.atom.button.DXButton
 import com.telkomsel.dexterity.components.atom.button.model.ButtonState
 import com.telkomsel.dexterity.components.atom.button.model.ButtonVariant
@@ -63,6 +64,7 @@ import com.telkomsel.dexterity.components.molecule.card.DXCard
 import com.telkomsel.dexterity.components.molecule.card.DXCardStyle
 import com.telkomsel.dexterity.components.molecule.card.customcard.CustomCardStyle
 import com.telkomsel.dexterity.components.molecule.card.customcard.CustomCardVariant
+import com.telkomsel.dexterity.components.molecule.card.model.CardMetadata
 import com.telkomsel.dexterity.theme.DX
 import kotlinx.coroutines.delay
 
@@ -71,113 +73,118 @@ private enum class SheetType { REGISTER, TOP_UP }
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun StationScreen(modifier: Modifier = Modifier, viewModel: StationViewModel = hiltViewModel(), onBack: () -> Unit) {
-    val uiState by viewModel.uiState.collectAsState()
-    val haptic = rememberHapticFeedback()
-    val analytics = LocalAnalytics.current
-    var activeSheet by rememberSaveable { mutableStateOf<SheetType?>(null) }
+    DXScreen(DefaultScreenMetadata("Station", "station", "StationScreen")) {
+        val uiState by viewModel.uiState.collectAsState()
+        val haptic = rememberHapticFeedback()
+        val analytics = LocalAnalytics.current
+        var activeSheet by rememberSaveable { mutableStateOf<SheetType?>(null) }
 
-    LaunchedEffect(uiState) {
-        when (uiState) {
-            is StationUiState.RegisterSuccess, is StationUiState.TopUpSuccess -> {
-                haptic.success()
-                delay(3000)
-                activeSheet = null
-                viewModel.reset()
+        LaunchedEffect(uiState) {
+            when (uiState) {
+                is StationUiState.RegisterSuccess, is StationUiState.TopUpSuccess -> {
+                    haptic.success()
+                    delay(3000)
+                    activeSheet = null
+                    viewModel.reset()
+                }
+
+                is StationUiState.Error -> haptic.error()
+                else -> {}
             }
-            is StationUiState.Error -> haptic.error()
-            else -> {}
         }
-    }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.station_title)) },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.station_cd_back))
-                    }
-                },
-            )
-        },
-    ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .consumeWindowInsets(innerPadding)
-                .padding(horizontal = DX.Spacing.L),
-            verticalArrangement = Arrangement.Center,
-        ) {
-            StationHome(
-                onRegister = {
-                    analytics.logButtonClick("Register New Member", "Station")
-                    activeSheet = SheetType.REGISTER
-                },
-                onTopUp = {
-                    analytics.logButtonClick("Top-Up Balance", "Station")
-                    activeSheet = SheetType.TOP_UP
-                },
-            )
-        }
-    }
-
-    if (activeSheet != null) {
-        val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-        ModalBottomSheet(
-            onDismissRequest = {
-                activeSheet = null
-                viewModel.reset()
-            },
-            sheetState = sheetState,
-        ) {
-            val minSheetHeight = (LocalWindowInfo.current.containerDpSize.height.value / 3).dp
-            AnimatedContent(
-                targetState = uiState,
-                transitionSpec = { fadeIn() togetherWith fadeOut() },
-                label = "sheet_content",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .heightIn(min = minSheetHeight),
-            ) { state ->
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    when (state) {
-                        is StationUiState.Idle -> {
-                            when (activeSheet) {
-                                SheetType.REGISTER -> RegisterSheetContent(viewModel)
-                                SheetType.TOP_UP -> TopUpSheetContent(viewModel)
-                                else -> {}
-                            }
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = { Text(stringResource(R.string.station_title)) },
+                    navigationIcon = {
+                        IconButton(onClick = onBack) {
+                            Icon(
+                                Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = stringResource(R.string.station_cd_back),
+                            )
                         }
+                    },
+                )
+            },
+        ) { innerPadding ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+                    .consumeWindowInsets(innerPadding)
+                    .padding(horizontal = DX.Spacing.L),
+                verticalArrangement = Arrangement.Center,
+            ) {
+                StationHome(
+                    onRegister = {
+                        activeSheet = SheetType.REGISTER
+                    },
+                    onTopUp = {
+                        activeSheet = SheetType.TOP_UP
+                    },
+                )
+            }
+        }
 
-                        is StationUiState.WaitingForTap -> SheetNfcTap(
-                            subtitle = if (activeSheet == SheetType.TOP_UP) {
-                                stringResource(
-                                    R.string.station_topup_amount,
-                                    viewModel.pendingTopUpAmount.toRupiah(),
-                                )
-                            } else {
-                                null
-                            },
-                        )
-                        is StationUiState.Processing -> SheetProcessing()
-                        is StationUiState.RegisterSuccess -> SheetSuccess(
-                            stringResource(R.string.station_register_success),
-                        )
+        if (activeSheet != null) {
+            val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+            ModalBottomSheet(
+                onDismissRequest = {
+                    activeSheet = null
+                    viewModel.reset()
+                },
+                sheetState = sheetState,
+            ) {
+                val minSheetHeight = (LocalWindowInfo.current.containerDpSize.height.value / 3).dp
+                AnimatedContent(
+                    targetState = uiState,
+                    transitionSpec = { fadeIn() togetherWith fadeOut() },
+                    label = "sheet_content",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(min = minSheetHeight),
+                ) { state ->
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        when (state) {
+                            is StationUiState.Idle -> {
+                                when (activeSheet) {
+                                    SheetType.REGISTER -> RegisterSheetContent(viewModel)
+                                    SheetType.TOP_UP -> TopUpSheetContent(viewModel)
+                                    else -> {}
+                                }
+                            }
 
-                        is StationUiState.TopUpSuccess -> SheetSuccess(
-                            stringResource(R.string.station_topup_success),
-                            subtitle = stringResource(
-                                R.string.station_topup_balance,
-                                state.newBalance.toRupiah(),
-                            ),
-                        )
+                            is StationUiState.WaitingForTap -> SheetNfcTap(
+                                subtitle = if (activeSheet == SheetType.TOP_UP) {
+                                    stringResource(
+                                        R.string.station_topup_amount,
+                                        viewModel.pendingTopUpAmount.toRupiah(),
+                                    )
+                                } else {
+                                    null
+                                },
+                            )
 
-                        is StationUiState.Error -> SheetError(state.error) { viewModel.retryLastOperation() }
+                            is StationUiState.Processing -> SheetProcessing()
+                            is StationUiState.RegisterSuccess -> SheetSuccess(
+                                stringResource(R.string.station_register_success),
+                            )
+
+                            is StationUiState.TopUpSuccess -> SheetSuccess(
+                                stringResource(R.string.station_topup_success),
+                                subtitle = stringResource(
+                                    R.string.station_topup_balance,
+                                    state.newBalance.toRupiah(),
+                                ),
+                            )
+
+                            is StationUiState.Error -> SheetError(state.error) { viewModel.retryLastOperation() }
+                        }
                     }
                 }
             }
@@ -234,6 +241,12 @@ private fun ActionCard(icon: ImageVector, title: String, description: String, on
                 }
             },
         ),
+        metadata = {
+            CardMetadata.Regular(
+                cardName = title,
+                listName = "Station Menu",
+            )
+        },
     )
 }
 
@@ -314,10 +327,9 @@ private fun SheetNfcTap(subtitle: String? = null) {
         }
         Text(
             stringResource(R.string.station_tap_nfc),
-            style = DX.Font.bodySemiBold,
-            color = DX.Color.text.primary,
+            style = DX.Font.caption,
+            color = DX.Color.text.secondary,
         )
-        Text(stringResource(R.string.station_hold_steady), style = DX.Font.caption, color = DX.Color.text.secondary)
     }
 }
 
@@ -331,7 +343,11 @@ private fun SheetProcessing() {
     ) {
         CircularProgressIndicator()
         Spacer(Modifier.height(DX.Spacing.L))
-        Text(stringResource(R.string.station_processing), style = DX.Font.bodySemiBold, color = DX.Color.text.primary)
+        Text(
+            stringResource(R.string.station_processing),
+            style = DX.Font.bodySemiBold,
+            color = DX.Color.text.primary,
+        )
         Text(
             stringResource(R.string.station_processing_hint),
             style = DX.Font.caption,
@@ -363,11 +379,16 @@ private fun SheetSuccess(title: String, subtitle: String? = null) {
 
 @Composable
 private fun SheetError(error: StationError, onRetry: () -> Unit) {
+    val analytics = LocalAnalytics.current
     val message = when (error) {
         is StationError.AlreadyRegistered -> stringResource(R.string.station_error_already_registered)
         is StationError.InvalidMemberId -> stringResource(R.string.station_error_invalid_member_id)
         is StationError.CardNotRecognized -> stringResource(R.string.station_error_card_not_recognized)
-        is StationError.MaxBalanceExceeded -> stringResource(R.string.station_error_max_balance, error.currentBalance)
+        is StationError.MaxBalanceExceeded -> stringResource(
+            R.string.station_error_max_balance,
+            error.currentBalance,
+        )
+
         is StationError.WriteFailed -> stringResource(R.string.station_error_write_failed)
     }
     LaunchedEffect(error) {
@@ -376,7 +397,13 @@ private fun SheetError(error: StationError, onRetry: () -> Unit) {
             is StationError.WriteFailed -> error.reason
             else -> null
         }
-        ErrorLogger.log("Station", message, reason)
+        analytics.logEvent(
+            name = "station_error",
+            params = mapOf(
+                "message" to message,
+                "reason" to reason.orEmpty(),
+            ),
+        )
     }
     Column(
         modifier = Modifier
@@ -392,7 +419,11 @@ private fun SheetError(error: StationError, onRetry: () -> Unit) {
             tint = DX.Color.text.red,
         )
         Spacer(Modifier.height(DX.Spacing.M))
-        Text(stringResource(R.string.station_error), style = DX.Font.subHeadingSemiBold, color = DX.Color.text.red)
+        Text(
+            stringResource(R.string.station_error),
+            style = DX.Font.subHeadingSemiBold,
+            color = DX.Color.text.red,
+        )
         Spacer(Modifier.height(DX.Spacing.S))
         Text(message, style = DX.Font.body, color = DX.Color.text.secondary)
         Spacer(Modifier.height(DX.Spacing.XL))

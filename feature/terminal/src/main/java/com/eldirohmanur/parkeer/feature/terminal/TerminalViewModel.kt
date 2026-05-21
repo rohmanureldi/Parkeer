@@ -3,6 +3,7 @@ package com.eldirohmanur.parkeer.feature.terminal
 import android.nfc.Tag
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.eldirohmanur.parkeer.core.firebase.AnalyticsHelper
 import com.eldirohmanur.parkeer.core.firebase.PerfTracer
 import com.eldirohmanur.parkeer.core.model.Activity
 import com.eldirohmanur.parkeer.core.model.AppConfig
@@ -23,6 +24,7 @@ class TerminalViewModel @Inject constructor(
     private val nfcTagHolder: NfcTagHolder,
     private val appConfig: AppConfig,
     private val perfTracer: PerfTracer,
+    private val analyticsHelper: AnalyticsHelper,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<TerminalUiState>(TerminalUiState.Ready)
@@ -87,6 +89,20 @@ class TerminalViewModel @Inject constructor(
 
                 cardReader.write(tag, updated)
                     .onSuccess {
+                        analyticsHelper.logEvent(
+                            "check_out_success",
+                            mapOf(
+                                "event_category" to "check_out",
+                                "screen_name" to "Terminal",
+                                "checkin_timestamp" to checkedIn.timestamp.toString(),
+                                "checkout_timestamp" to now.toString(),
+                                "price" to fee.toString(),
+                                "duration" to durationMs.toString(),
+                                "billed_hours" to hoursCharged.toString(),
+                                "user_id" to card.memberId.toString(),
+                                "user_name" to card.memberName,
+                            ),
+                        )
                         _uiState.value = TerminalUiState.Success(
                             BillingResult(
                                 memberName = card.memberName,
