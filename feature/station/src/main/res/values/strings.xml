@@ -10,7 +10,7 @@
     <string name="station_member_name_placeholder">Masukkan nama anggota</string>
     <string name="station_member_id_label">ID Anggota</string>
     <string name="station_member_id_placeholder">Masukkan ID anggota</string>
-    <string name="station_submit">Kirim</string>
+    <string name="station_submit">Daftarkan</string>
     <string name="station_ready_to_write">Siap Menulis →</string>
     <string name="station_cancel">Batal</string>
     <string name="station_topup_label">Jumlah Isi Saldo (Rp)</string>
