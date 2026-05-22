@@ -17,7 +17,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
@@ -31,7 +30,6 @@ import com.eldirohmanur.parkeer.feature.scout.components.ScoutReadyState
 import com.telkomsel.dexterity.components.analyticwrapper.DXScreen
 import com.telkomsel.dexterity.components.analyticwrapper.DefaultScreenMetadata
 import com.telkomsel.dexterity.theme.DX
-import java.time.format.DateTimeFormatter
 
 @Suppress("ParamsComparedByRef")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -40,8 +38,6 @@ fun ScoutScreen(modifier: Modifier = Modifier, viewModel: ScoutViewModel = hiltV
     DXScreen(DefaultScreenMetadata("Scout", "scout", "ScoutScreen")) {
         val uiState by viewModel.uiState.collectAsState()
         val haptic = rememberHapticFeedback()
-        val fullFmt = remember { DateTimeFormatter.ofPattern("dd MMM yyyy, HH:mm:ss") }
-        val shortFmt = remember { DateTimeFormatter.ofPattern("dd MMM, HH:mm") }
 
         LaunchedEffect(uiState) {
             when (uiState) {
@@ -80,9 +76,7 @@ fun ScoutScreen(modifier: Modifier = Modifier, viewModel: ScoutViewModel = hiltV
                         is ScoutUiState.Ready -> ScoutReadyState()
                         is ScoutUiState.Reading -> ScoutReadingState()
                         is ScoutUiState.Loaded -> ScoutLoadedState(
-                            state.card,
-                            fullFmt,
-                            shortFmt,
+                            card = state.card,
                             onTapAgain = { viewModel.reset() },
                         )
 

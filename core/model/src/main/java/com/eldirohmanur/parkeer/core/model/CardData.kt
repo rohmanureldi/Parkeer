@@ -1,8 +1,11 @@
 package com.eldirohmanur.parkeer.core.model
 
+import androidx.compose.runtime.Stable
+
 /**
  * Represents the complete data stored on an NFC membership card.
  */
+@Stable
 data class CardData(
     val memberId: Int = 0,
     val memberName: String = "",

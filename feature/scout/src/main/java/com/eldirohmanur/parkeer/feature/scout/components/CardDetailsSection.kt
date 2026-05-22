@@ -25,8 +25,9 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
 @Composable
-internal fun CardDetailsSection(card: CardData, shortFmt: DateTimeFormatter) {
+internal fun CardDetailsSection(card: CardData) {
     val zone = remember { ZoneId.systemDefault() }
+    val shortFmt = remember { DateTimeFormatter.ofPattern("dd MMM, HH:mm") }
 
     ParkeerCard(modifier = Modifier.fillMaxWidth()) {
         Column(Modifier.padding(DX.Spacing.L)) {

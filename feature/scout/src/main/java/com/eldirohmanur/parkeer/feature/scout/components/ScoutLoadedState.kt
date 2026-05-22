@@ -28,8 +28,9 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
 @Composable
-internal fun ScoutLoadedState(card: CardData, fullFmt: DateTimeFormatter, shortFmt: DateTimeFormatter, onTapAgain: () -> Unit) {
+internal fun ScoutLoadedState(card: CardData, onTapAgain: () -> Unit) {
     val zone = ZoneId.systemDefault()
+    val shortFmt = remember { DateTimeFormatter.ofPattern("dd MMM, HH:mm") }
 
     Column(
         modifier = Modifier.padding(top = DX.Spacing.L),
@@ -63,7 +64,7 @@ internal fun ScoutLoadedState(card: CardData, fullFmt: DateTimeFormatter, shortF
                 PhysicalCardUi(card = card)
             }
         }
-        CardDetailsSection(card, shortFmt)
+        CardDetailsSection(card)
         DXButton(
             onClick = onTapAgain,
             text = stringResource(R.string.scout_tap_again),
