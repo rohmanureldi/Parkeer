@@ -70,37 +70,39 @@ static void derive_master_key(uint8_t *out) {
 // Uses Android's JNI callback to Java's Mac for actual HMAC
 
 static jbyteArray do_hmac_sha256(JNIEnv *env, jbyteArray key, jbyteArray data) {
-    jclass macClass = (*env)->FindClass(env, "javax/crypto/Mac");
-    jmethodID getInstance = (*env)->GetStaticMethodID(env, macClass, "getInstance",
+    jclass macClass = env->FindClass("javax/crypto/Mac");
+    jmethodID getInstance = env->GetStaticMethodID(macClass, "getInstance",
                                                       "(Ljava/lang/String;)Ljavax/crypto/Mac;");
-    jstring algo = (*env)->NewStringUTF(env, "HmacSHA256");
-    jobject mac = (*env)->CallStaticObjectMethod(env, macClass, getInstance, algo);
+    jstring algo = env->NewStringUTF("HmacSHA256");
+    jobject mac = env->CallStaticObjectMethod(macClass, getInstance, algo);
 
-    jclass keySpecClass = (*env)->FindClass(env, "javax/crypto/spec/SecretKeySpec");
-    jmethodID keySpecInit = (*env)->GetMethodID(env, keySpecClass, "<init>",
+    jclass keySpecClass = env->FindClass("javax/crypto/spec/SecretKeySpec");
+    jmethodID keySpecInit = env->GetMethodID(keySpecClass, "<init>",
                                                 "([BLjava/lang/String;)V");
-    jobject keySpec = (*env)->NewObject(env, keySpecClass, keySpecInit, key, algo);
+    jobject keySpec = env->NewObject(keySpecClass, keySpecInit, key, algo);
 
-    jmethodID initMethod = (*env)->GetMethodID(env, macClass, "init", "(Ljava/security/Key;)V");
-    (*env)->CallVoidMethod(env, mac, initMethod, keySpec);
+    jmethodID initMethod = env->GetMethodID(macClass, "init", "(Ljava/security/Key;)V");
+    env->CallVoidMethod(mac, initMethod, keySpec);
 
-    jmethodID doFinal = (*env)->GetMethodID(env, macClass, "doFinal", "([B)[B");
-    jbyteArray result = (jbyteArray) (*env)->CallObjectMethod(env, mac, doFinal, data);
+    jmethodID doFinal = env->GetMethodID(macClass, "doFinal", "([B)[B");
+    jbyteArray result = (jbyteArray) env->CallObjectMethod(mac, doFinal, data);
 
-    (*env)->DeleteLocalRef(env, algo);
-    (*env)->DeleteLocalRef(env, mac);
-    (*env)->DeleteLocalRef(env, keySpec);
+    env->DeleteLocalRef(algo);
+    env->DeleteLocalRef(mac);
+    env->DeleteLocalRef(keySpec);
 
     return result;
 }
 
 // ─── JNI Exports ───
 
+extern "C" {
+
 JNIEXPORT jbyteArray JNICALL
 Java_com_eldirohmanur_parkeer_core_crypto_NativeCipher_getMasterKey(JNIEnv *env, jobject thiz) {
     if (!check_integrity()) {
         // Return garbage if tampered
-        jbyteArray garbage = (*env)->NewByteArray(env, 32);
+        jbyteArray garbage = env->NewByteArray(32);
         return garbage;
     }
 
@@ -108,19 +110,19 @@ Java_com_eldirohmanur_parkeer_core_crypto_NativeCipher_getMasterKey(JNIEnv *env,
     derive_master_key(raw_key);
 
     // Derive final key via HMAC(raw_key, "parkeer-native-v1")
-    jbyteArray jKey = (*env)->NewByteArray(env, 32);
-    (*env)->SetByteArrayRegion(env, jKey, 0, 32, (jbyte *) raw_key);
+    jbyteArray jKey = env->NewByteArray(32);
+    env->SetByteArrayRegion(jKey, 0, 32, (jbyte *) raw_key);
 
-    jbyteArray jInfo = (*env)->NewByteArray(env, 16);
+    jbyteArray jInfo = env->NewByteArray(16);
     const char *info = "parkeer-native-v1";
-    (*env)->SetByteArrayRegion(env, jInfo, 0, 16, (jbyte *) info);
+    env->SetByteArrayRegion(jInfo, 0, 16, (jbyte *) info);
 
     jbyteArray result = do_hmac_sha256(env, jKey, jInfo);
 
     // Zero sensitive data
     memset(raw_key, 0, 32);
-    (*env)->DeleteLocalRef(env, jKey);
-    (*env)->DeleteLocalRef(env, jInfo);
+    env->DeleteLocalRef(jKey);
+    env->DeleteLocalRef(jInfo);
 
     return result;
 }
@@ -129,3 +131,5 @@ JNIEXPORT jboolean JNICALL
 Java_com_eldirohmanur_parkeer_core_crypto_NativeCipher_checkIntegrity(JNIEnv *env, jobject thiz) {
     return (jboolean) check_integrity();
 }
+
+} // extern "C"
