@@ -3,10 +3,6 @@ package com.eldirohmanur.parkeer.feature.station
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountBalanceWallet
-import androidx.compose.material.icons.filled.DeleteForever
-import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -23,12 +19,12 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.eldirohmanur.parkeer.core.ui.ParkeerHapticFeedback
 import com.eldirohmanur.parkeer.core.ui.ParkeerTopAppBar
 import com.eldirohmanur.parkeer.core.ui.rememberHapticFeedback
-import com.eldirohmanur.parkeer.feature.station.components.ArcTab
 import com.eldirohmanur.parkeer.feature.station.components.ArcTabPager
 import com.eldirohmanur.parkeer.feature.station.components.NfcFlowSheet
 import com.eldirohmanur.parkeer.feature.station.components.RegisterSheetContent
 import com.eldirohmanur.parkeer.feature.station.components.ResetContent
 import com.eldirohmanur.parkeer.feature.station.components.TopUpSheetContent
+import com.eldirohmanur.parkeer.feature.station.model.ArcTab
 import com.telkomsel.dexterity.components.analyticwrapper.DXScreen
 import com.telkomsel.dexterity.components.analyticwrapper.DefaultScreenMetadata
 import com.telkomsel.dexterity.theme.DX
@@ -49,9 +45,9 @@ fun StationScreen(modifier: Modifier = Modifier, viewModel: StationViewModel = h
         var showNfcSheet by rememberSaveable { mutableStateOf(false) }
 
         val tabs = listOf(
-            ArcTab(Icons.Filled.AccountBalanceWallet, stringResource(R.string.station_top_up)),
-            ArcTab(Icons.Filled.PersonAdd, stringResource(R.string.station_register_new)),
-            ArcTab(Icons.Filled.DeleteForever, stringResource(R.string.station_reset)),
+            ArcTab.Register,
+            ArcTab.TopUp,
+            ArcTab.Reset,
         )
 
         ObserveUiState(uiState, viewModel, haptic) { showNfcSheet = it }
@@ -75,13 +71,15 @@ fun StationScreen(modifier: Modifier = Modifier, viewModel: StationViewModel = h
                     .padding(horizontal = DX.Spacing.L),
                 onPageChanged = { page ->
                     viewModel.reset()
-                    if (page == 2) viewModel.prepareResetTab()
+                    if (tabs[page] == ArcTab.Reset) {
+                        viewModel.prepareResetTab()
+                    }
                 },
             ) { page ->
-                when (page) {
-                    0 -> TopUpSheetContent(viewModel)
-                    1 -> RegisterSheetContent(viewModel)
-                    2 -> ResetContent(viewModel, uiState)
+                when (tabs[page]) {
+                    ArcTab.Register -> RegisterSheetContent(viewModel)
+                    ArcTab.Reset -> ResetContent(viewModel, uiState)
+                    ArcTab.TopUp -> TopUpSheetContent(viewModel)
                 }
             }
         }

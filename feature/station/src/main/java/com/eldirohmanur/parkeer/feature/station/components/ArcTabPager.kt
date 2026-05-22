@@ -24,14 +24,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.eldirohmanur.parkeer.feature.station.model.ArcTab
 import com.telkomsel.dexterity.theme.DX
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
-
-data class ArcTab(val icon: ImageVector, val title: String)
 
 @Composable
 internal fun ArcTabPager(
@@ -40,7 +39,7 @@ internal fun ArcTabPager(
     onPageChanged: (Int) -> Unit = {},
     content: @Composable (page: Int) -> Unit,
 ) {
-    val pagerState = rememberPagerState(pageCount = { tabs.size })
+    val pagerState = rememberPagerState(initialPage = 1, pageCount = { tabs.size })
     val scope = rememberCoroutineScope()
 
     LaunchedEffect(pagerState.currentPage) {
@@ -95,13 +94,13 @@ internal fun ArcTabPager(
                             ) {
                                 Icon(
                                     tab.icon,
-                                    contentDescription = tab.title,
+                                    contentDescription = stringResource(tab.titleRes),
                                     modifier = Modifier.size(iconSize),
                                     tint = Color.White.copy(alpha = iconAlpha),
                                 )
                             }
                             Text(
-                                tab.title,
+                                text = stringResource(tab.titleRes),
                                 style = DX.Font.captionSemiBold,
                                 color = Color(0xFF2D54EE),
                                 modifier = Modifier.alpha((1f - distance * 2f).coerceIn(0f, 1f)),
