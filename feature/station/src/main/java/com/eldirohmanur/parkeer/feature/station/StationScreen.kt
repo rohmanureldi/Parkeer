@@ -57,8 +57,8 @@ fun StationScreen(modifier: Modifier = Modifier, viewModel: StationViewModel = h
         var showNfcSheet by rememberSaveable { mutableStateOf(false) }
 
         val tabs = listOf(
-            ArcTab(Icons.Filled.PersonAdd, stringResource(R.string.station_register_new)),
             ArcTab(Icons.Filled.AccountBalanceWallet, stringResource(R.string.station_top_up)),
+            ArcTab(Icons.Filled.PersonAdd, stringResource(R.string.station_register_new)),
         )
 
         LaunchedEffect(uiState) {
@@ -98,8 +98,8 @@ fun StationScreen(modifier: Modifier = Modifier, viewModel: StationViewModel = h
                     .padding(horizontal = DX.Spacing.L),
             ) { page ->
                 when (page) {
-                    0 -> RegisterSheetContent(viewModel)
-                    1 -> TopUpSheetContent(viewModel)
+                    0 -> TopUpSheetContent(viewModel)
+                    1 -> RegisterSheetContent(viewModel)
                 }
             }
         }

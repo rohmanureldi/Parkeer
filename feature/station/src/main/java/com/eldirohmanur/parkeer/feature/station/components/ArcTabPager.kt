@@ -39,7 +39,7 @@ internal fun ArcTabPager(tabs: List<ArcTab>, modifier: Modifier = Modifier, cont
 
     Column(
         modifier = modifier
-            .then(Modifier.padding(top = DX.Spacing.L))
+            .then(Modifier.padding(top = DX.Spacing.XL3))
             .fillMaxSize(),
     ) {
         // Arc tabs row - sits on the arc line
@@ -59,34 +59,42 @@ internal fun ArcTabPager(tabs: List<ArcTab>, modifier: Modifier = Modifier, cont
                     tabs.forEachIndexed { index, tab ->
                         val relativePos = index - currentOffset
                         val distance = kotlin.math.abs(relativePos)
-                        val alpha = (1f - distance * 0.4f).coerceIn(0.4f, 1f)
-                        val iconSize = if (distance < 0.5f) 28.dp else 22.dp
+                        val alpha = (1f - distance * 0.5f).coerceIn(0.3f, 1f)
+                        val iconSize = (28 - distance * 6).coerceIn(22f, 28f).dp
+
+                        val iconAlpha = (1f - distance).coerceIn(0.5f, 1f)
 
                         Column(
                             modifier = Modifier
                                 .alpha(alpha)
-                                .clip(RoundedCornerShape(16.dp))
-                                .background(Color.White)
                                 .clickable(
                                     indication = null,
                                     interactionSource = remember { MutableInteractionSource() },
                                 ) {
                                     scope.launch { pagerState.animateScrollToPage(index) }
-                                }
-                                .padding(DX.Spacing.M),
+                                },
                             horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = Arrangement.spacedBy(DX.Spacing.XS),
                         ) {
-                            Icon(
-                                tab.icon,
-                                contentDescription = tab.title,
-                                modifier = Modifier.size(iconSize),
-                                tint = if (distance < 0.5f) DX.Color.text.primary else DX.Color.text.secondary,
-                            )
+                            Box(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(16.dp))
+                                    .background(Color(0xFFABB4E0))
+                                    .padding(DX.Spacing.M),
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                Icon(
+                                    tab.icon,
+                                    contentDescription = tab.title,
+                                    modifier = Modifier.size(iconSize),
+                                    tint = Color.White.copy(alpha = iconAlpha),
+                                )
+                            }
                             Text(
                                 tab.title,
-                                style = DX.Font.caption,
-                                color = if (distance < 0.5f) DX.Color.text.primary else DX.Color.text.secondary,
+                                style = DX.Font.captionSemiBold,
+                                color = Color(0xFFABB4E0),
+                                modifier = Modifier.alpha((1f - distance * 2f).coerceIn(0f, 1f)),
                             )
                         }
                     }
@@ -96,7 +104,7 @@ internal fun ArcTabPager(tabs: List<ArcTab>, modifier: Modifier = Modifier, cont
                     val containerWidth = constraints.maxWidth.toFloat()
                     val containerHeight = constraints.maxHeight
                     // Gentle arc: selected tab at top-center, unselected drops down
-                    val arcDrop = containerWidth * 0.08f
+                    val arcDrop = containerWidth * 0.12f
 
                     layout(constraints.maxWidth, containerHeight) {
                         placeables.forEachIndexed { index, placeable ->
