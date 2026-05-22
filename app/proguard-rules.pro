@@ -1,5 +1,9 @@
 # Parkeer ProGuard Rules — Aggressive Hardening
 
+# ─── Suppress warnings for desktop-only classes ───
+-dontwarn java.awt.**
+-dontwarn com.sun.jna.**
+
 # ─── R8 Aggressive Obfuscation ───
 -allowaccessmodification
 -repackageclasses ''
