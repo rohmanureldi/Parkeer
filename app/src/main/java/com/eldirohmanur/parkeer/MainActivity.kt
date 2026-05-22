@@ -61,7 +61,7 @@ class MainActivity : ComponentActivity() {
                             .drawBehind {
                                 drawRect(
                                     Brush.linearGradient(
-                                        colors = listOf(Color(0xFF1F40C2), Color(0xFFABB4E0)),
+                                        colors = listOf(Color(0xFF1F40C2), Color(0xFF1F40C2)),
                                         start = Offset(0f, size.height),
                                         end = Offset(size.width, 0f),
                                     ),

@@ -16,6 +16,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -33,9 +34,18 @@ import kotlin.math.roundToInt
 data class ArcTab(val icon: ImageVector, val title: String)
 
 @Composable
-internal fun ArcTabPager(tabs: List<ArcTab>, modifier: Modifier = Modifier, content: @Composable (page: Int) -> Unit) {
+internal fun ArcTabPager(
+    tabs: List<ArcTab>,
+    modifier: Modifier = Modifier,
+    onPageChanged: (Int) -> Unit = {},
+    content: @Composable (page: Int) -> Unit,
+) {
     val pagerState = rememberPagerState(pageCount = { tabs.size })
     val scope = rememberCoroutineScope()
+
+    LaunchedEffect(pagerState.currentPage) {
+        onPageChanged(pagerState.currentPage)
+    }
 
     Column(
         modifier = modifier
@@ -79,7 +89,7 @@ internal fun ArcTabPager(tabs: List<ArcTab>, modifier: Modifier = Modifier, cont
                             Box(
                                 modifier = Modifier
                                     .clip(RoundedCornerShape(16.dp))
-                                    .background(Color(0xFFABB4E0))
+                                    .background(Color(0xFF2D54EE))
                                     .padding(DX.Spacing.M),
                                 contentAlignment = Alignment.Center,
                             ) {
@@ -93,7 +103,7 @@ internal fun ArcTabPager(tabs: List<ArcTab>, modifier: Modifier = Modifier, cont
                             Text(
                                 tab.title,
                                 style = DX.Font.captionSemiBold,
-                                color = Color(0xFFABB4E0),
+                                color = Color(0xFF2D54EE),
                                 modifier = Modifier.alpha((1f - distance * 2f).coerceIn(0f, 1f)),
                             )
                         }

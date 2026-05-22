@@ -56,7 +56,7 @@ class NtagCardReader @Inject constructor(private val cipher: CardCipher) : CardR
             val ultralight = MifareUltralight.get(tag)
                 ?: error("Not a MifareUltralight tag")
             ultralight.connect()
-            try {
+            ultralight.use { ultralight ->
                 val activeSlot = readActiveSlot(ultralight)
                 val inactiveSlot = 1 - activeSlot
                 val writeStartPage = if (inactiveSlot == 0) SLOT_A_START_PAGE else SLOT_B_START_PAGE
@@ -79,8 +79,26 @@ class NtagCardReader @Inject constructor(private val cipher: CardCipher) : CardR
 
                 // Step 3: Flip pointer (atomic — single 4-byte page write)
                 ultralight.writePage(POINTER_PAGE, byteArrayOf(inactiveSlot.toByte(), 0, 0, 0))
-            } finally {
-                ultralight.close()
+            }
+        }
+    }
+
+    override suspend fun wipe(tag: Tag): Result<Unit> = withContext(Dispatchers.IO) {
+        runCatching {
+            val ultralight = MifareUltralight.get(tag)
+                ?: error("Not a MifareUltralight tag")
+            ultralight.connect()
+            ultralight.use { ultralight ->
+                val emptyPage = ByteArray(4)
+                // Wipe pointer
+                ultralight.writePage(POINTER_PAGE, emptyPage)
+                // Wipe both slots
+                for (page in SLOT_A_START_PAGE until SLOT_A_START_PAGE + SLOT_PAGES) {
+                    ultralight.writePage(page, emptyPage)
+                }
+                for (page in SLOT_B_START_PAGE until SLOT_B_START_PAGE + SLOT_PAGES) {
+                    ultralight.writePage(page, emptyPage)
+                }
             }
         }
     }

@@ -30,6 +30,7 @@ class StationViewModel @Inject constructor(
     val uiState: StateFlow<StationUiState> = _uiState.asStateFlow()
 
     private var mode: StationMode = StationMode.REGISTER
+    val currentMode: StationMode get() = mode
     private var memberName: String = ""
     private var memberId: String = ""
     private var topUpAmount: Int = 0
@@ -72,6 +73,11 @@ class StationViewModel @Inject constructor(
         _uiState.value = StationUiState.WaitingForTap
     }
 
+    fun prepareResetTab() {
+        mode = StationMode.RESET
+        _uiState.value = StationUiState.WaitingForTap
+    }
+
     private fun onTagDiscovered(tag: Tag) {
         viewModelScope.launch {
             _uiState.value = StationUiState.Processing
@@ -79,6 +85,7 @@ class StationViewModel @Inject constructor(
             when (mode) {
                 StationMode.REGISTER -> doRegister(tag)
                 StationMode.TOP_UP -> doTopUp(tag)
+                StationMode.RESET -> doReset(tag)
             }
             trace.stop()
         }
@@ -136,5 +143,17 @@ class StationViewModel @Inject constructor(
 
     fun reset() {
         _uiState.value = StationUiState.Idle
+    }
+
+    private suspend fun doReset(tag: Tag) {
+        cardReader.read(tag).getOrElse {
+            _uiState.value = StationUiState.Error(StationError.CardNotRecognized(it.message))
+            return
+        }
+        cardReader.wipe(tag)
+            .onSuccess { _uiState.value = StationUiState.ResetSuccess }
+            .onFailure {
+                _uiState.value = StationUiState.Error(StationError.WriteFailed(it.message))
+            }
     }
 }

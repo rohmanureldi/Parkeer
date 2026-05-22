@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBalanceWallet
+import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
@@ -38,6 +39,7 @@ import com.eldirohmanur.parkeer.core.ui.toRupiah
 import com.eldirohmanur.parkeer.feature.station.components.ArcTab
 import com.eldirohmanur.parkeer.feature.station.components.ArcTabPager
 import com.eldirohmanur.parkeer.feature.station.components.RegisterSheetContent
+import com.eldirohmanur.parkeer.feature.station.components.ResetContent
 import com.eldirohmanur.parkeer.feature.station.components.SheetError
 import com.eldirohmanur.parkeer.feature.station.components.SheetNfcTap
 import com.eldirohmanur.parkeer.feature.station.components.SheetProcessing
@@ -59,12 +61,13 @@ fun StationScreen(modifier: Modifier = Modifier, viewModel: StationViewModel = h
         val tabs = listOf(
             ArcTab(Icons.Filled.AccountBalanceWallet, stringResource(R.string.station_top_up)),
             ArcTab(Icons.Filled.PersonAdd, stringResource(R.string.station_register_new)),
+            ArcTab(Icons.Filled.DeleteForever, stringResource(R.string.station_reset)),
         )
 
         LaunchedEffect(uiState) {
             when (uiState) {
                 is StationUiState.WaitingForTap, is StationUiState.Processing -> {
-                    showNfcSheet = true
+                    if (viewModel.currentMode != StationMode.RESET) showNfcSheet = true
                 }
                 is StationUiState.RegisterSuccess, is StationUiState.TopUpSuccess -> {
                     haptic.success()
@@ -72,8 +75,11 @@ fun StationScreen(modifier: Modifier = Modifier, viewModel: StationViewModel = h
                     showNfcSheet = false
                     viewModel.reset()
                 }
-                is StationUiState.Error -> haptic.error()
-                else -> {}
+                is StationUiState.Error -> {
+                    if (viewModel.currentMode != StationMode.RESET) haptic.error()
+                }
+
+                else -> showNfcSheet = false
             }
         }
 
@@ -96,10 +102,15 @@ fun StationScreen(modifier: Modifier = Modifier, viewModel: StationViewModel = h
                     )
                     .consumeWindowInsets(innerPadding)
                     .padding(horizontal = DX.Spacing.L),
+                onPageChanged = { page ->
+                    viewModel.reset()
+                    if (page == 2) viewModel.prepareResetTab()
+                },
             ) { page ->
                 when (page) {
                     0 -> TopUpSheetContent(viewModel)
                     1 -> RegisterSheetContent(viewModel)
+                    2 -> ResetContent(viewModel, uiState)
                 }
             }
         }

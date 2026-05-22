@@ -38,4 +38,9 @@
     <string name="station_error_card_not_recognized">Kartu tidak dapat dibaca. Mungkin rusak atau bukan kartu Parkeer.</string>
     <string name="station_error_max_balance">Saldo akan melebihi Rp 1.000.000. Saldo saat ini: Rp %1$d</string>
     <string name="station_error_write_failed">Gagal menyimpan ke kartu. Tahan kartu dengan stabil dan coba lagi.</string>
+    <string name="station_reset">Reset</string>
+    <string name="station_reset_tap">Tempelkan kartu untuk reset</string>
+    <string name="station_reset_desc">Semua data di kartu akan dihapus</string>
+    <string name="station_reset_success">Kartu berhasil direset</string>
+    <string name="station_reset_failed">Gagal mereset kartu. Coba lagi.</string>
 </resources>

@@ -14,7 +14,9 @@ sealed interface StationUiState {
     data object Processing : StationUiState
     data class RegisterSuccess(val name: String, val id: Int) : StationUiState
     data class TopUpSuccess(val name: String, val oldBalance: Int, val added: Int, val newBalance: Int) : StationUiState
+
+    data object ResetSuccess : StationUiState
     data class Error(val error: StationError) : StationUiState
 }
 
-enum class StationMode { REGISTER, TOP_UP }
+enum class StationMode { REGISTER, TOP_UP, RESET }
