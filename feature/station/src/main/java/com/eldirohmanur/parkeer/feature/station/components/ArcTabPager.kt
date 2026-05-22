@@ -69,7 +69,8 @@ internal fun ArcTabPager(
                         val relativePos = index - currentOffset
                         val distance = kotlin.math.abs(relativePos)
                         val alpha = (1f - distance * 0.5f).coerceIn(0.3f, 1f)
-                        val iconSize = (28 - distance * 6).coerceIn(22f, 28f).dp
+                        val iconSize = (32 - distance * 10).coerceIn(22f, 32f).dp
+                        val containerPadding = (16 - distance * 4).coerceIn(12f, 16f).dp
 
                         val iconAlpha = (1f - distance).coerceIn(0.5f, 1f)
 
@@ -89,7 +90,7 @@ internal fun ArcTabPager(
                                 modifier = Modifier
                                     .clip(RoundedCornerShape(16.dp))
                                     .background(Color(0xFF2D54EE))
-                                    .padding(DX.Spacing.M),
+                                    .padding(containerPadding),
                                 contentAlignment = Alignment.Center,
                             ) {
                                 Icon(
