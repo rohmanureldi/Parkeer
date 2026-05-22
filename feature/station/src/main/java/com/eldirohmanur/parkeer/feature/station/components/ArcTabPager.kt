@@ -59,7 +59,7 @@ internal fun ArcTabPager(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .weight(0.15f),
+                .weight(0.20f),
         ) {
             val currentOffset = pagerState.currentPage + pagerState.currentPageOffsetFraction
 
@@ -120,8 +120,9 @@ internal fun ArcTabPager(
                             val relativePos = index - currentOffset
                             val x =
                                 (containerWidth / 2f + relativePos * containerWidth * 0.45f).roundToInt() - placeable.width / 2
+                            val baseY = containerHeight - placeable.height
                             val y =
-                                containerHeight - placeable.height + (relativePos * relativePos * arcDrop).roundToInt()
+                                baseY - (arcDrop).roundToInt() + (relativePos * relativePos * arcDrop).roundToInt()
 
                             placeable.place(x, y)
                         }
@@ -134,7 +135,7 @@ internal fun ArcTabPager(
         HorizontalPager(
             state = pagerState,
             modifier = Modifier
-                .weight(0.85f)
+                .weight(0.80f)
                 .fillMaxWidth(),
         ) { page ->
             content(page)
