@@ -96,8 +96,8 @@ fun GateScreen(modifier: Modifier = Modifier, viewModel: GateViewModel = hiltVie
                 ) { state ->
                     when (state) {
                         is GateUiState.Ready -> GateReadyState(
-                            simEnabled,
-                            simHoursAgo,
+                            simEnabled = simEnabled,
+                            simHoursAgo = simHoursAgo,
                             onSimToggle = { simEnabled = it },
                             onSimHoursChange = {
                                 simHoursAgo =
@@ -107,9 +107,9 @@ fun GateScreen(modifier: Modifier = Modifier, viewModel: GateViewModel = hiltVie
 
                         is GateUiState.Processing -> GateProcessingState()
                         is GateUiState.Success -> GateSuccessState(
-                            state.memberName,
-                            state.checkInTime,
-                            simEnabled,
+                            memberName = state.memberName,
+                            checkInTime = state.checkInTime,
+                            simEnabled = simEnabled,
                             onDone = {
                                 viewModel.reset()
                             },

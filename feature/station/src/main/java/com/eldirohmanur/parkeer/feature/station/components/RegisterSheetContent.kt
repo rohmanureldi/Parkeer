@@ -20,6 +20,7 @@ import com.telkomsel.dexterity.components.atom.button.model.ButtonVariant
 import com.telkomsel.dexterity.components.atom.input.DXInput
 import com.telkomsel.dexterity.components.atom.input.DXInputConfig
 import com.telkomsel.dexterity.components.atom.input.HeaderConfig
+import com.telkomsel.dexterity.components.atom.input.SupportingConfig
 import com.telkomsel.dexterity.theme.DX
 
 @Composable
@@ -43,6 +44,7 @@ internal fun RegisterSheetContent(viewModel: StationViewModel) {
                 onValueChange = { name = it },
                 placeholder = stringResource(R.string.station_member_name_placeholder),
                 header = HeaderConfig(label = stringResource(R.string.station_member_name_label)),
+                supporting = SupportingConfig(wordCount = 10, showWordCount = true),
             ),
         )
         DXButton(

@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Warning
@@ -20,6 +21,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.eldirohmanur.parkeer.core.ui.NfcPulseAnimation
 import com.eldirohmanur.parkeer.core.ui.ParkeerCard
@@ -27,6 +29,7 @@ import com.eldirohmanur.parkeer.feature.gate.R
 import com.telkomsel.dexterity.components.atom.input.DXInput
 import com.telkomsel.dexterity.components.atom.input.DXInputConfig
 import com.telkomsel.dexterity.components.atom.input.HeaderConfig
+import com.telkomsel.dexterity.components.atom.input.SupportingConfig
 import com.telkomsel.dexterity.components.atom.switch.DXSwitch
 import com.telkomsel.dexterity.theme.DX
 import java.time.Instant
@@ -89,9 +92,13 @@ internal fun GateReadyState(simEnabled: Boolean, simHoursAgo: String, onSimToggl
                         DXInput(
                             config = DXInputConfig.TextField(
                                 value = simHoursAgo,
+                                keyboardOptions = KeyboardOptions(
+                                    keyboardType = KeyboardType.Number,
+                                ),
                                 onValueChange = { onSimHoursChange(it.filter { c -> c.isDigit() }) },
                                 placeholder = stringResource(R.string.gate_sim_hours_placeholder),
                                 header = HeaderConfig(label = stringResource(R.string.gate_sim_hours_label)),
+                                supporting = SupportingConfig(wordCount = 2),
                             ),
                         )
                         Spacer(Modifier.height(DX.Spacing.S))
