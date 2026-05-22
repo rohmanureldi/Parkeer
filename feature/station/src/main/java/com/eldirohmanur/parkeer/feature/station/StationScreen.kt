@@ -37,7 +37,13 @@ import kotlinx.coroutines.delay
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StationScreen(modifier: Modifier = Modifier, viewModel: StationViewModel = hiltViewModel(), onBack: () -> Unit) {
-    DXScreen(DefaultScreenMetadata("Station", "station", "StationScreen")) {
+    DXScreen(
+        DefaultScreenMetadata(
+            screenName = "Station",
+            eventCategory = "station",
+            screenClass = "StationScreen",
+        ),
+    ) {
         val uiState by viewModel.uiState.collectAsState()
         val haptic = rememberHapticFeedback()
         var showNfcSheet by rememberSaveable { mutableStateOf(false) }
@@ -79,17 +85,15 @@ fun StationScreen(modifier: Modifier = Modifier, viewModel: StationViewModel = h
                 }
             }
         }
-
-        if (showNfcSheet) {
-            NfcFlowSheet(
-                uiState = uiState,
-                viewModel = viewModel,
-                onDismiss = {
-                    showNfcSheet = false
-                    viewModel.reset()
-                },
-            )
-        }
+        NfcFlowSheet(
+            isVisible = showNfcSheet,
+            uiState = uiState,
+            viewModel = viewModel,
+            onDismiss = {
+                showNfcSheet = false
+                viewModel.reset()
+            },
+        )
     }
 }
 

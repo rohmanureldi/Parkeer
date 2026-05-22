@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="station_title">Station</string>
-    <string name="station_subtitle">Admin – Registrasi &amp; Isi Saldo</string>
-    <string name="station_welcome_admin">Selamat datang, Admin</string>
+    <string name="station_title">Admin</string>
+    <string name="station_subtitle">Registrasi &amp; Isi Saldo</string>
     <string name="station_register_new">Registrasi</string>
     <string name="station_register_desc">Tulis kartu anggota baru via NFC</string>
     <string name="station_top_up">Isi Saldo</string>
@@ -35,7 +34,7 @@
     <string name="station_cd_error">Error</string>
     <string name="station_error_already_registered">Kartu ini sudah terdaftar. Gunakan kartu kosong.</string>
     <string name="station_error_invalid_member_id">Masukkan ID anggota berupa angka yang valid.</string>
-    <string name="station_error_card_not_recognized">Kartu tidak dapat dibaca. Mungkin rusak atau bukan kartu Parkeer.</string>
+    <string name="station_error_card_not_recognized">Kartu tidak dapat dibaca. Pastikan telah terdaftar sebagai member Parkeer.</string>
     <string name="station_error_max_balance">Saldo akan melebihi Rp 1.000.000. Saldo saat ini: Rp %1$d</string>
     <string name="station_error_write_failed">Gagal menyimpan ke kartu. Tahan kartu dengan stabil dan coba lagi.</string>
     <string name="station_reset">Reset</string>

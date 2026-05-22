@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="gate_title">Gate</string>
-    <string name="gate_subtitle">Titik Masuk – Check-In</string>
-    <string name="gate_subtitle_sim">Titik Masuk – Check-In (Simulasi)</string>
+    <string name="gate_title">Portal Masuk</string>
+    <string name="gate_subtitle">Check-In</string>
+    <string name="gate_subtitle_sim">Check-In (Simulasi)</string>
     <string name="gate_ready">Siap</string>
     <string name="gate_tap_to_check_in">Tempelkan kartu untuk check-in</string>
     <string name="gate_simulation_mode">Mode Simulasi</string>
     <string name="gate_sim_hours_placeholder">Jam lalu</string>
     <string name="gate_sim_hours_label">Atur waktu check-in (jam lalu)</string>
     <string name="gate_sim_will_record">Akan dicatat: %1$s</string>
-    <string name="gate_processing">Menulis ke kartu…</string>
+    <string name="gate_processing">Memproses…</string>
     <string name="gate_processing_hint">Jangan lepas kartu</string>
     <string name="gate_welcome">Selamat datang, %1$s!</string>
     <string name="gate_checked_in_at">Check-in pada %1$s</string>
@@ -23,7 +23,7 @@
     <string name="gate_cd_sim_warning">Peringatan simulasi</string>
     <string name="gate_cd_success">Berhasil</string>
     <string name="gate_cd_error">Error</string>
-    <string name="gate_error_card_not_recognized">Kartu tidak dapat dibaca. Pastikan ini kartu anggota yang terdaftar.</string>
+    <string name="gate_error_card_not_recognized">Kartu tidak dapat dibaca. Pastikan telah terdaftar sebagai member Parkeer.</string>
     <string name="gate_error_already_checked_in">Kartu ini sudah check-in. Silakan ke Terminal untuk check-out.</string>
     <string name="gate_error_write_failed">Gagal menyimpan ke kartu. Tahan kartu dengan stabil dan coba lagi.</string>
 </resources>

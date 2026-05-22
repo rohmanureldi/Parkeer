@@ -3,12 +3,12 @@
     <string name="app_name" translatable="false">Parkeer</string>
     <string name="app_brand">Parkeer</string>
     <string name="app_tagline">Kartu Manfaat Keanggotaan</string>
-    <string name="role_station">Station</string>
+    <string name="role_station">Admin</string>
     <string name="role_station_desc">Registrasi &amp; Isi Saldo</string>
-    <string name="role_gate">Gate</string>
+    <string name="role_gate">Portal Masuk</string>
     <string name="role_gate_desc">Check-In</string>
-    <string name="role_terminal">Terminal</string>
+    <string name="role_terminal">Portal Keluar</string>
     <string name="role_terminal_desc">Check-Out</string>
-    <string name="role_scout">Scout</string>
-    <string name="role_scout_desc">Lihat Kartu</string>
+    <string name="role_scout">Cek Kartu</string>
+    <string name="role_scout_desc">Lihat Detail Kartu</string>
 </resources>

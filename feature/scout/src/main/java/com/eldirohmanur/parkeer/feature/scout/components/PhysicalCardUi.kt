@@ -100,15 +100,23 @@ internal fun PhysicalCardUi(card: CardData, modifier: Modifier = Modifier) {
                     fontSize = 11.sp,
                 )
             }
-            val statusText = when (card.visitState) {
-                is VisitState.CheckedIn -> stringResource(R.string.scout_card_status_parked)
-                is VisitState.Idle -> stringResource(R.string.scout_card_status_idle)
+            val statusText = stringResource(R.string.scout_card_status_parked).takeIf {
+                card.visitState is VisitState.CheckedIn
             }
+
             val statusColor = when (card.visitState) {
                 is VisitState.CheckedIn -> Color(0xFF69F0AE)
                 is VisitState.Idle -> Color.White.copy(alpha = 0.5f)
             }
-            Text(statusText, color = statusColor, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+
+            if (statusText.isNullOrBlank().not()) {
+                Text(
+                    statusText,
+                    color = statusColor,
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Bold,
+                )
+            }
         }
     }
 }
