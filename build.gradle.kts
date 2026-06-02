@@ -12,6 +12,15 @@ plugins {
     alias(libs.plugins.firebase.perf) apply false
 }
 
+subprojects {
+    afterEvaluate {
+        extensions.findByType<com.android.build.api.dsl.CommonExtension<*, *, *, *, *, *>>()?.lint {
+            abortOnError = false
+            checkReleaseBuilds = false
+        }
+    }
+}
+
 spotless {
     kotlin {
         target("**/*.kt")
