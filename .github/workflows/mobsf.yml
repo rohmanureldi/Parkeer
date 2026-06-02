@@ -16,6 +16,10 @@ permissions:
 
 jobs:
   mobsfscan:
+    permissions:
+      contents: read
+      security-events: write
+      actions: read
     runs-on: ubuntu-latest
     name: mobsfscan code scanning
     steps:
