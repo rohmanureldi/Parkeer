@@ -32,7 +32,6 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: ${{ env.JAVA_VERSION }}
-          cache: 'gradle'
 
       - name: Decode google-services.json
         run: echo "${{ secrets.GOOGLE_SERVICES_JSON }}" | base64 -d > app/google-services.json
