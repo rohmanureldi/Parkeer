@@ -8,7 +8,32 @@ plugins {
     id("com.google.gms.google-services")
     alias(libs.plugins.firebase.crashlytics)
     alias(libs.plugins.firebase.perf)
+    jacoco
 }
+
+jacoco {
+    toolVersion = "0.8.12"
+}
+
+val exclusions =
+    listOf(
+        "**/R.class",
+        "**/R\$*.class",
+        "**/BuildConfig.*",
+        "**/Manifest*.*",
+        "**/*Test*.*",
+        "**/di/**",
+        "**/*_Hilt*.*",
+        "**/*_Factory*.*",
+        "**/*_MembersInjector*.*",
+        "**/Hilt_*.*",
+        "**/*Screen*.*",
+        "**/*Composable*.*",
+        "**/*Preview*.*",
+        "**/*Activity*.*",
+        "**/*Application*.*",
+        "**/*Navigation*.*",
+    )
 
 android {
     namespace = "com.eldirohmanur.parkeer"
@@ -23,6 +48,10 @@ android {
     }
 
     buildTypes {
+        debug {
+            enableAndroidTestCoverage = true
+            enableUnitTestCoverage = true
+        }
         release {
             isMinifyEnabled = true
             isShrinkResources = true
@@ -42,10 +71,129 @@ android {
         }
     }
 
+    lint {
+        baseline = file("lint-baseline.xml")
+        abortOnError = false
+    }
+
+    @Suppress("UnstableApiUsage")
+    testOptions { unitTests.all { it.useJUnitPlatform() } }
+
     buildFeatures {
         compose = true
         buildConfig = true
     }
+}
+
+tasks.withType<Test> {
+    configure<JacocoTaskExtension> {
+        isIncludeNoLocationClasses = true
+        excludes = listOf("jdk.internal.*")
+    }
+}
+
+// Collect source dirs from all modules
+val moduleSourceDirs =
+    listOf(
+        "core/model",
+        "core/nfc",
+        "core/crypto",
+        "core/cardprotocol",
+        "core/firebase",
+        "feature/station",
+        "feature/gate",
+        "feature/terminal",
+        "feature/scout",
+    ).map { rootProject.file("$it/src/main/java") }
+
+// Collect class dirs from all modules
+fun classTree(buildDir: File) =
+    listOf(
+        fileTree("$buildDir/intermediates/javac/debug") { exclude(exclusions) },
+        fileTree("$buildDir/tmp/kotlin-classes/debug") { exclude(exclusions) },
+    )
+
+val moduleBuildDirs =
+    listOf(
+        "core/model",
+        "core/nfc",
+        "core/crypto",
+        "core/cardprotocol",
+        "core/firebase",
+        "feature/station",
+        "feature/gate",
+        "feature/terminal",
+        "feature/scout",
+    ).map { rootProject.file("$it/build") } + listOf(layout.buildDirectory.get().asFile)
+
+tasks.register<JacocoReport>("jacocoTestReport") {
+    dependsOn(
+        "testDebugUnitTest",
+        ":feature:station:testDebugUnitTest",
+        ":feature:gate:testDebugUnitTest",
+        ":feature:terminal:testDebugUnitTest",
+        ":feature:scout:testDebugUnitTest",
+        ":core:cardprotocol:testDebugUnitTest",
+    )
+    group = "Reporting"
+    description = "Generate combined Jacoco coverage report for all modules"
+
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+    }
+
+    sourceDirectories.setFrom(files(moduleSourceDirs + layout.projectDirectory.dir("src/main/java")))
+    classDirectories.setFrom(files(moduleBuildDirs.flatMap { classTree(it) }))
+    executionData.setFrom(
+        files(
+            moduleBuildDirs.map {
+                fileTree(it) {
+                    include(
+                        "**/*.exec",
+                        "**/*.ec",
+                    )
+                }
+            },
+        ),
+    )
+}
+
+tasks.register<JacocoCoverageVerification>("jacocoTestCoverageVerification") {
+    dependsOn("jacocoTestReport")
+    group = "Verification"
+    description = "Verify code coverage against defined thresholds"
+
+    violationRules {
+        rule {
+            element = "CLASS"
+            limit {
+                counter = "LINE"
+                value = "COVEREDRATIO"
+                minimum = BigDecimal("0.60")
+            }
+            excludes =
+                listOf(
+                    "*.di.*",
+                    "*.MainActivity",
+                    "*.ParkeerApp",
+                )
+        }
+    }
+
+    classDirectories.setFrom(files(moduleBuildDirs.flatMap { classTree(it) }))
+    executionData.setFrom(
+        files(
+            moduleBuildDirs.map {
+                fileTree(it) {
+                    include(
+                        "**/*.exec",
+                        "**/*.ec",
+                    )
+                }
+            },
+        ),
+    )
 }
 
 dependencies {

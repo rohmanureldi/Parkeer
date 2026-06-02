@@ -13,3 +13,4 @@ captures/
 *.keystore
 .kotlin/
 /app/release/**
+.hotswan/

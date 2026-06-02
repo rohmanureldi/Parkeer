@@ -5,12 +5,14 @@ plugins {
     alias(libs.plugins.hilt)
     alias(libs.plugins.ksp)
     alias(libs.plugins.stability.analyzer)
+    jacoco
 }
 
 android {
     namespace = "com.eldirohmanur.parkeer.feature.terminal"
     compileSdk = 36
     defaultConfig { minSdk = 26 }
+    buildTypes { debug { enableUnitTestCoverage = true } }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
@@ -22,7 +24,6 @@ android {
         }
     }
     buildFeatures { compose = true }
-    @Suppress("UnstableApiUsage")
     testOptions { unitTests.all { it.useJUnitPlatform() } }
 }
 
@@ -45,4 +46,7 @@ dependencies {
     lintChecks(libs.compose.lint.checks)
 
     testImplementation(libs.junit.jupiter)
+    testImplementation(libs.mockk)
+    testImplementation(libs.turbine)
+    testImplementation(libs.coroutines.test)
 }
