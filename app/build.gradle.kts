@@ -59,7 +59,7 @@ android {
 
     signingConfigs {
         create("release") {
-            storeFile = file(System.getenv("PARKEER_KEYSTORE_PATH") ?: "release.keystore")
+            storeFile = file(System.getenv("PARKEER_KEYSTORE_PATH") ?: "../Creds/parkeer.jks")
             storePassword = System.getenv("PARKEER_KEYSTORE_PASSWORD") ?: ""
             keyAlias = System.getenv("PARKEER_KEY_ALIAS") ?: ""
             keyPassword = System.getenv("PARKEER_KEY_PASSWORD") ?: ""
