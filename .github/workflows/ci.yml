@@ -48,7 +48,7 @@ jobs:
       - name: Add coverage to PR
         uses: madrapps/jacoco-report@v1.8.0
         with:
-          path: app/build/reports/jacoco/jacocoTestReport.xml
+          paths: app/build/reports/jacoco/jacocoTestReport.xml
           token: ${{ secrets.GITHUB_TOKEN }}
           min-coverage-overall: 60
           min-coverage-changed-files: 80
