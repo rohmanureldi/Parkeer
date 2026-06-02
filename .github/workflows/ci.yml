@@ -18,6 +18,9 @@ env:
 
 jobs:
   build:
+    permissions:
+      contents: read
+      pull-requests: write
     name: Build & Test
     runs-on: self-hosted
     steps:
@@ -37,15 +40,18 @@ jobs:
       - name: Build debug APK
         run: ./gradlew assembleDebug --no-daemon
 
-      - name: Run unit tests
-        run: ./gradlew testDebugUnitTest --no-daemon
+      - name: Run Coverage
+        run: |
+          chmod +x gradlew
+          ./gradlew jacocoTestReport
 
-      - name: Upload test results
-        if: always()
-        uses: actions/upload-artifact@v4
+      - name: Add coverage to PR
+        uses: madrapps/jacoco-report@v1.8.0
         with:
-          name: test-results
-          path: '**/build/test-results/**/*.xml'
+          path: app/build/reports/jacoco/jacocoTestReport.xml
+          token: ${{ secrets.GITHUB_TOKEN }}
+          min-coverage-overall: 60
+          min-coverage-changed-files: 80
 
   distribute:
     name: Firebase Distribution
