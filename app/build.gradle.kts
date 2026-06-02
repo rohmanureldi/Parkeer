@@ -57,6 +57,15 @@ android {
         versionName = "1.0.0"
     }
 
+    signingConfigs {
+        create("release") {
+            storeFile = file(System.getenv("PARKEER_KEYSTORE_PATH") ?: "release.keystore")
+            storePassword = System.getenv("PARKEER_KEYSTORE_PASSWORD") ?: ""
+            keyAlias = System.getenv("PARKEER_KEY_ALIAS") ?: ""
+            keyPassword = System.getenv("PARKEER_KEY_PASSWORD") ?: ""
+        }
+    }
+
     buildTypes {
         debug {
             enableAndroidTestCoverage = true
@@ -65,6 +74,7 @@ android {
         release {
             isMinifyEnabled = true
             isShrinkResources = true
+            signingConfig = signingConfigs.getByName("release")
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
