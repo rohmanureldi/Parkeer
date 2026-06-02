@@ -199,4 +199,21 @@ class StationViewModelTest {
         val state = vm.uiState.value as StationUiState.Error
         assertTrue(state.error is StationError.WriteFailed)
     }
+
+    @Test
+    fun `register with non-numeric memberId emits InvalidMemberId`() = runTest(testDispatcher) {
+        coEvery { cardReader.read(tag) } returns Result.failure(Exception("blank"))
+
+        vm.prepareRegister("Test")
+        // Force memberId to non-numeric via reflection to hit the defensive branch
+        val field = vm.javaClass.getDeclaredField("memberId")
+        field.isAccessible = true
+        field.set(vm, "abc")
+
+        nfcTagHolder.dispatch(tag)
+        advanceUntilIdle()
+
+        val state = vm.uiState.value as StationUiState.Error
+        assertEquals(StationError.InvalidMemberId, state.error)
+    }
 }

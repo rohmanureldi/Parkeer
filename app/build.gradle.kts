@@ -33,6 +33,16 @@ val exclusions =
         "**/*Activity*.*",
         "**/*Application*.*",
         "**/*Navigation*.*",
+        "**/components/**",
+        "**/navigation/**",
+        "**/screen/**",
+        "**/security/**",
+        "**/NtagCardReader*.*",
+        "**/Firebase*.*",
+        "**/AnalyticsInitializer*.*",
+        "**/LocalAnalytics*.*",
+        "**/NativeCipher*.*",
+        "**/KeyStoreManager*.*",
     )
 
 android {
@@ -134,6 +144,7 @@ tasks.register<JacocoReport>("jacocoTestReport") {
         ":feature:terminal:testDebugUnitTest",
         ":feature:scout:testDebugUnitTest",
         ":core:cardprotocol:testDebugUnitTest",
+        ":core:crypto:testDebugUnitTest",
     )
     group = "Reporting"
     description = "Generate combined Jacoco coverage report for all modules"

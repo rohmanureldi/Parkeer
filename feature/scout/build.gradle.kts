@@ -24,7 +24,11 @@ android {
         }
     }
     buildFeatures { compose = true }
-    testOptions { unitTests.all { it.useJUnitPlatform() } }
+    @Suppress("UnstableApiUsage")
+    testOptions {
+        unitTests.all { it.useJUnitPlatform() }
+        unitTests.isIncludeAndroidResources = true
+    }
 }
 
 dependencies {
@@ -49,4 +53,8 @@ dependencies {
     testImplementation(libs.mockk)
     testImplementation(libs.turbine)
     testImplementation(libs.coroutines.test)
+    testImplementation(libs.robolectric)
+    testImplementation(libs.junit.vintage.engine)
+    testImplementation(libs.compose.ui.test.junit4)
+    debugImplementation(libs.compose.ui.test.manifest)
 }

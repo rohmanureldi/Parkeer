@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
+    jacoco
 }
 
 android {
@@ -12,6 +13,7 @@ android {
             abiFilters += listOf("arm64-v8a", "armeabi-v7a")
         }
     }
+    buildTypes { debug { enableUnitTestCoverage = true } }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
@@ -22,6 +24,8 @@ android {
             jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
         }
     }
+    @Suppress("UnstableApiUsage")
+    testOptions { unitTests.all { it.useJUnitPlatform() } }
     externalNativeBuild {
         cmake {
             path = file("src/main/cpp/CMakeLists.txt")
@@ -31,4 +35,6 @@ android {
 
 dependencies {
     implementation(libs.core.ktx)
+
+    testImplementation(libs.junit.jupiter)
 }

@@ -202,4 +202,18 @@ class TerminalViewModelTest {
 
         verify { analyticsHelper.logEvent("check_out_success", any()) }
     }
+
+    @Test
+    fun `invalid time emits InvalidTime error`() = runTest(testDispatcher) {
+        val futureTime = System.currentTimeMillis() + 100_000
+        val card =
+            CardData(memberId = 1, balance = 50_000, visitState = VisitState.CheckedIn(futureTime))
+        coEvery { cardReader.read(tag) } returns Result.success(card)
+
+        nfcTagHolder.dispatch(tag)
+        advanceUntilIdle()
+
+        val state = vm.uiState.value as TerminalUiState.Error
+        assertEquals(TerminalError.InvalidTime, state.error)
+    }
 }
