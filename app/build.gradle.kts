@@ -55,6 +55,7 @@ android {
         targetSdk = 35
         versionCode = 1
         versionName = "1.0.0"
+        testInstrumentationRunner = "com.eldirohmanur.parkeer.HiltTestRunner"
     }
 
     signingConfigs {
@@ -94,6 +95,15 @@ android {
     lint {
         baseline = file("lint-baseline.xml")
         abortOnError = false
+    }
+
+    packaging {
+        resources {
+            excludes += setOf("META-INF/LICENSE.md", "META-INF/LICENSE-notice.md")
+        }
+        jniLibs {
+            useLegacyPackaging = false
+        }
     }
 
     @Suppress("UnstableApiUsage")
@@ -253,4 +263,14 @@ dependencies {
     testImplementation(libs.mockk)
     testImplementation(libs.turbine)
     testImplementation(libs.coroutines.test)
+
+    androidTestImplementation(platform(libs.compose.bom))
+    androidTestImplementation(libs.compose.ui.test.junit4)
+    androidTestImplementation(libs.ext.junit)
+    androidTestImplementation(libs.espresso.core)
+    androidTestImplementation(libs.hilt.android)
+    androidTestImplementation("com.google.dagger:hilt-android-testing:2.54")
+    androidTestImplementation("io.mockk:mockk-android:1.13.13")
+    kspAndroidTest(libs.hilt.compiler)
+    debugImplementation(libs.compose.ui.test.manifest)
 }
