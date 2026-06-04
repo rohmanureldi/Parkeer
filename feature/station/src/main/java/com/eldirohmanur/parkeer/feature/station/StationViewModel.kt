@@ -125,10 +125,6 @@ class StationViewModel @Inject constructor(
 
         val oldBalance = card.balance
         val newBalance = oldBalance + topUpAmount
-        if (newBalance > 1_000_000) {
-            _uiState.value = StationUiState.Error(StationError.MaxBalanceExceeded(oldBalance))
-            return
-        }
 
         val log = TransactionLog(topUpAmount, System.currentTimeMillis(), Activity.TOP_UP)
         val updated = card.copy(

@@ -111,20 +111,6 @@ class StationViewModelTest {
     }
 
     @Test
-    fun `topUp rejects when exceeding max balance`() = runTest(testDispatcher) {
-        val card = CardData(memberId = 1, memberName = "Bob", balance = 980_000)
-        coEvery { cardReader.read(tag) } returns Result.success(card)
-
-        vm.prepareTopUp(50_000)
-        nfcTagHolder.dispatch(tag)
-        advanceUntilIdle()
-
-        val state = vm.uiState.value as StationUiState.Error
-        assertTrue(state.error is StationError.MaxBalanceExceeded)
-        assertEquals(980_000, (state.error as StationError.MaxBalanceExceeded).currentBalance)
-    }
-
-    @Test
     fun `topUp handles unreadable card`() = runTest(testDispatcher) {
         coEvery { cardReader.read(tag) } returns Result.failure(Exception("IO error"))
 
